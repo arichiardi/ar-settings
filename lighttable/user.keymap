@@ -47,6 +47,7 @@
                  "ctrl-alt-f" [:subpar.move.forward-up]
                  "ctrl-alt-u" [:subpar.move.backward-down]
                  "ctrl-alt-d" [:subpar.move.forward-down]
+                 "alt-r" [:paredit-plus.raise-sexp]
 
                  ;; Slurps
                  "ctrl-right" [:paredit.grow.right]

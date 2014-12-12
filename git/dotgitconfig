@@ -1,0 +1,59 @@
+[color]
+	filemode = false
+	diff = auto
+	status = auto
+	branch = auto
+	pager = true
+[core]
+	editor = vi 
+[push]
+	default = simple
+[rebase]
+    tool = sdiff
+	conflictstyle = diff3
+    autosquash = true
+[branch]
+    autosetuprebase = always
+[include]
+    path = /home/kapitan/git/.configs/a.richiardi.work@gmail.com
+[merge]
+    tool = sdiff
+    conflictstyle = diff3
+	ff = no
+[alias]
+	co = "checkout"
+	s = "status"
+	b = "branch"
+	ba = "branch -v -a"
+	c = "commit"
+	p = "pull"
+	f = "fetch -v"
+	fa = "fetch -v --all"
+	pr = "pull --rebase"
+	a = "add"
+	aa = "add -A"
+	ca = "commit -a"
+	d = "diff"
+	rmt = "remote --verbose"
+	rc = "rebase --continue"
+	ra = "rebase --abort"
+    ri = "rebase --interactive"
+	rmc = "rm --cached"
+	ss = status --short -uno
+	ln = log --graph --decorate --pretty=oneline --abbrev-commit
+	lna = log --graph --decorate --pretty=format:"%h%x09%an%x09%ad%x09%s" --abbrev-commit
+	lg = log -p --pretty=full
+	fixup = !sh -c 'REV=$(git rev-parse $1) && git commit --fixup $@ && git rebase -i --autosquash $REV^' -
+	fixprev = "!f() { SHA=$(git ln -1|awk '{ print $2 }') && REV=$(git rev-parse $SHA) && git commit --fixup $SHA && git rebase -i --autosquash $REV^; }; f -"
+	squash = !sh -c 'REV=$(git rev-parse $1) && git commit --squash $@ && git rebase -i --autosquash $REV^' -
+	squaprev = "!f() { SHA=$(git ln -1|awk '{ print $2 }') && REV=$(git rev-parse $SHA) && git commit --squash $SHA && git rebase -i --autosquash $REV^; }; f -"
+	alias = config --get-regexp ^alias\\.
+	alias = --get-regexp
+    my = "mergetool -y"
+    fl = "log -u"
+    assume = "update-index --assume-unchanged"
+    unassume = "update-index --no-assume-unchanged"
+    assumed = "!git ls-files -v | grep ^h | cut -c 3-"
+    unassumeall = "!git assumed | xargs git update-index --no-assume-unchanged"
+    ours = "!f() { git co --ours $@ && git add $@; }; f"
+    theirs = "!f() { git co --theirs $@ && git add $@; }; f"
