@@ -1,0 +1,91 @@
+! Xft settings ---------------------------------------------------------------
+
+Xft.dpi:        96
+Xft.antialias:  true
+Xft.rgba:       rgb
+Xft.hinting:    true
+Xft.hintstyle:  hintslight
+Xft.lcdfilter:  lcddefault
+
+! xscreensaver ---------------------------------------------------------------
+
+!font settings
+xscreensaver.Dialog.headingFont:        -*-dina-bold-r-*-*-10-*-*-*-*-*-*-*
+xscreensaver.Dialog.bodyFont:           -*-dina-medium-r-*-*-10-*-*-*-*-*-*-*
+xscreensaver.Dialog.labelFont:          -*-dina-medium-r-*-*-10-*-*-*-*-*-*-*
+xscreensaver.Dialog.unameFont:          -*-dina-medium-r-*-*-10-*-*-*-*-*-*-*
+xscreensaver.Dialog.buttonFont:         -*-dina-bold-r-*-*-10-*-*-*-*-*-*-*
+xscreensaver.Dialog.dateFont:           -*-dina-medium-r-*-*-10-*-*-*-*-*-*-*
+xscreensaver.passwd.passwdFont:         -*-dina-bold-r-*-*-10-*-*-*-*-*-*-*
+!general dialog box (affects main hostname, username, password text)
+xscreensaver.Dialog.foreground:         #EDEDED
+xscreensaver.Dialog.background:         #202020
+xscreensaver.Dialog.topShadowColor:     #202024
+xscreensaver.Dialog.bottomShadowColor:  #202024
+xscreensaver.Dialog.Button.foreground:  #EDEDFF
+xscreensaver.Dialog.Button.background:  #444
+!username/password input box and date text colour
+xscreensaver.Dialog.text.foreground:    #EDEDFF
+xscreensaver.Dialog.text.background:    #444
+xscreensaver.Dialog.internalBorderWidth:24
+xscreensaver.Dialog.borderWidth:        20
+xscreensaver.Dialog.shadowThickness:    2
+!timeout bar (background is actually determined by Dialog.text.background)
+xscreensaver.passwd.thermometer.foreground:  #A9B7C4
+xscreensaver.passwd.thermometer.background:  #202020
+xscreensaver.passwd.thermometer.width:       8
+!datestamp format--see the strftime(3) manual page for details
+xscreensaver.dateFormat:    %I:%M%P %a %b %d, %Y
+! VT100 settings
+*VT100.Translations: #override \
+              ~Ctrl ~Meta Mod4 <Key>space: string("\033[32;16~")
+*VT100.geometry: 105x24
+! XTerm settings --------------------------------------------------------------
+xterm*ttyModes: erase ^?
+xterm*visualBell: false
+xterm*scrollBar: false
+xterm*saveLines: 16384
+xterm*faceName: Droid Sans Mono:size=10:antialias=false
+xterm*faceSize: 10
+xterm*font: 7x13
+xterm*reverseVideo: off
+xterm*bellIsUrgent: true
+xterm*termName: xterm-256color
+xterm*metaSendsEscape: true
+xterm*eightBitInput: false
+xterm*charClass: 33:48,35-38:48,39:43,42-47:48,58-59:48,61:48,63-64:48,126:48
+! URxvt settings --------------------------------------------------------------
+URxvt*geometry: 105x24
+URxvt*scrollBar: false
+URxvt*saveLines: 16384
+URxvt*font: xft:Droid Sans Mono:size=10:antialias=true:autohint=true
+URxvt*reverseVideo: off
+URxvt*fading: 15
+URxvt*fadeColor: black
+URxvt*shading: 75
+URxvt*depth: 32
+URxvt*background: rgba:0800/0800/0800/eeee
+URxvt*blurRadius: 1
+URxvt*mouseWheelScrollPage: true
+URxvt*iconFile: /usr/share/pixmaps/urxvt.xpm
+URxvt*jumpScroll: false
+URxvt*urgentOnBell: false
+URxvt*visualBell: false
+URxvt*print-pipe: cat > $(TMPDIR=$HOME mktemp urxvt.prt)
+URxvt*tripleclickwords: false
+URxvt*letterSpace: -1
+! URxvt keysym mappings
+URxvt*keysym.Mod4-space: \033[32;16~
+URxvt*keysym.Mod4-d: \033[32;64~
+! URxvt extensions
+URxvt*perl-lib: /usr/lib/urxvt/perl/
+URxvt*perl-ext-common: default,selection,matcher,searchable-scrollback
+URxvt*url-launcher: /usr/bin/firefox
+URxvt*matcher.button: 1
+! URxvt perl regex - NOT WORKING
+URxvt.selection.pattern-0: ([^:\\t\\r\\n\\$\\(\\)\ ]+)
+! URxvt pseudo-transparency
+!URxvt*tintColor: Gray75
+!URxvt*transparent: true
+! X Colors settings
+# include "/home/kapitan/.Xdefaults-theme"
