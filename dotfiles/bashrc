@@ -191,7 +191,7 @@ export VISUAL="emacsclient -c -a emacs"
 
 # Misc
 export XMLLINT_INDENT="  "
-export GPGKEY=F42714E7
+export GPGKEY=5BB502F6
 
 function man() {
     emacsclient -t -c -eval "(progn (setq Man-notify-method 'bully) (man \"$1\"))"

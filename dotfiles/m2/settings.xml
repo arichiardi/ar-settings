@@ -1,0 +1,62 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                      http://maven.apache.org/xsd/settings-1.0.0.xsd">
+  <localRepository>/home/kapitan/.m2/repository</localRepository>
+  <interactiveMode/>
+  <usePluginRegistry/>
+  <offline/>
+  <pluginGroups/>
+  <servers>
+    <server>
+      <id>ossrh</id>
+      <username>arichiardi</username>
+      <password></password>
+    </server>
+  </servers>
+  <mirrors/>
+  <proxies/>
+  <profiles>
+    <profile>
+      <id>ar-profile</id>
+      <repositories>
+        <repository>
+          <id>sonatype.oss.snapshots</id>
+          <name>Sonatype OSS Snapshot Repository</name>
+          <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+    </profile>
+    <profile>
+      <id>scala</id>
+      <activation>
+        <property>
+          <name>${project.groupId}</name>
+          <value>org.scala-lang</value>
+        </property>
+      </activation>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>scala-tools.org</id>
+          <name>Scala-Tools Maven2 Repository</name>
+          <url>https://oss.sonatype.org/content/groups/scala-tools/</url>
+        </pluginRepository>
+      </pluginRepositories>
+      <repositories>
+        <repository>
+          <id>scala-tools.org</id>
+          <name>Scala-Tools Maven2 Repository</name>
+          <url>http://scala-tools.org/repo-releases</url>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+  <activeProfiles/>
+    <!-- <activeProfile>ar-profile</activeProfile> -->
+</settings>
