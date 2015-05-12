@@ -9,7 +9,7 @@
 [core]
     editor = emacsclient -t
 [rebase]
-    tool = sdiff
+    tool = meld184
     conflictstyle = diff3
     autosquash = true
 [branch]
@@ -17,7 +17,7 @@
 [include]
     path = /home/kapitan/.gitidentities/a.richiardi.work@gmail.com
 [merge]
-    tool = sdiff
+    tool = meld184
     conflictstyle = diff3
     ff = no
 [diff "jpg"]
@@ -26,6 +26,8 @@
 [diff "jpeg"]
     binary = true
     textconv = hexdump -v -C
+[mergetool "meld184"]
+    cmd = meld --auto-merge $LOCAL $BASE $REMOTE --diff $BASE $LOCAL --diff $BASE $REMOTE --output $MERGED
 [alias]
     co = "checkout"
     s = "status"
@@ -39,11 +41,16 @@
     a = "add"
     aa = "add -A"
     ai = "add --interactive"
+    ap = "add --patch"
     ca = "commit -a"
+    cp = "cherry-pick"
+    cpc = "cherry-pick --continue"
+    cpa = "cherry-pick --abort"
     d = "diff"
     df = "diff --name-only"
     dh = "diff HEAD"
-    rmt = "remote --verbose"
+    dh1 = "diff HEAD^"
+    rmtv = "remote --verbose"
     rc = "rebase --continue"
     ri = "rebase --interactive"
     ra = "rebase --abort"
@@ -53,9 +60,9 @@
     lna = log --graph --decorate --pretty=format:"%h%x09%an%x09%ad%x09%s" --abbrev-commit
     patch = log -p --pretty=full
     fixup = !sh -c 'REV=$(git rev-parse $1) && git commit --fixup $@ && git rebase -i --autosquash $REV^' -
-    fixprev = "!f() { SHA=$(git ln -1|awk '{ print $2 }') && REV=$(git rev-parse $SHA) && git commit --fixup $SHA && git rebase -i --autosquash $REV^; }; f -"
+    fixprev = "!f() { SHA=$(git rev-parse HEAD) && REV=$(git rev-parse $SHA) && git commit --fixup $SHA && git rebase -i --autosquash $REV^; }; f -"
     squash = !sh -c 'REV=$(git rev-parse $1) && git commit --squash $@ && git rebase -i --autosquash $REV^' -
-    squaprev = "!f() { SHA=$(git ln -1|awk '{ print $2 }') && REV=$(git rev-parse $SHA) && git commit --squash $SHA && git rebase -i --autosquash $REV^; }; f -"
+    squaprev = "!f() { SHA=$(git rev-parse HEAD) && REV=$(git rev-parse $SHA) && git commit --squash $SHA && git rebase -i --autosquash $REV^; }; f -"
     alias = config --get-regexp ^alias\\.
     my = "mergetool -y"
     fl = "log -u"
@@ -66,3 +73,7 @@
     ours = "!f() { git co --ours $@ && git add $@; }; f"
     theirs = "!f() { git co --theirs $@ && git add $@; }; f"
     rsa = "reset HEAD *"
+    rsh = "reset HEAD"
+    rsh1 = "reset HEAD^"
+    sa = "stash apply"
+    sl = "stash list"
