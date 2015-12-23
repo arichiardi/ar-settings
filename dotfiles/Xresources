@@ -2,9 +2,9 @@
 
 Xft.dpi:        96
 Xft.antialias:  true
-Xft.rgba:       rgb
+Xft.rgba:       rgba
 Xft.hinting:    true
-Xft.hintstyle:  hintslight
+Xft.hintstyle:  hintfull
 Xft.lcdfilter:  lcddefault
 
 ! xscreensaver ---------------------------------------------------------------
@@ -45,48 +45,30 @@ xterm*ttyModes: erase ^?
 xterm*visualBell: false
 xterm*scrollBar: false
 xterm*saveLines: 16384
-xterm*faceName: Droid Sans Mono:size=10:antialias=false
-xterm*faceSize: 10
-xterm*font: 7x13
+xterm*faceName:Inconsolata
+xterm*faceSize: 12
+!xterm*font:
 xterm*reverseVideo: off
 xterm*bellIsUrgent: true
 xterm*termName: xterm-256color
 xterm*metaSendsEscape: true
 xterm*eightBitInput: false
 xterm*charClass: 33:48,35-38:48,39:43,42-47:48,58-59:48,61:48,63-64:48,126:48
-! URxvt settings --------------------------------------------------------------
-URxvt*geometry: 105x24
-URxvt*scrollBar: false
-URxvt*saveLines: 16384
-URxvt*font: xft:Droid Sans Mono:size=10:antialias=true:autohint=true
-URxvt*reverseVideo: off
-URxvt*fading: 15
-URxvt*fadeColor: black
-URxvt*shading: 75
-URxvt*depth: 32
-URxvt*background: rgba:0800/0800/0800/eeee
-URxvt*blurRadius: 1
-URxvt*mouseWheelScrollPage: true
-URxvt*iconFile: /usr/share/pixmaps/urxvt.xpm
-URxvt*jumpScroll: false
-URxvt*urgentOnBell: false
-URxvt*visualBell: false
-URxvt*print-pipe: cat > $(TMPDIR=$HOME mktemp urxvt.prt)
-URxvt*tripleclickwords: false
-URxvt*letterSpace: -1
-! URxvt keysym mappings
-URxvt*keysym.Mod4-space: \033[32;16~
-URxvt*keysym.Mod4-d: \033[32;64~
-URxvt*keysym.Mod4-t: \033[32;74~
-! URxvt extensions
-URxvt*perl-lib: /usr/lib/urxvt/perl/
-URxvt*perl-ext-common: default,selection,matcher,searchable-scrollback
-URxvt*url-launcher: /usr/bin/firefox
-URxvt*matcher.button: 1
-! URxvt perl regex - NOT WORKING
-URxvt.selection.pattern-0: ([^:\\t\\r\\n\\$\\(\\)\ ]+)
-! URxvt pseudo-transparency
-!URxvt*tintColor: Gray75
-!URxvt*transparent: true
+
+! YeahConsole settings
+yeahconsole*term:urxvt
+yeahconsole*screenWidth:1280
+yeahconsole*toggleKey:None+F4
+yeahconsole*xOffset:40
+yeahconsole*keyBigger:ControlAlt+equal
+yeahconsole*keySmaller:ControlAlt+minus
+yeahconsole*font: xft:Inconsolata:size=11,style=medium
+yeahconsole*consoleHeight: 18
+yeahconsole*aniDelay: 0
+yeahconsole*stepSize: 2
+! Emacs
+Emacs.font: Ubuntu Mono-11
+
 ! X Colors settings
-# include "/home/kapitan/.Xdefaults-theme"
+#include "/home/kapitan/.Xresources.d/theme"
+#include "/home/kapitan/.Xresources.d/urxvt"
