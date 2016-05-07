@@ -1,0 +1,4 @@
+((nil . ((projectile-grep-default-files . '("*.clj" "*.cljs" "*.cljc"))
+         (clojure-mode . ((eval . (aggressive-indent-mode -1))))
+         (eval . (add-to-list 'aggressive-indent-excluded-modes 'clojure-mode))
+         (eval . (push 'clojure-mode live-ignore-whitespace-modes)))))
