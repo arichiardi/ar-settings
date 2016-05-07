@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Goes through all jpeg files in current directory, grabs date from each
+# and sorts them into subdirectories according to the date
+# Creates subdirectories corresponding to the dates as necessary.
+
+# Takes the DateTimeOriginal field (format is 2014:09:16 14:31:37)
+
+for f in *  # Try all
+do
+  datepath="$(exiftool -DateTimeOriginal $f|awk '{print $4}'|awk -F: '{print $1,$2}'|sed s/\ /-/)"
+  echo $datepath
+
+  if [ -n "$datepath" ]; then # if empty will leave it as it is
+    if ! [ -e "$datepath" ]; then
+      mkdir -pv "$datepath"
+    fi
+    mv -vi $f $datepath
+  fi
+done

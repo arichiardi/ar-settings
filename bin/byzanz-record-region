@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# Delay before starting. This should be 10 because send-notify is dumb on Ubuntu.
+DELAY=5
+
+DURATION=10
+
+FOLDER="$HOME/tmp"
+
+TIME=$(date +"%Y-%m-%d_%H%M%S")
+
+USERDUR=$(gdialog --title "Duration?" --inputbox "Please enter the screencast duration in seconds" 200 100 2>&1)
+# Duration and output file
+if [ $USERDUR -gt 0 ]; then
+    D=$USERDUR
+else
+    D=$DURATION
+fi
+
+BEEPSOUND="/usr/share/sounds/freedesktop/stereo/message-new-instant.oga"
+beep() {
+    paplay $BEEPSOUND &
+}
+
+# xrectsel from https://github.com/lolilolicon/xrectsel
+GEOMETRY=$(xrectsel "--x=%x --y=%y --width=%w --height=%h") || exit -1
+
+# Notify the user of recording time and delay
+notify-send -t $((DELAY*1000)) -u normal -i info "Byzanz" "Recording in ${DELAY}s"
+
+sleep $(( $DELAY+1 ))
+beep
+byzanz-record --delay=0 --duration=$D $GEOMETRY "$FOLDER/recording_$TIME.gif"
+beep
+notify-send -u normal -i info "Byzanz" "Recorded in ${FOLDER}/recording_${TIME}.gif"
