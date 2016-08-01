@@ -3,14 +3,21 @@ alias cd..='cd ..'
 alias ws='cd ~/workspace'
 alias ln='ln -i'
 alias uls='cd /usr/local/share'
+alias gpg='gpg2'
+alias rethinkdb='docker start rethinkdb'
+# not needed for now - sleep 5; xdg-open http://$(docker inspect --format "{{ .NetworkSettings.IPAddress }}" rethinkdb):8080
+alias postgres='sudo systemctl stop postgresql.service'
+alias docker-tcp='sudo systemctl stop docker; nohup sudo docker daemon -H tcp://localhost:4243 --raw-logs > /dev/null 2>&1 &'
+alias docker-rmia='docker rmi $(docker images -qf "dangling=true")'
 
 # Clojure
 alias clj='lein repl'
+alias b='boot'
 
 # Emacs
 alias vi="emacsclient -t"
 alias e="emacsclient -t"
-alias em="nohup emacsclient -c -a emacs"
+alias em="emacsclient -c -a emacs"
 
 # Android SDK
 alias adbkill='sudo /usr/local/share/android-sdk/platform-tools/adb kill-server'

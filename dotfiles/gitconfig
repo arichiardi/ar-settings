@@ -4,10 +4,14 @@
     status = auto
     branch = auto
     pager = true
+[pull]
+    rebase = true
 [push]
     default = simple
 [core]
     editor = emacsclient -t
+    autocrlf = false
+    filemode = false
 [rebase]
     tool = meld184
     conflictstyle = diff3
@@ -29,6 +33,7 @@
 [mergetool "meld184"]
     cmd = meld --auto-merge $LOCAL $BASE $REMOTE --diff $BASE $LOCAL --diff $BASE $REMOTE --output $MERGED
 [alias]
+    apr = "apply --reject"
     co = "checkout"
     s = "status"
     b = "branch"
@@ -42,7 +47,7 @@
     aa = "add -A"
     ai = "add --interactive"
     ap = "add --patch"
-    ca = "commit -a"
+    ca = "commit --amend"
     cp = "cherry-pick"
     cpc = "cherry-pick --continue"
     cpa = "cherry-pick --abort"
@@ -50,7 +55,11 @@
     df = "diff --name-only"
     dh = "diff HEAD"
     dh1 = "diff HEAD^"
-    rmtv = "remote --verbose"
+    ds = "diff --staged"
+    rmt = "remote"
+    rmta = "remote add"
+	rmtv = "remote --verbose"
+	r = "rebase"
     rc = "rebase --continue"
     ri = "rebase --interactive"
     ra = "rebase --abort"
@@ -74,6 +83,9 @@
     theirs = "!f() { git co --theirs $@ && git add $@; }; f"
     rsa = "reset HEAD *"
     rsh = "reset HEAD"
-    rsh1 = "reset HEAD^"
+	rsh1 = "reset HEAD^"
+	rshhh = "reset --hard"
     sa = "stash apply"
-    sl = "stash list"
+	sl = "stash list"
+	ski = "stash save --keep-index"
+	rmsub = "!f(){ git rm --cached \"$1\";rm -rv \"$1\";rm -rfv \".git/modules/$1\";git config -f .gitmodules --remove-section \"submodule.$1\";git config -f .git/config --remove-section \"submodule.$1\";git add .gitmodules; }; f"

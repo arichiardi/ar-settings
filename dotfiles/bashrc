@@ -46,12 +46,12 @@ git_prompt=yes
 
 if [ -n "$force_color_prompt" ]; then
     if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-	# We have color support; assume it's compliant with Ecma-48
-	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-	# a case would tend to support setf rather than setaf.)
-	color_prompt=yes
+	    # We have color support; assume it's compliant with Ecma-48
+	    # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+	    # a case would tend to support setf rather than setaf.)
+	    color_prompt=yes
     else
-	color_prompt=
+	    color_prompt=
     fi
 fi
 
@@ -62,7 +62,6 @@ if [ -n "git_prompt" ]; then
     GIT_PS1_SHOWDIRTYSTATE=nonempty
     PS1='\u@\h:\w$(__git_ps1 " (%s)")\$ '
 else
-echo "ciao"
     if [ "$color_prompt" = yes ]; then
         PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
     else
@@ -73,11 +72,11 @@ unset color_prompt force_color_prompt
 
 # If this is an xterm set the title to user@host:dir
 case "$TERM" in
-xterm*|rxvt*)
-    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
-    ;;
-*)
-    ;;
+    xterm*|rxvt*)
+        PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+        ;;
+    *)
+        ;;
 esac
 
 # enable color support of ls and also add handy aliases
@@ -147,13 +146,13 @@ function test_identities {
 if [ -n "$SSH_AGENT_PID" ]; then
     ps -ef | grep "$SSH_AGENT_PID" | grep ssh-agent > /dev/null
     if [ $? -eq 0 ]; then
-    test_identities
+        test_identities
     fi
-# if $SSH_AGENT_PID is not properly set, we might be able to load one from
-# $SSH_ENV
+    # if $SSH_AGENT_PID is not properly set, we might be able to load one from
+    # $SSH_ENV
 else
     if [ -f "$SSH_ENV" ]; then
-    . "$SSH_ENV" > /dev/null
+        . "$SSH_ENV" > /dev/null
     fi
     ps -ef | grep "$SSH_AGENT_PID" | grep -v grep | grep ssh-agent > /dev/null
     if [ $? -eq 0 ]; then
@@ -169,6 +168,7 @@ IDEA_JDK=/usr/lib/jvm/java-8-oracle
 
 # Java 8
 JAVA8_HOME=/usr/lib/jvm/java-8-oracle
+NASHORN_HOME=/usr/lib/jvm/java-8-oracle/bin
 
 # Git
 source ~/bin/git/git-completion.bash
@@ -198,3 +198,75 @@ function man() {
 }
 # unalias man
 # alias man=emacs-man
+
+export GEM_HOME=/home/kapitan/.gem/ruby/2.2.0
+
+###-begin-npm-completion-###
+#
+# npm command completion script
+#
+# Installation: npm completion >> ~/.bashrc  (or ~/.zshrc)
+# Or, maybe: npm completion > /usr/local/etc/bash_completion.d/npm
+#
+
+COMP_WORDBREAKS=${COMP_WORDBREAKS/=/}
+COMP_WORDBREAKS=${COMP_WORDBREAKS/@/}
+export COMP_WORDBREAKS
+
+if type complete &>/dev/null; then
+    _npm_completion () {
+        local si="$IFS"
+        IFS=$'\n' COMPREPLY=($(COMP_CWORD="$COMP_CWORD" \
+                                         COMP_LINE="$COMP_LINE" \
+                                         COMP_POINT="$COMP_POINT" \
+                                         npm completion -- "${COMP_WORDS[@]}" \
+                                         2>/dev/null)) || return $?
+        IFS="$si"
+    }
+    complete -F _npm_completion npm
+elif type compdef &>/dev/null; then
+    _npm_completion() {
+        si=$IFS
+        compadd -- $(COMP_CWORD=$((CURRENT-1)) \
+                               COMP_LINE=$BUFFER \
+                               COMP_POINT=0 \
+                               npm completion -- "${words[@]}" \
+                               2>/dev/null)
+        IFS=$si
+    }
+    compdef _npm_completion npm
+elif type compctl &>/dev/null; then
+    _npm_completion () {
+        local cword line point words si
+        read -Ac words
+        read -cn cword
+        let cword-=1
+        read -l line
+        read -ln point
+        si="$IFS"
+        IFS=$'\n' reply=($(COMP_CWORD="$cword" \
+                                     COMP_LINE="$line" \
+                                     COMP_POINT="$point" \
+                                     npm completion -- "${words[@]}" \
+                                     2>/dev/null)) || return $?
+        IFS="$si"
+    }
+    compctl -K _npm_completion npm
+fi
+###-end-npm-completion-###
+
+## From https://stackoverflow.com/questions/10081293/install-npm-into-home-directory-with-distribution-nodejs-package-ubuntu
+NPM_PACKAGES="$HOME/.local/share/nodejs"
+PATH="$NPM_PACKAGES/bin:$PATH"
+MANPATH="$NPM_PACKAGES/share/man:$MANPATH"
+NODE_PATH="$NPM_PACKAGES/lib/node_modules:$NODE_PATH"
+
+# Boot
+export BOOT_JVM_OPTIONS="-Xmx1g -client -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -Xverify:none -XX:-OmitStackTraceInFastThrow"
+export BOOT_COLOR=1
+
+# Haskell
+eval "$(stack --bash-completion-script stack)"
+
+# Docker Remote API
+# DOCKER_OPTS='-H tcp://localhost:4243 -H unix:///var/run/docker.sock'
