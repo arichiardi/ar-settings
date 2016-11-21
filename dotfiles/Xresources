@@ -39,14 +39,14 @@ xscreensaver.dateFormat:    %I:%M%P %a %b %d, %Y
 ! VT100 settings
 *VT100.Translations: #override \
               ~Ctrl ~Meta Mod4 <Key>space: string("\033[32;16~")
-*VT100.geometry: 105x24
+!*VT100.geometry: 105x25
 ! XTerm settings --------------------------------------------------------------
 xterm*ttyModes: erase ^?
 xterm*visualBell: false
 xterm*scrollBar: false
 xterm*saveLines: 16384
-xterm*faceName:Inconsolata
-xterm*faceSize: 12
+xterm*faceName: Inconsolata\\-g
+xterm*faceSize: 14
 !xterm*font:
 xterm*reverseVideo: off
 xterm*bellIsUrgent: true
@@ -57,18 +57,17 @@ xterm*charClass: 33:48,35-38:48,39:43,42-47:48,58-59:48,61:48,63-64:48,126:48
 
 ! YeahConsole settings
 yeahconsole*term:urxvt
-yeahconsole*screenWidth:1280
 yeahconsole*toggleKey:None+F4
-yeahconsole*xOffset:40
 yeahconsole*keyBigger:ControlAlt+equal
 yeahconsole*keySmaller:ControlAlt+minus
-yeahconsole*font: xft:Inconsolata:size=11,style=medium
+yeahconsole*font: xft:Inconsolata\\-g:style=g:antialias=true:hinting=true:size=11
 yeahconsole*consoleHeight: 18
 yeahconsole*aniDelay: 0
 yeahconsole*stepSize: 2
 ! Emacs
-Emacs.font: Ubuntu Mono-11
+Emacs.font: Inconsolata\\-g
 
 ! X Colors settings
 #include "/home/kapitan/.Xresources.d/theme"
 #include "/home/kapitan/.Xresources.d/urxvt"
+#include "/home/kapitan/.Xresources.d/rofi"

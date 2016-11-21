@@ -1,15 +1,16 @@
-! URxvt settings --------------------------------------------------------------
 URxvt*geometry: 95x24
 URxvt*scrollBar: false
 URxvt*saveLines: 16384
-URxvt*font: xft:Inconsolata:style=medium:size=12:antialias=false
+URxvt*font: xft:Inconsolata\\-g:style=g:antialias=true:hinting=true:size=11
+URxvt*boldFont: xft:Inconsolata\\-g:style=g:bold:antialias=true:hinting=true:size=11
 URxvt*letterSpace: -1
 URxvt*reverseVideo: off
-URxvt*fading: 15
+URxvt*fading: 25
 URxvt*fadeColor: black
 URxvt*shading: 75
 URxvt*depth: 32
-URxvt*background: rgba:0800/0800/0800/eeee
+URxvt*background: #000000
+URxvt*foreground: #cccccc
 URxvt*blurRadius: 1
 URxvt*mouseWheelScrollPage: true
 URxvt*iconFile: /usr/share/pixmaps/urxvt.xpm
@@ -18,22 +19,39 @@ URxvt*urgentOnBell: false
 URxvt*visualBell: false
 URxvt*print-pipe: cat > $(TMPDIR=$HOME mktemp urxvt.prt)
 URxvt*tripleclickwords: false
-! URxvt keysym mappings
+URxvt*externalBorder: 0
+URxvt*internalBorder: 0
+! custom keysym mappings
 URxvt*keysym.Mod4-space: \033[32;16~
 URxvt*keysym.Mod4-d: \033[32;64~
 URxvt*keysym.Mod4-t: \033[32;74~
-! URxvt extensions
-URxvt*perl-lib: /usr/lib/urxvt/perl/
-URxvt*perl-ext-common: default,selection,matcher,searchable-scrollback
-URxvt*url-launcher: /usr/bin/firefox
-URxvt*matcher.button: 1
-! URxvt perl regex - NOT WORKING
-URxvt.selection.pattern-0: ([^:\\t\\r\\n\\$\\(\\)\ ]+)
-! URxvt pseudo-transparency
-!URxvt*tintColor: Gray75
-!URxvt*transparent: true
+! https://wiki.archlinux.org/index.php/Rxvt-unicode$
+! do not scroll with output$
+URxvt*scrollTtyOutput: false$
+! scroll in relation to buffer (with mouse scroll or Shift+Page Up)$
+URxvt*scrollWithBuffer: true$
+! scroll back to the bottom on keypress$
+URxvt*scrollTtyKeypress: true
 
-! URxvt Settings Documentation
+! extensions
+URxvt*perl-lib: /usr/lib/urxvt/perl/
+URxvt*perl-ext-common: default,selection,matcher,searchable-scrollback,url-select,font-size,keyboard-select
+URxvt*url-launcher: /usr/bin/xdg-open
+! perl:matcher settings
+URxvt*matcher.button: 1
+URxvt.keysym.M-u: perl:matcher:select
+! highlighting https://gist.github.com/r4um/2413814
+URxvt.matcher.rend.0: fg:4 Uline Bold
+! perl:font-size
+URxvt.keysym.Mod4-Up: font-size:increase
+URxvt.keysym.Mod4-Down: font-size:decrease
+URxvt.keysym.Mod4-End: font-size:reset
+URxvt.keysym.Mod4-Home: font-size:show
+! perl:keyboard-select
+URxvt.keysym.Mod4-Escape: perl:keyboard-select:activate
+URxvt.keysym.Mod4-s: perl:keyboard-select:search
+
+! settings documentation --------------------------------------------------------------
 ! URxvt*termName:                       string
 ! URxvt*geometry:                       geometry
 ! URxvt*chdir:                          string
