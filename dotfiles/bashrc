@@ -162,6 +162,22 @@ else
     fi
 fi
 
+# From https://superuser.com/questions/509950/why-are-unicode-characters-not-rendering-correctly
+LANG=en_US.UTF-8
+LC_CTYPE="en_US.UTF-8"
+LC_NUMERIC="en_US.UTF-8"
+LC_TIME="en_US.UTF-8"
+LC_COLLATE="en_US.UTF-8"
+LC_MONETARY="en_US.UTF-8"
+LC_MESSAGES="en_US.UTF-8"
+LC_PAPER="en_US.UTF-8"
+LC_NAME="en_US.UTF-8"
+LC_ADDRESS="en_US.UTF-8"
+LC_TELEPHONE="en_US.UTF-8"
+LC_MEASUREMENT="en_US.UTF-8"
+LC_IDENTIFICATION="en_US.UTF-8"
+LC_ALL=en_US.UTF-8
+
 # Idea
 # From http://stackoverflow.com/questions/5124368/gradle-doesnt-work-in-intellij-problems-with-java-home
 IDEA_JDK=/usr/lib/jvm/java-8-oracle
@@ -193,9 +209,14 @@ export VISUAL="emacsclient -c -a emacs"
 export XMLLINT_INDENT="  "
 export GPGKEY=5BB502F6
 
-function man() {
-    emacsclient -t -c -eval "(progn (setq Man-notify-method 'bully) (man \"$1\"))"
+function man () {
+    if [ $TERM ]; then
+        emacsclient -t -c -eval "(progn (setq Man-notify-method 'bully) (man \"$@\"))";
+    else
+        yelp "man:$@";
+    fi
 }
+
 # unalias man
 # alias man=emacs-man
 
@@ -261,12 +282,19 @@ PATH="$NPM_PACKAGES/bin:$PATH"
 MANPATH="$NPM_PACKAGES/share/man:$MANPATH"
 NODE_PATH="$NPM_PACKAGES/lib/node_modules:$NODE_PATH"
 
+# Leiningen
+export LEIN_JVM_OPTS=
+# MOVED TO /etc/bash_completion.d
+# source ~/bin/lein_completion.bash
+
 # Boot
 export BOOT_JVM_OPTIONS="-Xmx1g -client -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -Xverify:none -XX:-OmitStackTraceInFastThrow"
 export BOOT_COLOR=1
 
-# Haskell
-eval "$(stack --bash-completion-script stack)"
-
 # Docker Remote API
 # DOCKER_OPTS='-H tcp://localhost:4243 -H unix:///var/run/docker.sock'
+
+# put /bin/node_modules executables in path
+
+NODE_BIN_PATHS=$(find ~/bin/node_modules/ -type f -executable -exec dirname {} \; | grep bin$ | tr '\n' ':')
+PATH="$PATH:$NODE_BIN_PATHS"
