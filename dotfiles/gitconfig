@@ -11,7 +11,7 @@
 [core]
     editor = emacsclient -t
     autocrlf = false
-    filemode = false
+	filemode = false
 [rebase]
     tool = meld184
     conflictstyle = diff3
@@ -21,17 +21,22 @@
 [include]
     path = /home/kapitan/.gitidentities/a.richiardi.work@gmail.com
 [merge]
-    tool = meld184
-    conflictstyle = diff3
-    ff = no
+    tool = ediff
+[mergetool "ediff"]
+    cmd = /home/kapitan/bin/ediff-merge-script \"$LOCAL\" \"$REMOTE\" \"$MERGED\" \"$BASE\"
+    trustExitCode = true
+#[merge]
+#    tool = meld184
+#    conflictstyle = diff3
+#    ff = no
+#[mergetool "meld184"]$
+#    cmd = meld --auto-merge $LOCAL $BASE $REMOTE --diff $BASE $LOCAL --diff $BASE $REMOTE --output $MERGED
 [diff "jpg"]
     binary = true
     textconv = hexdump -v -C
 [diff "jpeg"]
     binary = true
     textconv = hexdump -v -C
-[mergetool "meld184"]
-    cmd = meld --auto-merge $LOCAL $BASE $REMOTE --diff $BASE $LOCAL --diff $BASE $REMOTE --output $MERGED
 [alias]
     apr = "apply --reject"
     co = "checkout"
