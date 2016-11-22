@@ -1,3 +1,6 @@
+[user]
+    email = "a.richiardi.work@gmail.com"
+    name = "Andrea Richiardi"
 [color]
     filemode = false
     diff = auto
