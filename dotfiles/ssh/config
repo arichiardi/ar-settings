@@ -1,0 +1,12 @@
+Host bitbucket.org
+ IdentitiesOnly yes
+ HostName bitbucket.org
+ User git
+ IdentityFile ~/.ssh/5BB502F6_rsa
+
+Host github.com
+ IdentitiesOnly yes
+ HostName github.com
+ User arichiardi
+ IdentityFile ~/.ssh/5BB502F6_rsa
+
