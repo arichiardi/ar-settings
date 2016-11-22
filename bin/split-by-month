@@ -5,16 +5,35 @@
 # Creates subdirectories corresponding to the dates as necessary.
 
 # Takes the DateTimeOriginal field (format is 2014:09:16 14:31:37)
+# by default or FileModifyDate if not present
 
-for f in *  # Try all
-do
-  datepath="$(exiftool -DateTimeOriginal $f|awk '{print $4}'|awk -F: '{print $1,$2}'|sed s/\ /-/)"
-  echo $datepath
-
-  if [ -n "$datepath" ]; then # if empty will leave it as it is
-    if ! [ -e "$datepath" ]; then
-      mkdir -pv "$datepath"
+for f in $(find -iregex ".*\.jpg"); do
+    if [ -n "$f" ]; then
+        TAG_VALUE=$(exiftool -DateTimeOriginal $f)
+        if [ -n "$TAG_VALUE" ]; then
+            DATEPATH="$(echo -ne $TAG_VALUE | awk '{print $4}' | awk -F: '{print $1,$2}' | sed s/\ /-/)"
+            # echo $DATEPATH
+            if [ -n "$DATEPATH" ]; then # if empty will leave it as it is
+                if ! [ -e "$DATEPATH" ]; then
+                    mkdir -pv "$DATEPATH"
+                fi
+                mv -vi $f $DATEPATH
+            fi
+        else
+            TAG_VALUE=$(exiftool -CreateDate $f)
+            # echo -en "No -DateTimeOriginal found, trying -FileModifyDate\n"
+            if [ -n "$TAG_VALUE" ]; then
+                DATEPATH="$(echo -ne $TAG_VALUE | cut -d : -f 2,3 | cut -d ' ' -f 2 | sed s/[\:]/\-/g)"
+                # echo $DATEPATH
+                if [ -n "$DATEPATH" ]; then # if empty will leave it as it is
+                    if ! [ -e "$DATEPATH" ]; then
+                        mkdir -pv "$DATEPATH"
+                    fi
+                    mv -vi $f $DATEPATH
+                fi
+            else
+                echo "$f does not contain either -DateTimeOriginal or -CreateDate, skipping...";
+            fi
+        fi
     fi
-    mv -vi $f $datepath
-  fi
 done
