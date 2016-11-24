@@ -1,0 +1,3 @@
+--langmap=java:+.java
+--language-force=java
+--exclude=target
