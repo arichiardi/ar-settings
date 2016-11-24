@@ -1,0 +1,2 @@
+--langmap=lisp:+.clj.cljs,java:+.java
+--exclude=target
