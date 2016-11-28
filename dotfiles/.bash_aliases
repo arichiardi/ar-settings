@@ -29,3 +29,10 @@ alias g='git'
 
 # from http://stackoverflow.com/questions/7066325/how-to-list-show-git-aliases
 alias gitalias="git config --get-regexp ^alias\."
+
+# Maven
+alias mvn='notify-after mvn'
+alias mc='mvn clean'
+alias mci='mvn clean install'
+alias mcist='mvn clean install -DskipAllTests -T3 -Dmaven.test.skip=true'
+alias mcisst='mvn clean install -DskipTests -DskipITests -DskipAllTests -Dskip.checkstyle -Dcheckstyle.skip -Dpmd.skip -Djacoco.skip -T3'
