@@ -15,9 +15,9 @@ alias clj='lein repl'
 alias b='boot'
 
 # Emacs
-alias vi="emacsclient -t"
-alias e="emacsclient -t"
-alias em="emacsclient -c -a emacs"
+alias vi="~/bin/emacsclient-daemon -t"
+alias e="~/bin/emacsclient-daemon.sh -t"
+alias em="~/bin/emacsclient-daemon.sh -c"
 
 # Android SDK
 alias adbkill='sudo /usr/local/share/android-sdk/platform-tools/adb kill-server'
