@@ -35,7 +35,7 @@ URxvt*scrollTtyKeypress: true
 
 ! extensions
 URxvt*perl-lib: /usr/lib/urxvt/perl/
-URxvt*perl-ext-common: default,selection,matcher,searchable-scrollback,url-select,font-size,keyboard-select
+URxvt*perl-ext-common: default,selection,matcher,searchable-scrollback,font-size,keyboard-select
 URxvt*url-launcher: /usr/bin/xdg-open
 ! perl:matcher settings
 URxvt*matcher.button: 1
