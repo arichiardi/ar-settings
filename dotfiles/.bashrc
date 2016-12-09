@@ -40,7 +40,7 @@ esac
 # uncomment for a colored prompt, if the terminal has the capability; turned
 # off by default to not distract the user: the focus in a terminal window
 # should be on the output of commands, not on the prompt
-#force_color_prompt=yes
+force_color_prompt=yes
 # AR uncomment to use the git prompt
 git_prompt=yes
 
@@ -96,10 +96,6 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 
-# Add an "alert" alias for long running commands.  Use like so:
-#   sleep 10; alert
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
-
 # Alias definitions.
 # You may want to put all your additions into a separate file like
 # ~/.bash_aliases, instead of adding them here directly.
@@ -108,6 +104,23 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
+
+function urxvt_keyboard_select {
+    local C=$(tput setaf 6)
+    local NC=$(tput sgr0)
+    local B=$(tput bold)
+    echo -e "\
+ ${C}${B}h/j/k/l${NC}:    Move cursor left/down/up/right (also with arrow keys)
+ ${C}${B}g/G/0/^/$/H/M/L/f/F/;/,/w/W/b/B/e/E${NC}: More vi-like cursor movement keys
+ ${C}${B}'/'/?${NC}:      Start forward/backward search
+ ${C}${B}n/N${NC}:        Repeat last search, N: in reverse direction
+ ${C}${B}Ctrl-f/b${NC}:   Scroll down/up one screen
+ ${C}${B}Ctrl-d/u${NC}:   Scroll down/up half a screen
+ ${C}${B}v/V/Ctrl-v${NC}: Toggle normal/linewise/blockwise selection
+ ${C}${B}y/Return${NC}:   Copy selection to primary buffer, Return: quit afterwards
+ ${C}${B}Y${NC}:          Copy selected lines to primary buffer or cursor line and quit
+ ${C}${B}q/Escape${NC}:   Quit keyboard selection mode"
+}
 
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
@@ -178,23 +191,45 @@ LC_MEASUREMENT="en_US.UTF-8"
 LC_IDENTIFICATION="en_US.UTF-8"
 LC_ALL=en_US.UTF-8
 
+# From http://blog.effy.cz/2014/07/maven-build-notifications.html
+notify-after () {
+    CMD=$1
+    shift
+
+    $CMD $@
+    RETCODE=$?
+    BUILD_DIR=${PWD##*/}
+    BUILD_CMD=`basename $CMD`
+    if [ $RETCODE -eq 0 ]
+    then
+        notify-send -c $BUILD_CMD -i emblem-default -t 1800000 "$BUILD_DIR: $BUILD_CMD successful" "$(date)"
+    elif [ $RETCODE -eq 130 ]
+    then
+        notify-send -c $BUILD_CMD -i emblem-ohno -t 1800000 "$BUILD_DIR: $BUILD_CMD canceled" "$(date)"
+    else
+        notify-send -c $BUILD_CMD -i emblem-important -t 1800000 "$BUILD_DIR: $BUILD_CMD failed" "$(date)"
+    fi
+    return $RETCODE
+}
+
 # Idea
 # From http://stackoverflow.com/questions/5124368/gradle-doesnt-work-in-intellij-problems-with-java-home
-IDEA_JDK=/usr/lib/jvm/java-8-oracle
+IDEA_JDK=/usr/lib/jvm/java-8-openjdk-amd64
 
-# Java 8
-JAVA8_HOME=/usr/lib/jvm/java-8-oracle
-NASHORN_HOME=/usr/lib/jvm/java-8-oracle/bin
+# Java
+JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+NASHORN_HOME=$JAVA_HOME/bin
+M2_HOME=/usr/share/maven
+MAVEN_HOME=$M2_HOME
+MAVEN_OPTS="-Xmx2048m -Xms512m -XX:MaxPermSize=312M -XX:ReservedCodeCacheSize=128m -Dsun.lang.ClassLoader.allowArraySyntax=true -ea -Dfile.encoding=UTF-8"
+MAVEN_JMX="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=6969 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false"
 
 # Git
 source ~/bin/git/git-completion.bash
 source ~/bin/git/git-prompt.sh
 
-# Android SDK
-ANDROID_HOME=/usr/local/share/android-sdk
-
 # Path additions
-PATH=$PATH:/usr/local/share/scala-2.10.3/bin:/usr/local/share/scala-2.10.3/sbt/bin:/usr/local/share/apache-maven/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools
+# PATH=$PATH:...
 
 # Clojure
 export CLOJURE_EXT=$HOME/.m2/repository/org/clojure/clojure/1.6.0/clojure-1.6.0.jar
@@ -220,68 +255,6 @@ function man () {
 # unalias man
 # alias man=emacs-man
 
-export GEM_HOME=/home/kapitan/.gem/ruby/2.2.0
-
-###-begin-npm-completion-###
-#
-# npm command completion script
-#
-# Installation: npm completion >> ~/.bashrc  (or ~/.zshrc)
-# Or, maybe: npm completion > /usr/local/etc/bash_completion.d/npm
-#
-
-COMP_WORDBREAKS=${COMP_WORDBREAKS/=/}
-COMP_WORDBREAKS=${COMP_WORDBREAKS/@/}
-export COMP_WORDBREAKS
-
-if type complete &>/dev/null; then
-    _npm_completion () {
-        local si="$IFS"
-        IFS=$'\n' COMPREPLY=($(COMP_CWORD="$COMP_CWORD" \
-                                         COMP_LINE="$COMP_LINE" \
-                                         COMP_POINT="$COMP_POINT" \
-                                         npm completion -- "${COMP_WORDS[@]}" \
-                                         2>/dev/null)) || return $?
-        IFS="$si"
-    }
-    complete -F _npm_completion npm
-elif type compdef &>/dev/null; then
-    _npm_completion() {
-        si=$IFS
-        compadd -- $(COMP_CWORD=$((CURRENT-1)) \
-                               COMP_LINE=$BUFFER \
-                               COMP_POINT=0 \
-                               npm completion -- "${words[@]}" \
-                               2>/dev/null)
-        IFS=$si
-    }
-    compdef _npm_completion npm
-elif type compctl &>/dev/null; then
-    _npm_completion () {
-        local cword line point words si
-        read -Ac words
-        read -cn cword
-        let cword-=1
-        read -l line
-        read -ln point
-        si="$IFS"
-        IFS=$'\n' reply=($(COMP_CWORD="$cword" \
-                                     COMP_LINE="$line" \
-                                     COMP_POINT="$point" \
-                                     npm completion -- "${words[@]}" \
-                                     2>/dev/null)) || return $?
-        IFS="$si"
-    }
-    compctl -K _npm_completion npm
-fi
-###-end-npm-completion-###
-
-## From https://stackoverflow.com/questions/10081293/install-npm-into-home-directory-with-distribution-nodejs-package-ubuntu
-NPM_PACKAGES="$HOME/.local/share/nodejs"
-PATH="$NPM_PACKAGES/bin:$PATH"
-MANPATH="$NPM_PACKAGES/share/man:$MANPATH"
-NODE_PATH="$NPM_PACKAGES/lib/node_modules:$NODE_PATH"
-
 # Leiningen
 export LEIN_JVM_OPTS=
 # MOVED TO /etc/bash_completion.d
@@ -296,5 +269,7 @@ export BOOT_COLOR=1
 
 # put /bin/node_modules executables in path
 
-NODE_BIN_PATHS=$(find ~/bin/node_modules/ -type f -executable -exec dirname {} \; | grep bin$ | tr '\n' ':')
-PATH="$PATH:$NODE_BIN_PATHS"
+#NODE_BIN_PATHS=$(find ~/bin/node_modules/ -type f -executable -exec dirname {} \; | grep bin$ | tr '\n' ':')
+#PATH="$PATH:$NODE_BIN_PATHS"
+
+export GIT_HOME=~/git
