@@ -23,7 +23,8 @@ bin/restoresecret.sh $SSH_DIR/5BB502F6_rsa.enc $SSH_DIR/5BB502F6_rsa
 chmod 600 $SSH_DIR/*
 
 echo -e "${LIGHT_GREEN}Installing packages...${NC}"
-sudo apt-get install rxvt-unicode i3 rofi qasmixer scrot cmake arandr silversearcher-ag zeal xsel docker docker-compose exuberant-ctags
+sudo apt-get install rxvt-unicode i3 rofi qasmixer scrot cmake arandr silversearcher-ag zeal \
+     xsel docker docker-compose exuberant-ctags openjdk-8-jdk openjdk-8-doc tree
 
 echo -e "${LIGHT_GREEN}Installing cask...${NC}"
 curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python
@@ -34,6 +35,28 @@ mkdir -p $HOME/.fonts
 cp -Riv fonts/. $HOME/.fonts
 fc-cache -rv
 
-echo -e "${LIGHT_RED}Installing bash auto-completions...${NC}"
+echo -e "${LIGHT_RED}Installing docker bash auto-completions...${NC}"
 curl -L https://raw.githubusercontent.com/docker/compose/$(docker-compose version --short)/contrib/completion/bash/docker-compose > $TEMP_DIR/docker-compose
-sudo mv $TEMP_DIR/docker-compose /etc/bash_completion.d/docker-compose
+sudo cp -iv --no-preserve=mode,ownership $TEMP_DIR/docker-compose /etc/bash_completion.d/docker-compose
+rm -fv $TEMP_DIR/docker-compose
+
+echo -e "${LIGHT_GREEN}Installing nvm (Node Version Manager)...${NC}"
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.32.1/install.sh | bash
+NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+
+echo -e "${LIGHT_RED}Installing Node.js...${NC}"
+NPM_PACKAGES="$HOME/.local/share/npm-packages"
+mkdir -p "$NPM_PACKAGES"
+nvm install node
+nvm use node
+nvm alias default node
+
+echo -e "${LIGHT_RED}Installing Node.js bash auto-completions...${NC}"
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.32.1/bash_completion > $TEMP_DIR/nvm
+sudo cp -iv --no-preserve=mode,ownership $TEMP_DIR/nvm /etc/bash_completion.d/nvm
+rm -fv $TEMP_DIR/nvm
+
+npm completion > $TEMP_DIR/npm
+sudo cp -iv --no-preserve=mode,ownership $TEMP_DIR/npm /etc/bash_completion.d/npm
+rm -fv $TEMP_DIR/npm
