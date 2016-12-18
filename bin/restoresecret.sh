@@ -44,7 +44,8 @@ SRC_FILE=$1
 
 DEST_FILE=
 if [ -d $2 ] ; then
-    DEST_FILE=$2$1
+    NORMALIZED_DIR=$(readlink -e $2)
+    DEST_FILE=$NORMALIZED_DIR/$1
 else
     DEST_FILE=$2
 fi
