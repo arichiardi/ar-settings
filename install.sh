@@ -30,15 +30,14 @@ echo -e "${LIGHT_GREEN}Installing cask...${NC}"
 curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python
 ln -s $HOME/.cask/bin/cask $HOME/bin/cask
 
+echo -e "${LIGHT_GREEN}Installing leiningen...${NC}"
+curl -o- https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein > $HOME/bin/lein
+chmod +x $HOME/bin/lein
+
 echo -e "${LIGHT_GREEN}Installing fonts and refreshing cache...${NC}"
 mkdir -p $HOME/.fonts
 cp -Riv fonts/. $HOME/.fonts
 fc-cache -rv
-
-echo -e "${LIGHT_RED}Installing docker bash auto-completions...${NC}"
-curl -L https://raw.githubusercontent.com/docker/compose/$(docker-compose version --short)/contrib/completion/bash/docker-compose > $TEMP_DIR/docker-compose
-sudo cp -iv --no-preserve=mode,ownership $TEMP_DIR/docker-compose /etc/bash_completion.d/docker-compose
-rm -fv $TEMP_DIR/docker-compose
 
 echo -e "${LIGHT_GREEN}Installing nvm (Node Version Manager)...${NC}"
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.32.1/install.sh | bash
@@ -52,8 +51,16 @@ nvm install node
 nvm use node
 nvm alias default node
 
-echo -e "${LIGHT_RED}Installing Node.js bash auto-completions...${NC}"
-curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.32.1/bash_completion > $TEMP_DIR/nvm
+echo -e "${LIGHT_RED}Installing bash completions...${NC}"
+curl -o- https://raw.githubusercontent.com/docker/compose/$(docker-compose version --short)/contrib/completion/bash/docker-compose > $TEMP_DIR/docker-compose
+sudo cp -iv --no-preserve=mode,ownership $TEMP_DIR/docker-compose /etc/bash_completion.d/docker-compose
+rm -fv $TEMP_DIR/docker-compose
+
+curl -o- https://raw.githubusercontent.com/technomancy/leiningen/master/bash_completion.bash > $TEMP_DIR/lein
+sudo cp -iv --no-preserve=mode,ownership $TEMP_DIR/lein /etc/bash_completion.d/lein
+rm -fv $TEMP_DIR/lein
+
+curl -o- https://raw.githubusercontent.com/creationix/nvm/master/bash_completion > $TEMP_DIR/nvm
 sudo cp -iv --no-preserve=mode,ownership $TEMP_DIR/nvm /etc/bash_completion.d/nvm
 rm -fv $TEMP_DIR/nvm
 
