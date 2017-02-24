@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Poweroff
+Icon=system-restart
+Exec="reboot"
+Comment=Reboot the machine
+Categories=System;
+Terminal=false
