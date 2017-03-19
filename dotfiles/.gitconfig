@@ -1,6 +1,8 @@
 [user]
     email = "a.richiardi.work@gmail.com"
     name = "Andrea Richiardi"
+[gpg]
+    program = gpg2
 [color]
     filemode = false
     diff = auto
