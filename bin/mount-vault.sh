@@ -1,9 +1,9 @@
 #!/bin/bash
 
 DEV_LOOP=$(sudo losetup -f)
-MOUNT_POINT=~/tmp/vault
+MOUNT_POINT=/tmp/vault
 
-echo -e "Mounting vault on ${DEV_LOOP}..."
+echo -e "Mounting vault on $DEV_LOOP..."
 sudo losetup $DEV_LOOP $1
 
 if [ "$?" = "0" ]; then
@@ -12,8 +12,8 @@ if [ "$?" = "0" ]; then
 
     if [ "$?" = "0" ]; then
         echo -e "Mounting vault..."
-        mkdir -p /tmp/backup
-        sudo mount /dev/mapper/vault ~/tmp/vault
+        mkdir -p $MOUNT_POINT
+        sudo mount /dev/mapper/vault $MOUNT_POINT
 
         if [ "$?" = "0" ]; then
             echo -e "Completed, vault mounted on $MOUNT_POINT"

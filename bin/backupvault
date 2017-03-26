@@ -1,0 +1,15 @@
+#!/bin/sh
+
+TARSNAP=$(which tarsnap)
+CONF=$HOME/.backup/vault.tarsnap
+WORK_DIR=/tmp
+ROOT_DIR=vault
+
+$TARSNAP --configfile "$CONF" \
+-C "$WORK_DIR" \
+-c \
+-v \
+-f "$(uname -n)-$(date +%Y%m%d-%H%M%S)" \
+"$ROOT_DIR"
+
+cd -
