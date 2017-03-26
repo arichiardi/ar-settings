@@ -56,16 +56,16 @@ if [ -f $DEST_FILE ] ; then
     read -t $ANSWER_TIMEOUT ANS
     ANS=${ANS,,}
     if [ $ANS == 'y' ] ; then
-      shred $SHRED_OPTS $DEST_FILE 2> /dev/null
+        shred $SHRED_OPTS $DEST_FILE 2> /dev/null
     else
-      exit 0
+        exit 0
     fi
 fi
 
 do_fail() {
-  shred $SHRED_OPTS $DEST_FILE 2> /dev/null
-  echo Cannot decript, probably because of invalid passphrase!
-  exit 1
+    shred $SHRED_OPTS $DEST_FILE 2> /dev/null
+    echo Cannot decript, probably because of invalid passphrase!
+    exit 1
 }
 
 echo -n Decrypting backup...

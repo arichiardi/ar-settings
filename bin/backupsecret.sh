@@ -62,32 +62,32 @@ if [ -f $DEST_FILE ] ; then
     read -t $ANSWER_TIMEOUT ANS
     ANS=${ANS,,}
     if [ $ANS == 'y' ] ; then
-      shred $SHRED_OPTS $DEST_FILE 2> /dev/null
+        shred $SHRED_OPTS $DEST_FILE 2> /dev/null
     else
-      exit 0
+        exit 0
     fi
 fi
 
 do_clean() {
-  shred $SHRED_OPTS $SRC_FILE 2> /dev/null
-  shred $SHRED_OPTS $TMP_FILE 2> /dev/null
+    shred $SHRED_OPTS $SRC_FILE 2> /dev/null
+    shred $SHRED_OPTS $TMP_FILE 2> /dev/null
 }
 
 do_fail_clean_temp() {
-  shred $SHRED_OPTS $TMP_FILE 2> /dev/null
-  echo failed!
-  exit 1
+    shred $SHRED_OPTS $TMP_FILE 2> /dev/null
+    echo failed!
+    exit 1
 }
 
 do_fail() {
-  echo failed!
-  exit 1
+    echo failed!
+    exit 1
 }
 
 TMP_FILE=/tmp/bkp$STAMP
 
 echo -n Encrypting backup...
-openssl enc $OPENSSL_OPTS -in $SRC_FILE -out $TMP_FILE 2> /dev/null
+openssl enc $OPENSSL_OPTS -in $SRC_FILE -out $TMP_FILE
 [ 0 -ne $? ] && do_fail_clean_temp
 echo done.
 $CP $TMP_FILE $DEST_FILE
