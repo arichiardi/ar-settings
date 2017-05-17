@@ -1,6 +1,7 @@
 [user]
     email = "a.richiardi.work@gmail.com"
     name = "Andrea Richiardi"
+    signingkey = 0x5BB502F6
 [gpg]
     program = gpg2
 [color]
@@ -16,7 +17,6 @@
 [core]
     editor = emacsclient -t
     autocrlf = false
-	filemode = false
 [rebase]
     tool = meld184
     conflictstyle = diff3
@@ -24,18 +24,14 @@
 [branch]
     autosetuprebase = always
 [include]
-    path = /home/kapitan/.gitidentities/a.richiardi.work@gmail.com
+    path = ~/.gitidentities/a.richiardi.work@gmail.com
 [merge]
     tool = ediff
 [mergetool "ediff"]
-    cmd = /home/kapitan/bin/ediff-merge-script \"$LOCAL\" \"$REMOTE\" \"$MERGED\" \"$BASE\"
+    cmd = ~/bin/ediff-merge-script \"$LOCAL\" \"$REMOTE\" \"$MERGED\" \"$BASE\"
     trustExitCode = true
-#[merge]
-#    tool = meld184
-#    conflictstyle = diff3
-#    ff = no
-#[mergetool "meld184"]$
-#    cmd = meld --auto-merge $LOCAL $BASE $REMOTE --diff $BASE $LOCAL --diff $BASE $REMOTE --output $MERGED
+[diff]
+    compactionHeuristic = true
 [diff "jpg"]
     binary = true
     textconv = hexdump -v -C
@@ -51,6 +47,7 @@
     c = "commit"
     p = "pull"
     f = "fetch -v"
+    fp = "!f() { git fetch -v && git pull; }; f"
     fa = "fetch -v --all"
     pr = "pull --rebase"
     a = "add"
@@ -68,8 +65,8 @@
     ds = "diff --staged"
     rmt = "remote"
     rmta = "remote add"
-	rmtv = "remote --verbose"
-	r = "rebase"
+    rmtv = "remote --verbose"
+    r = "rebase"
     rc = "rebase --continue"
     ri = "rebase --interactive"
     ra = "rebase --abort"
@@ -77,7 +74,7 @@
     ss = status --short -uno
     ln = log --graph --decorate --pretty=oneline --abbrev-commit
     lna = log --graph --decorate --pretty=format:"%h%x09%an%x09%ad%x09%s" --abbrev-commit
-    patch = log -p --pretty=full
+    patch = !git --no-pager diff --no-color
     fixup = !sh -c 'REV=$(git rev-parse $1) && git commit --fixup $@ && git rebase -i --autosquash $REV^' -
     fixprev = "!f() { SHA=$(git rev-parse HEAD) && REV=$(git rev-parse $SHA) && git commit --fixup $SHA && git rebase -i --autosquash $REV^; }; f -"
     squash = !sh -c 'REV=$(git rev-parse $1) && git commit --squash $@ && git rebase -i --autosquash $REV^' -
@@ -89,13 +86,13 @@
     unassume = "update-index --no-assume-unchanged"
     assumed = "!git ls-files -v | grep ^h | cut -c 3-"
     unassumeall = "!git assumed | xargs git update-index --no-assume-unchanged"
-    ours = "!f() { git co --ours $@ && git add $@; }; f"
-    theirs = "!f() { git co --theirs $@ && git add $@; }; f"
+    ours = "!f() { git checkout --ours $@ && git add $@; }; f"
+    theirs = "!f() { git checkout --theirs $@ && git add $@; }; f"
     rsa = "reset HEAD *"
     rsh = "reset HEAD"
-	rsh1 = "reset HEAD^"
-	rshhh = "reset --hard"
+    rsh1 = "reset HEAD^"
+    rshhh = "reset --hard"
     sa = "stash apply"
-	sl = "stash list"
-	ski = "stash save --keep-index"
-	rmsub = "!f(){ git rm --cached \"$1\";rm -rv \"$1\";rm -rfv \".git/modules/$1\";git config -f .gitmodules --remove-section \"submodule.$1\";git config -f .git/config --remove-section \"submodule.$1\";git add .gitmodules; }; f"
+    sl = "stash list"
+    ski = "stash save --keep-index"
+    rmsub = "!f(){ git rm --cached \"$1\";rm -rv \"$1\";rm -rfv \".git/modules/$1\";git config -f .gitmodules --remove-section \"submodule.$1\";git config -f .git/config --remove-section \"submodule.$1\";git add .gitmodules; }; f"
