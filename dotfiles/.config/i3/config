@@ -168,7 +168,7 @@ bindsym $mod+Shift+r mode "resize"
 # finds out, if available)
 bar {
         status_command i3status
-        tray_output LVDS1
+        tray_output primary
         font pango:Inconsolata-g 9
 }
 
@@ -227,6 +227,8 @@ bindsym $mod+F6 exec "rhythmbox-client --previous"
 bindsym $mod+F7 exec "rhythmbox-client --clear-queue"
 bindsym --release Print exec --no-startup-id scrot
 bindsym --release Shift+Print exec --no-startup-id scrot -s
+bindsym XF86MonBrightnessDown exec "xbacklight -dec 20"
+bindsym XF86MonBrightnessUp exec "xbacklight -inc 20"
 
 # class                 border  backgr. text    indicator child_border
 client.focused          #285577 #0f2c4c #ffffff #90220f   #285577
@@ -303,16 +305,13 @@ exec --no-startup-id blueman-applet
 # Setup the right screen layout
 # exec --no-startup-id ~/bin/hdmi1-right-of-lvds1.sh
 
-# Now lives in /etc/systemd/user/emacs.service
-# exec --no-startup-id emacs --daemon
-
-mode "projects" {
-
-     # bindsym r exec ~/bin/project-terminals.sh --both
-
-     # Exit to the default mode
-     bindsym Return mode "default"
-     bindsym Escape mode "default"
-}
-
-bindsym $mod+Shift+b mode "booma"
+# Sample for creation a project mode
+#mode "projects" {
+#
+#     # bindsym r exec ~/bin/project-terminals.sh --both
+#
+#     # Exit to the default mode
+#     bindsym Return mode "default"
+#     bindsym Escape mode "default"
+#}
+#bindsym $mod+Shift+b mode "projects"
