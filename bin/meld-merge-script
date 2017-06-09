@@ -1,0 +1,39 @@
+#!/bin/bash
+# set -x
+
+# Handles proper use of Meld from Git.
+#
+# To use, place this script in your path, make it executable, then run
+#   git config --global merge.tool meldscript
+#   git config --global mergetool.meldscript.cmd meld-merge-script $LOCAL $REMOTE $MERGED $BASE
+
+LOCAL="$1"
+REMOTE="$2"
+MERGED="$3"
+BASE="$4"
+
+echo -e "\nLOCAL=$LOCAL"
+echo -e "REMOTE=$REMOTE"
+echo -e "BASE=$BASE"
+echo -e "MERGED=$MERGED"
+
+meld --auto-compare --auto-merge "$LOCAL" "$MERGED" "$REMOTE" \
+     --diff "$BASE" "$LOCAL" \
+     --diff "$BASE" "$REMOTE"
+
+# check modified file for unwanted conflict markers
+# echo $_MERGED | xargs egrep '[><]{7}' -H -I --line-number
+git --no-pager diff --check "$MERGED"
+
+if [ $? -ne 0 ]; then
+    _BASENAME=$(which basename)
+    _MKTEMP=$(which mktemp)
+    MERGED_BACKUP=$(${_MKTEMP} --tmpdir `${_BASENAME} $MERGED`.XXXXXXXXXX)
+    cp -iv "$MERGED" "$MERGED_BACKUP"
+    echo 1>&2 "Oops! Conflict markers detected in $MERGED."
+    echo 1>&2 "Saved your changes to $MERGED_BACKUP"
+    echo 1>&2 "Exiting with code 1."
+    exit 1
+else
+    exit 0
+fi

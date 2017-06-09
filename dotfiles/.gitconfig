@@ -26,9 +26,9 @@
 [include]
     path = ~/.gitidentities/a.richiardi.work@gmail.com
 [merge]
-    tool = ediff
-[mergetool "ediff"]
-    cmd = ~/bin/ediff-merge-script \"$LOCAL\" \"$REMOTE\" \"$MERGED\" \"$BASE\"
+    tool = meld-merge-script
+[mergetool "meld-merge-script"]
+    cmd = ~/bin/meld-merge-script \"$LOCAL\" \"$REMOTE\" \"$MERGED\" \"$BASE\"
     trustExitCode = true
 [diff]
     compactionHeuristic = true
