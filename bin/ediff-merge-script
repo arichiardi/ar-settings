@@ -1,4 +1,5 @@
 #!/bin/bash
+# set -x
 
 # test args
 if [ ! ${#} -ge 3 ]; then
@@ -12,12 +13,13 @@ _EMACSCLIENT=$(which emacsclient)
 _BASENAME=$(which basename)
 _CP=$(which cp)
 _EGREP=$(which egrep)
-_MKTEMP=/tmp
+_MKTEMP=$(which mktemp)
 
 # args
 _LOCAL=${1}
 _REMOTE=${2}
 _MERGED=${3}
+
 if [ -r ${4} ] ; then
     _BASE=${4}
     _EDIFF=ediff-merge-files-with-ancestor
@@ -38,15 +40,17 @@ fi
 # run emacsclient
 ${_EMACSCLIENT} ${_EMACSCLIENTOPTS} -a "" -e "(${_EVAL})" 2>&1
 
-# check modified file
-if [ ! $(egrep -c '^(<<<<<<<|=======|>>>>>>>|####### Ancestor)' ${_MERGED}) = 0 ]; then
+# check modified file for unwanted conflict markers
+# echo $_MERGED | xargs egrep '[><]{7}' -H -I --line-number
+$(git --no-pager diff --check $_MERGED > /dev/null >&2)
+
+if [ $? -ne 0 ]; then
     _MERGEDSAVE=$(${_MKTEMP} --tmpdir `${_BASENAME} ${_MERGED}`.XXXXXXXXXX)
     ${_CP} ${_MERGED} ${_MERGEDSAVE}
     echo 1>&2 "Oops! Conflict markers detected in $_MERGED."
     echo 1>&2 "Saved your changes to ${_MERGEDSAVE}"
     echo 1>&2 "Exiting with code 1."
     exit 1
+else
+    exit 0
 fi
-
-exit 0
-
