@@ -9,9 +9,11 @@ alias rethinkdb='docker start rethinkdb'
 alias postgres='sudo systemctl stop postgresql.service'
 alias docker-tcp='sudo systemctl stop docker; nohup sudo docker daemon -H tcp://localhost:4243 --raw-logs > /dev/null 2>&1 &'
 alias docker-rmia='docker rmi $(docker images -qf "dangling=true")'
+alias usb='udisksctl mount -b'
+alias uusb='udisksctl unmount -b
 
 # Clojure
-alias clj='lein repl'
+alias l='lein'
 alias b='boot'
 
 # Emacs

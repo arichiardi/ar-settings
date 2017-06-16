@@ -22,10 +22,13 @@ mkdir -p $SSH_DIR
 bin/restoresecret.sh $SSH_DIR/5BB502F6_rsa.enc $SSH_DIR/5BB502F6_rsa
 chmod 600 $SSH_DIR/*
 
+echo -e "${LIGHT_GREEN}Updating apt...${NC}"
+sudo apt-get update
+
 echo -e "${LIGHT_GREEN}Installing packages...${NC}"
 sudo apt-get install rxvt-unicode i3 rofi qasmixer scrot cmake arandr silversearcher-ag zeal \
      xsel docker docker-compose exuberant-ctags openjdk-8-jdk openjdk-8-doc tree \
-     rlwrap awscli markdown xclip xbacklight texinfo meld
+     rlwrap awscli markdown xclip xbacklight texinfo meld python3-pip
 
 echo -e "${LIGHT_GREEN}Installing cask...${NC}"
 curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python
