@@ -7,8 +7,11 @@ NC='\033[0m' # No Color
 SSH_DIR=$HOME/.ssh
 TEMP_DIR=$(mktemp -d -t)
 
-echo -e "${LIGHT_GREEN}Copying bin scripts...${NC}"
+echo -e "${LIGHT_GREEN}Create necessary folders...${NC}"
 mkdir -p $HOME/bin
+mkdir -p $HOME/tmp/vault
+
+echo -e "${LIGHT_GREEN}Copying bin scripts...${NC}"
 cp -Riv bin/. $HOME/bin
 
 echo -e "${LIGHT_RED}Copying etc folder...${NC}"
@@ -28,7 +31,7 @@ sudo apt-get update
 echo -e "${LIGHT_GREEN}Installing packages...${NC}"
 sudo apt-get install rxvt-unicode i3 rofi qasmixer scrot cmake arandr silversearcher-ag zeal \
      xsel docker docker-compose exuberant-ctags openjdk-8-jdk openjdk-8-doc tree \
-     rlwrap awscli markdown xclip xbacklight texinfo meld python3-pip
+     rlwrap awscli markdown xclip xbacklight texinfo meld python3-pip cryptsetup
 
 echo -e "${LIGHT_GREEN}Installing cask...${NC}"
 curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python

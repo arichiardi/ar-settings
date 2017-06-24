@@ -219,7 +219,8 @@ bindsym $mod+Shift+f mode "focused"
 
 # Custom bindings
 bindsym Mod4+e exec "emacsclient -c -a emacs"
-bindsym Mod4+h exec "/usr/bin/thunar /home/kapitan"
+bindsym Mod4+h exec "/usr/bin/gentoo -1 ~/Downloads -2 ~"
+bindsym Mod4+v exec "/usr/bin/gentoo -1 ~/tmp/vault -2 ~"
 bindsym Shift+Ctrl+p exec "/usr/bin/keepass2"
 bindsym $mod+F4 exec "rhythmbox-client --play-pause"
 bindsym $mod+F5 exec "rhythmbox-client --next"
