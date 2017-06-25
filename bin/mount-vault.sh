@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 LOOP_DEV=$(sudo losetup -j $1)
 if [ ! -z "$LOOP_DEV" ] ; then
    echo -e "The vault $1 is already mounted!";
