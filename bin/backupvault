@@ -1,15 +1,30 @@
 #!/bin/sh
 
+set -e
+
 TARSNAP=$(which tarsnap)
-CONF=$HOME/.backup/vault.tarsnap
+if [ -z "$TARSNAP" ]; then
+    echo "Tarsnap is not installed, see https://www.tarsnap.com/download.html"
+    exit 1
+fi
+
+CONF=$HOME/.backup/tarsnap.conf
 WORK_DIR=/tmp
 ROOT_DIR=vault
 
-$TARSNAP --configfile "$CONF" \
--C "$WORK_DIR" \
--c \
--v \
--f "$(uname -n)-$(date +%Y%m%d-%H%M%S)" \
-"$ROOT_DIR"
+$TARSNAP --verify-config $CONF
+
+if [ "$1" = "--fsck" -o "$1" = "-f" -o "$1" = "--cache" ] ; then
+    echo "Rebuilding tarsnap cache...";
+    $TARSNAP --fsck --configfile "$CONF";
+else
+    echo "Performing tarsnap backup...";
+    $TARSNAP --configfile "$CONF" \
+             -C "$WORK_DIR" \
+             -c \
+             -v \
+             -f "$(uname -n)-$(date +%Y%m%d-%H%M%S)" \
+             "$ROOT_DIR";
+fi
 
 cd -
