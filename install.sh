@@ -7,9 +7,13 @@ NC='\033[0m' # No Color
 SSH_DIR=$HOME/.ssh
 TEMP_DIR=$(mktemp -d -t)
 
-echo -e "${LIGHT_GREEN}Create necessary folders...${NC}"
+echo -e "${LIGHT_GREEN}Create necessary dirs...${NC}"
 mkdir -p $HOME/bin
-mkdir -p $HOME/tmp/vault
+mkdir -p $HOME/tmp
+mkdir -p /tmp/vault
+
+echo -e "${LIGHT_GREEN}Setting up vault dir...${NC}"
+sudo chmod g+s /tmp/vault
 
 echo -e "${LIGHT_GREEN}Copying bin scripts...${NC}"
 cp -Riv bin/. $HOME/bin

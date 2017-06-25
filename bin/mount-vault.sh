@@ -1,7 +1,13 @@
 #!/bin/bash
 
+LOOP_DEV=$(sudo losetup -j $1)
+if [ ! -z "$LOOP_DEV" ] ; then
+   echo -e "The vault $1 is already mounted!";
+   exit 1;
+fi
+
 DEV_LOOP=$(sudo losetup -f)
-MOUNT_POINT=$HOME/tmp/vault
+MOUNT_POINT=/tmp/vault
 
 echo -e "Mounting vault on $DEV_LOOP..."
 sudo losetup $DEV_LOOP $1

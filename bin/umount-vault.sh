@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MOUNT_POINT=$HOME/tmp/vault
+MOUNT_POINT=/tmp/vault
 BKP_VAULT_BIN=$HOME/bin/backupvault
 
 ANSWER_TIMEOUT=10
@@ -26,6 +26,9 @@ fi
 
 echo -e "Umounting vault from $MOUNT_POINT..."
 sudo umount $MOUNT_POINT
+
+echo -e "Avoding executables..."
+find $MOUNT_POINT -type f \( -perm -u=x -o -perm -g=x -o -perm -o=x \) -exec sudo chmod -v 664 {} ";"
 
 if [ "$?" = "0" ]; then
     echo -e "Encrypting back again..."
