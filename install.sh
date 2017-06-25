@@ -78,3 +78,7 @@ rm -fv $TEMP_DIR/nvm
 npm completion > $TEMP_DIR/npm
 sudo cp -iv --no-preserve=mode,ownership $TEMP_DIR/npm /etc/bash_completion.d/npm
 rm -fv $TEMP_DIR/npm
+
+curl -o- https://raw.githubusercontent.com/github/hub/master/etc/hub.bash_completion.sh > $TEMP_DIR/hub
+sudo cp -iv --no-preserve=mode,ownership $TEMP_DIR/hub /etc/bash_completion.d/hub
+rm -fv $TEMP_DIR/hub

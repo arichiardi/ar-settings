@@ -27,7 +27,7 @@ alias adbstart='sudo /usr/local/share/android-sdk/platform-tools/adb start-serve
 alias adbrestart='adbkill;adbstart'
 
 # Git
-alias g='git'
+alias g='hub'
 
 # from http://stackoverflow.com/questions/7066325/how-to-list-show-git-aliases
 alias gitalias="git config --get-regexp ^alias\."
