@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DEV_LOOP=$(sudo losetup -f)
-MOUNT_POINT=/tmp/vault
+MOUNT_POINT=$HOME/tmp/vault
 
 echo -e "Mounting vault on $DEV_LOOP..."
 sudo losetup $DEV_LOOP $1

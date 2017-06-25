@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MOUNT_POINT=/tmp/vault
+MOUNT_POINT=$HOME/tmp/vault
 BKP_VAULT_BIN=$HOME/bin/backupvault
 
 ANSWER_TIMEOUT=10
