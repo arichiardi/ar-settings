@@ -39,7 +39,7 @@ sudo apt-get install rxvt-unicode i3 rofi qasmixer scrot cmake arandr silversear
 
 echo -e "${LIGHT_GREEN}Installing cask...${NC}"
 curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python
-ln -s $HOME/.cask/bin/cask $HOME/bin/cask
+ln -si $HOME/.cask/bin/cask $HOME/bin/cask
 
 echo -e "${LIGHT_GREEN}Installing leiningen...${NC}"
 curl -o- https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein > $HOME/bin/lein
