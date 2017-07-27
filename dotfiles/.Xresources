@@ -45,8 +45,8 @@ xterm*ttyModes: erase ^?
 xterm*visualBell: false
 xterm*scrollBar: false
 xterm*saveLines: 16384
-xterm*faceName: Inconsolata\\-g
-xterm*faceSize: 14
+xterm*faceName: Deja Vu Sans Mono
+xterm*faceSize: 16
 !xterm*font:
 xterm*reverseVideo: off
 xterm*bellIsUrgent: true
@@ -60,14 +60,15 @@ yeahconsole*term:urxvt
 yeahconsole*toggleKey:None+F4
 yeahconsole*keyBigger:ControlAlt+equal
 yeahconsole*keySmaller:ControlAlt+minus
-yeahconsole*font: xft:Inconsolata\\-g:style=g:antialias=true:hinting=true:size=11
+yeahconsole*font: xft:Deja Vu Sans Mono:style=g:antialias=false:hinting=false:size=12
 yeahconsole*consoleHeight: 18
 yeahconsole*aniDelay: 0
 yeahconsole*stepSize: 2
 ! Emacs
-Emacs.font: Inconsolata\\-g
+! Emacs.FontBackend: xft
+Emacs.font: Deja Vu Sans Mono 11
 
 ! X Colors settings
-#include "/home/kapitan/.Xresources.d/theme"
-#include "/home/kapitan/.Xresources.d/urxvt"
-#include "/home/kapitan/.Xresources.d/rofi"
+#include "/home/arichiardi/.Xresources.d/theme"
+#include "/home/arichiardi/.Xresources.d/urxvt"
+#include "/home/arichiardi/.Xresources.d/rofi"
