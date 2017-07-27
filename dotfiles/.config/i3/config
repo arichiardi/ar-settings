@@ -217,10 +217,10 @@ mode "focused" {
 bindsym $mod+Shift+f mode "focused"
 
 # Custom bindings
-bindsym Mod4+e exec "emacsclient -c -a emacs"
+bindsym Mod4+e exec "$HOME/bin/emacsclient-daemon.sh -c"
 bindsym Mod4+h exec "/usr/bin/gentoo -1 ~/Downloads -2 ~"
 bindsym Mod4+v exec "/usr/bin/gentoo -1 ~/tmp/vault -2 ~"
-bindsym Shift+Ctrl+p exec "/usr/bin/keepass2"
+bindsym Shift+Ctrl+p exec "/usr/bin/keepassx"
 bindsym $mod+F4 exec "rhythmbox-client --play-pause"
 bindsym $mod+F5 exec "rhythmbox-client --next"
 bindsym $mod+F6 exec "rhythmbox-client --previous"
@@ -229,6 +229,13 @@ bindsym --release Print exec --no-startup-id scrot
 bindsym --release Shift+Print exec --no-startup-id scrot -s
 bindsym XF86MonBrightnessDown exec "xbacklight -dec 20"
 bindsym XF86MonBrightnessUp exec "xbacklight -inc 20"
+bindsym XF86AudioRaiseVolume exec "amixer -D pulse sset Master 5%+"
+bindsym XF86AudioLowerVolume exec "amixer -D pulse sset Master 5%-"
+bindsym XF86AudioMute exec "amixer -D pulse sset Master toggle"
+# Mic
+bindsym Shift+XF86AudioRaiseVolume exec "amixer -D pulse set Capture 10%+"
+bindsym Shift+XF86AudioLowerVolume exec "amixer -D pulse set Capture 10%-"
+bindsym XF86AudioMicMute exec ~/bin/mute-mic
 
 # class                 border  backgr. text    indicator child_border
 client.focused          #285577 #0f2c4c #ffffff #90220f   #285577
@@ -240,16 +247,15 @@ hide_edge_borders vertical
 ## Manual management of external displays
 # https://wiki.archlinux.org/index.php/i3
 # Set the shortcuts and what they do
-set $mode_display Ext Screen (v) VGA ON, (h) HDMI ON, (x) VGA OFF, (y) HDMI OFF
+set $mode_display Ext Screen (x) MAIN ONLY, (1) 1 HDMI RIGHT, (2) 2 HDMI RIGHT
 mode "$mode_display" {
-    bindsym v exec --no-startup-id xrandr --output VGA1 --auto --right-of LVDS1, mode "default"
-    bindsym h exec --no-startup-id xrandr --output HDMI1 --auto --right-of LVDS1, mode "default"
-    bindsym x exec --no-startup-id xrandr --output VGA1 --auto --off, mode "default"
-    bindsym y exec --no-startup-id xrandr --output HDMI1 --auto --off, mode "default"
+  bindsym x exec --no-startup-id ~/bin/lvds1-only.sh
+  bindsym 1 exec --no-startup-id ~/bin/hdmi1-right-of-lvds1.sh
+  bindsym 2 exec --no-startup-id ~/bin/hdmis-right-of-primary.sh
 
-    # back to normal: Enter or Escape
-    bindsym Return mode "default"
-    bindsym Escape mode "default"
+  # back to normal: Enter or Escape
+  bindsym Return mode "default"
+  bindsym Escape mode "default"
 }
 
 # Declare here the shortcut to bring the display selection menu
@@ -263,56 +269,23 @@ exec --no-startup-id /usr/bin/gnome-keyring-daemon --start --components=pkcs11
 exec --no-startup-id /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1
 exec --no-startup-id gnome-settings-daemon --start --components=secrets
 exec --no-startup-id /usr/bin/gnome-keyring-daemon --start --components=ssh
-exec --no-startup-id xfsettingsd
-exec --no-startup-id start-pulseaudio-x11
-exec --no-startup-id xfce4-volumed
-exec --no-startup-id xfc4-power-manager
+exec --no-startup-id /usr/lib/at-spi2-core/at-spi-bus-launcher --launch-immediately
+exec --no-startup-id xdg-user-dirs-gtk-update
+exec --no-startup-id a11y-profile-manager-indicator
+exec --no-startup-id gsettings-data-convert
+exec --no-startup-id /usr/bin/gnome-software --gapplication-service
+exec --no-startup-id /usr/lib/vino/vino-server --sm-disable
+exec --no-startup-id /usr/lib/x86_64-linux-gnu/deja-dup/deja-dup-monitor
+exec --no-startup-id /usr/lib/gnome-user-share/gnome-user-share-obexpush
 exec --no-startup-id system-config-printer-applet
+exec --no-startup-id start-pulseaudio-x11
 exec --no-startup-id xscreensaver -no-splash
-exec --no-startup-id xsetroot -solid "#162140"
-exec --no-startup-id qasmixer --tray
-exec --no-startup-id nm-applet
+exec --no-startup-id xsetroot -solid $main-color
+exec --no-startup-id wicd-gtk -t
 exec --no-startup-id blueman-applet
-
-# System startup (Ubuntu)
-# exec --no-startup-id /usr/bin/gnome-keyring-daemon --start --components=pkcs11
-# exec --no-startup-id /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1
-# exec --no-startup-id gnome-settings-daemon --start --components=secrets
-# exec --no-startup-id /usr/bin/gnome-keyring-daemon --start --components=ssh
-# exec --no-startup-id /usr/lib/at-spi2-core/at-spi-bus-launcher --launch-immediately
-# exec --no-startup-id xdg-user-dirs-gtk-update
-# exec --no-startup-id /usr/lib/x86_64-linux-gnu/indicator-messages/indicator-messages-service
-# exec --no-startup-id /usr/lib/x86_64-linux-gnu/indicator-messages/indicator-messages-service
-# exec --no-startup-id /usr/lib/x86_64-linux-gnu/indicator-application/indicator-application-service
-# exec --no-startup-id /usr/lib/x86_64-linux-gnu/indicator-bluetooth/indicator-bluetooth-service
-# exec --no-startup-id /usr/lib/x86_64-linux-gnu/indicator-power/indicator-power-service
-# exec --no-startup-id /usr/lib/x86_64-linux-gnu/indicator-keyboard/indicator-keyboard-service
-# exec --no-startup-id /usr/lib/x86_64-linux-gnu/indicator-sound/indicator-sound-service
-# exec --no-startup-id /usr/lib/x86_64-linux-gnu/indicator-session/indicator-session-service
-# exec --no-startup-id a11y-profile-manager-indicator
-# exec --no-startup-id gsettings-data-convert
-# exec --no-startup-id /usr/bin/gnome-software --gapplication-service
-# exec --no-startup-id /usr/lib/vino/vino-server --sm-disable
-# exec --no-startup-id /usr/lib/x86_64-linux-gnu/deja-dup/deja-dup-monitor
-# exec --no-startup-id /usr/lib/gnome-user-share/gnome-user-share-obexpush
-# exec --no-startup-id system-config-printer-applet
-# exec --no-startup-id start-pulseaudio-x11
-# exec --no-startup-id xscreensaver -no-splash
-# exec --no-startup-id xsetroot -solid $main-color
-# exec --no-startup-id nm-applet
-# exec --no-startup-id blueman-applet
-# exec --no-startup-id qasmixer --tray
+exec --no-startup-id qasmixer --tray
+exec --no-startup-id rfkill block bluetooth
+exec --no-startup-id ~/bin/battery-notifier.sh
 
 # Setup the right screen layout
-# exec --no-startup-id ~/bin/hdmi1-right-of-lvds1.sh
-
-# Sample for creation a project mode
-#mode "projects" {
-#
-#     # bindsym r exec ~/bin/project-terminals.sh --both
-#
-#     # Exit to the default mode
-#     bindsym Return mode "default"
-#     bindsym Escape mode "default"
-#}
-#bindsym $mod+Shift+b mode "projects"
+exec --no-startup-id ~/bin/hdmis-right-of-primary.sh
