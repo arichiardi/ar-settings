@@ -139,26 +139,26 @@ bindsym Mod4+Shift+l exec i3lock -e -f -c $main-color
 
 # resize window (you can also use the mouse for that)
 mode "resize" {
-        # These bindings trigger as soon as you enter the resize mode
+  # These bindings trigger as soon as you enter the resize mode
 
-        # Pressing left will shrink the window’s width.
-        # Pressing right will grow the window’s width.
-        # Pressing up will shrink the window’s height.
-        # Pressing down will grow the window’s height.
-        bindsym n resize shrink width 10 px or 10 ppt
-        bindsym e resize grow height 10 px or 10 ppt
-        bindsym i resize shrink height 10 px or 10 ppt
-        bindsym o resize grow width 10 px or 10 ppt
+  # Pressing left will shrink the window’s width.
+  # Pressing right will grow the window’s width.
+  # Pressing up will shrink the window’s height.
+  # Pressing down will grow the window’s height.
+  bindsym n resize shrink width 10 px or 10 ppt
+  bindsym e resize grow height 10 px or 10 ppt
+  bindsym i resize shrink height 10 px or 10 ppt
+  bindsym o resize grow width 10 px or 10 ppt
 
-        # same bindings, but for the arrow keys
-        bindsym Left resize shrink width 10 px or 10 ppt
-        bindsym Down resize grow height 10 px or 10 ppt
-        bindsym Up resize shrink height 10 px or 10 ppt
-        bindsym Right resize grow width 10 px or 10 ppt
+  # same bindings, but for the arrow keys
+  bindsym Left resize shrink width 10 px or 10 ppt
+  bindsym Down resize grow height 10 px or 10 ppt
+  bindsym Up resize shrink height 10 px or 10 ppt
+  bindsym Right resize grow width 10 px or 10 ppt
 
-        # back to normal: Enter or Escape
-        bindsym Return mode "default"
-        bindsym Escape mode "default"
+  # back to normal: Enter or Escape
+  bindsym Return mode "default"
+  bindsym Escape mode "default"
 }
 
 bindsym $mod+Shift+r mode "resize"
@@ -166,8 +166,8 @@ bindsym $mod+Shift+r mode "resize"
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 bar {
-        status_command i3status
-        tray_output primary
+  status_command i3status
+  tray_output primary
   font pango:Deja Vu Sans Mono 9
 }
 
@@ -179,39 +179,39 @@ bar {
 show_marks yes
 
 mode "focused" {
-                # hardcoded focus keybindings
-                bindsym c [title="^(?!.*Slack).*Chromium$"] focus
-                bindsym g [class="(?i)google-chrome"] focus
-                bindsym m [class="(?i)thunderbird"] focus
-                bindsym u [class="(?i)urxvt"] focus
-                bindsym t [title="(?i)telegram"] focus
-                bindsym w [title="Slack.*Chromium"] focus
+  # hardcoded focus keybindings
+  bindsym c [title="^(?!.*Slack).*Chromium$"] focus
+  bindsym g [class="(?i)google-chrome"] focus
+  bindsym m [class="(?i)thunderbird"] focus
+  bindsym u [class="(?i)urxvt"] focus
+  bindsym t [title="(?i)telegram"] focus
+  bindsym w [title="Slack.*Chromium"] focus
 
-                # development stuff
-                bindsym b [title="(?i)booma backend"] focus
-                bindsym f [title="(?i)booma frontend"] focus
+  # development stuff
+  #bindsym b [title="(?i)booma backend"] focus
+  #bindsym f [title="(?i)booma frontend"] focus
 
-                # keybindings for marking and jumping to clients
-                bindsym a exec i3-input -F 'mark %s' -P 'Mark name: '
-                bindsym g exec i3-input -F '[con_mark=%s] focus' -P 'Go to mark: '
+  # keybindings for marking and jumping to clients
+  bindsym a exec i3-input -F 'mark %s' -P 'Mark name: '
+  bindsym g exec i3-input -F '[con_mark=%s] focus' -P 'Go to mark: '
 
-                # Assign marks to keys 1-5
-                bindsym Shift+1 mark mark1
-                bindsym Shift+2 mark mark2
-                bindsym Shift+3 mark mark3
-                bindsym Shift+4 mark mark4
-                bindsym Shift+5 mark mark5
+  # Assign marks to keys 1-5
+  bindsym Shift+1 mark mark1
+  bindsym Shift+2 mark mark2
+  bindsym Shift+3 mark mark3
+  bindsym Shift+4 mark mark4
+  bindsym Shift+5 mark mark5
 
-                # Jump to clients marked 1-5
-                bindsym 1 [con_mark="mark1"] focus
-                bindsym 2 [con_mark="mark2"] focus
-                bindsym 3 [con_mark="mark3"] focus
-                bindsym 4 [con_mark="mark4"] focus
-                bindsym 5 #{con_mark="mark5"} focus
+  # Jump to clients marked 1-5
+  bindsym 1 [con_mark="mark1"] focus
+  bindsym 2 [con_mark="mark2"] focus
+  bindsym 3 [con_mark="mark3"] focus
+  bindsym 4 [con_mark="mark4"] focus
+  bindsym 5 #{con_mark="mark5"} focus
 
-                # Exit to the default mode
-                bindsym Return mode "default"
-                bindsym Escape mode "default"
+  # Exit to the default mode
+  bindsym Return mode "default"
+  bindsym Escape mode "default"
 }
 
 bindsym $mod+Shift+f mode "focused"
@@ -251,13 +251,14 @@ mode "$mode_display" {
     bindsym Return mode "default"
     bindsym Escape mode "default"
 }
+
 # Declare here the shortcut to bring the display selection menu
 bindsym $mod+x mode "$mode_display"
 
 # Xresources startup
 exec --no-startup-id sh -c 'xrdb -merge $HOME/.Xresources'
 
-# System startup (Xfce)
+# System startup (Ubuntu)
 exec --no-startup-id /usr/bin/gnome-keyring-daemon --start --components=pkcs11
 exec --no-startup-id /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1
 exec --no-startup-id gnome-settings-daemon --start --components=secrets
