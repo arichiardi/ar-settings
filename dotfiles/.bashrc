@@ -296,3 +296,7 @@ export GIT_HOME=~/git
 
 export NVM_DIR="/home/arichiardi/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+
+# Ctags + global
+export GTAGSCONF=~/.globalrc
+export GTAGSLABEL=ctags-exuberant
