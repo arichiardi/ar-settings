@@ -56,7 +56,11 @@ fi
 # AR uncomment to use the git prompt
 git_prompt=1
 
+# Git
+
 PS1_TAIL='\$ '
+PROMPT_COMMAND_HEAD=
+
 if [ ! -z "$git_prompt" ]; then
     source ~/bin/git/git-prompt.sh
 
@@ -252,6 +256,7 @@ IDEA_JDK=$JAVA_HOME
 # Clojure
 export CLOJURE_EXT=$HOME/.m2/repository/org/clojure/clojure/1.8.0/clojure-1.8.0.jar
 export CLOJURE_OPTS="-Xms128M -Xmx512M -server"
+export CLOJURE_JAR=$HOME/.m2/repository/org/clojure/clojure/1.8.0/clojure-1.8.0.jar
 
 # Emacs default editor
 export ALTERNATE_EDITOR=""
@@ -283,8 +288,9 @@ export LEIN_JVM_OPTS=
 # source ~/bin/lein_completion.bash
 
 # Boot
-export BOOT_JVM_OPTIONS="-Xmx1g -client -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -Xverify:none -XX:-OmitStackTraceInFastThrow"
+export BOOT_JVM_OPTIONS="-Xmx8g -client -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -Xverify:none -XX:-OmitStackTraceInFastThrow"
 export BOOT_COLOR=1
+export BOOT_GPG_COMMAND=gpg2
 
 # Docker Remote API
 # DOCKER_OPTS='-H tcp://localhost:4243 -H unix:///var/run/docker.sock'
@@ -293,6 +299,14 @@ export BOOT_COLOR=1
 complete -C '/usr/bin/aws_completer' aws
 
 export GIT_HOME=~/git
+
+export ANDROID_STUDIO=/usr/local/share/android-studio
+export ANDROID_HOME=/usr/local/share/android-sdk
+export GENYMOTION_HOME=/usr/local/share/genymotion
+export PATH=$PATH:"$ANDROID_STUDIO/bin":"$ANDROID_HOME/tools":"$ANDROID_HOME/platform-tools":"$GENYMOTION_HOME"
+
+# opam init
+. $HOME/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true
 
 export NVM_DIR="/home/arichiardi/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
