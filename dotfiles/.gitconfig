@@ -38,6 +38,12 @@
 [diff "jpeg"]
     binary = true
     textconv = hexdump -v -C
+[diff-so-fancy]
+    markEmptyLines = true
+    changeHunkIndicators = false
+    stripLeadingSymbols = false
+[pager]
+    diff = diff-so-fancy | less --tabs=4 -RFX --pattern '^(Date|added|deleted|modified): '
 [alias]
     apr = "apply --reject"
     co = "checkout"

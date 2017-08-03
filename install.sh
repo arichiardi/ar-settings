@@ -29,7 +29,7 @@ mkdir -p $SSH_DIR
 bin/restoresecret.sh $SSH_DIR/5BB502F6_rsa.enc $SSH_DIR/5BB502F6_rsa
 chmod 600 $SSH_DIR/*
 
-echo -e "${LIGHT_GREEN}Updating apt...${NC}"
+echo -e "${LIGHT_GREEN}Updating apt packages...${NC}"
 sudo apt-get update
 
 echo -e "${LIGHT_GREEN}Installing packages...${NC}"
@@ -44,6 +44,10 @@ ln -si $HOME/.cask/bin/cask $HOME/bin/cask
 echo -e "${LIGHT_GREEN}Installing leiningen...${NC}"
 curl -o- https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein > $HOME/bin/lein
 chmod +x $HOME/bin/lein
+
+echo -e "${LIGHT_GREEN}Installing diff-so-fancy...${NC}"
+curl -o- https://raw.githubusercontent.com/so-fancy/diff-so-fancy/master/third_party/build_fatpack/diff-so-fancy > $HOME/bin/diff-so-fancy
+chmod +x $HOME/bin/diff-so-fancy
 
 echo -e "${LIGHT_GREEN}Installing fonts and refreshing cache...${NC}"
 mkdir -p $HOME/.fonts
