@@ -29,8 +29,8 @@ fi
 echo -e "Umounting vault from $MOUNT_POINT..."
 sudo umount $MOUNT_POINT
 
-echo -e "Avoding executables..."
-find $MOUNT_POINT -type f \( -perm -u=x -o -perm -g=x -o -perm -o=x \) -exec sudo chmod -v 664 {} ";"
+echo -e "Remove all executable flags..."
+find $MOUNT_POINT -type f \( -perm -u=x -o -perm -g=x -o -perm -o=x \) -exec sudo chmod -v -x {} ";"
 
 if [ "$?" = "0" ]; then
     echo -e "Encrypting back again..."
