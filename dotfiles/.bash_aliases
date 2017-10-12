@@ -4,13 +4,19 @@ alias ws='cd ~/workspace'
 alias ln='ln -i'
 alias uls='cd /usr/local/share'
 alias gpg='gpg2'
-alias rethinkdb='docker start rethinkdb'
-# not needed for now - sleep 5; xdg-open http://$(docker inspect --format "{{ .NetworkSettings.IPAddress }}" rethinkdb):8080
+alias gpg='gpg2'
+alias vault='$HOME/bin/mount-vault.sh /usr/local/data/vault.enc'
 alias postgres='sudo systemctl stop postgresql.service'
 alias docker-tcp='sudo systemctl stop docker; nohup sudo docker daemon -H tcp://localhost:4243 --raw-logs > /dev/null 2>&1 &'
 alias docker-rmia='docker rmi $(docker images -qf "dangling=true")'
 alias usb='udisksctl mount -b'
 alias uusb='udisksctl unmount -b
+alias btreset='sudo rmmod btusb && sudo modprobe btusb'
+alias tarsnap='tarsnap --configfile ~/.backup/tarsnap.conf'
+alias yarn-upi='yarn upgrade-interactive'
+alias head1='head -n1'
+alias tail1='tail -n1'
+alias emacs-resurrect='kill -CONT $(pgrep emacs | xargs)'
 
 # Clojure
 alias l='lein'
