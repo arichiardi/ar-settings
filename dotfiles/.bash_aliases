@@ -17,8 +17,8 @@ alias l='lein'
 alias b='boot'
 
 # Emacs
-alias vi="~/bin/emacsclient-daemon -t"
-alias e="~/bin/emacsclient-daemon.sh -t"
+alias vi="~/bin/emacsclient-daemon -nw"
+alias e="~/bin/emacsclient-daemon.sh -nw"
 alias em="~/bin/emacsclient-daemon.sh -c"
 
 # Android SDK

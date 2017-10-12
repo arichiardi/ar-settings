@@ -4,38 +4,33 @@
 #
 # See https://bugs.launchpad.net/elementaryos/+bug/1355274
 #
-# It accepts the -c/-t (defaulting to -c) parameter.
+# It accepts the same parameters as emacs, adding -c if no -c or -nw is
+# supplied (effectively defaulting to the graphical version of emacs).
 
-do_usage() {
-    echo -n
-    echo "Usage:"
-    echo "$0 [-c|-t]"
-    exit 1
-}
+set -ex
 
 XLIB_SKIP_ARGB_VISUALS=1
 
 EMACS_BIN=$(which emacs)
-EMACS_ICON=/usr/share/icons/hicolor/scalable/apps/emacs24.svg
+EMACSCLIENT_BIN=$(which emacsclient)
+EMACS_ICON=/usr/share/icons/hicolor/scalable/apps/emacs25.svg
 
 if [ 0 -eq $(pgrep --exact --count emacs) ]
 then
     echo "Starting server."
     notify-send -i "$EMACS_ICON" -u normal -h int:transient:1 "Starting server" "Please wait."
-
     $EMACS_BIN --daemon
 fi
 
-EMACS_PARAMS=""
-EMACS_FILE=""
-if [[ "$1" = "-c" || "$1" = "-t" ]] ; then
-    EMACS_PARAMS="$1"
-    EMACS_FILE="$2"
-elif [ -e "$1" ] ; then
-    EMACS_PARAMS="-c"
-    EMACS_FILE="$1"
-else
-    do_usage
+EMACS_PARAMS="-a emacs $@"
+
+if [[ ! ( ! "$EMACS_PARAMS" =~ "-c" && ! "$EMACS_PARAMS" =~ "-nw" ) ]]; then
+    EMACS_PARAM="-c $EMACS_PARAMS"
 fi
 
-emacsclient $EMACS_PARAMS -a emacs $EMACS_FILE
+if [[ "$EMACS_PARAMS" =~ "-nw" ]]; then
+    echo "Using plain emacs because of https://debbugs.gnu.org/cgi/bugreport.cgi?bug=28800"
+    EMACSCLIENT_BIN=$EMACS_BIN
+fi
+
+$EMACSCLIENT_BIN $EMACS_PARAMS
