@@ -16,7 +16,7 @@ sudo losetup $DEV_LOOP $1
 
 if [ "$?" = "0" ]; then
     echo -e "Decrypting vault..."
-    sudo cryptsetup luksOpen /dev/loop0 vault
+    sudo cryptsetup luksOpen $DEV_LOOP vault
 
     if [ "$?" = "0" ]; then
         echo -e "Mounting vault..."
