@@ -1,6 +1,6 @@
 URxvt*geometry: 95x24
 URxvt*scrollBar: false
-URxvt*saveLines: 16384
+URxvt*saveLines: 32768
 URxvt*font: xft:DejaVu Sans Mono:style=g:antialias=true:hinting=true:size=11
 URxvt*boldFont: xft:DejaVu Sans Mono:style=g:bold:antialias=true:hinting=true:size=11
 URxvt*letterSpace: -1

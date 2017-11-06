@@ -1,13 +1,13 @@
 ! Enabled modi
-rofi.modi:                           drun,window,ssh
+rofi.modi:                            drun,window,ssh
 ! Window opacity
-rofi.opacity:                        90
+rofi.opacity:                         90
 ! Window width
-rofi.width:                          50
+rofi.width:                           50
 ! Number of lines
-rofi.lines:                          15
+rofi.lines:                           15
 ! Number of columns
-rofi.columns:                        1
+rofi.columns:                         1
 ! Font to use
 rofi.font:                            DejaVu Sans Mono 10
 ! Foreground color
@@ -116,8 +116,8 @@ rofi.fullscreen:                     false
 rofi.fake-transparency:              false
 ! DPI
 rofi.dpi:                            -1
-! Pidfile location
-rofi.pid:                            /run/user/1000/rofi.pid
+! Pidfile location (let's use the default)
+!rofi.pid:                            /run/user/1001/rofi.pid
 ! Keybinding
 rofi.kb-primary-paste:               Control+Shift+v,Shift+Insert
 ! Keybinding
