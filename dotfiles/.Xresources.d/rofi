@@ -9,7 +9,7 @@ rofi.lines:                          15
 ! Number of columns
 rofi.columns:                        1
 ! Font to use
-rofi.font:                           Inconsolata\\-g 10
+rofi.font:                            DejaVu Sans Mono 10
 ! Foreground color
 !rofi.fg:                             #cccccc
 ! Background color
