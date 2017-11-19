@@ -1,8 +1,8 @@
 URxvt*geometry: 95x24
 URxvt*scrollBar: false
-URxvt*saveLines: 32768
-URxvt*font: xft:DejaVu Sans Mono:style=g:antialias=true:hinting=true:size=11
-URxvt*boldFont: xft:DejaVu Sans Mono:style=g:bold:antialias=true:hinting=true:size=11
+URxvt*saveLines: 16384
+URxvt*font: xft:Inconsolata\\-g:style=g:antialias=true:hinting=true:size=11
+URxvt*boldFont: xft:Inconsolata\\-g:style=g:bold:antialias=true:hinting=true:size=11
 URxvt*letterSpace: -1
 URxvt*reverseVideo: off
 URxvt*fading: 25
@@ -35,7 +35,7 @@ URxvt*scrollTtyKeypress: true
 
 ! extensions
 URxvt*perl-lib: /usr/lib/urxvt/perl/
-URxvt*perl-ext-common: default,selection,matcher,searchable-scrollback,font-size,keyboard-select
+URxvt*perl-ext-common: default,selection,matcher,searchable-scrollback,url-select,font-size,keyboard-select
 URxvt*url-launcher: /usr/bin/xdg-open
 ! perl:matcher settings
 URxvt*matcher.button: 1

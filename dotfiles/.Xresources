@@ -69,6 +69,5 @@ yeahconsole*stepSize: 2
 Emacs.font: Deja Vu Sans Mono 11
 
 ! X Colors settings
-#include "/home/arichiardi/.Xresources.d/theme"
-#include "/home/arichiardi/.Xresources.d/urxvt"
-#include "/home/arichiardi/.Xresources.d/rofi"
+#include "/home/kapitan/.Xresources.d/theme"
+#include "/home/kapitan/.Xresources.d/urxvt"
