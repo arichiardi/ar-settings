@@ -1,12 +1,11 @@
 # Misc
+alias o='xdg-open'
 alias cd..='cd ..'
 alias ws='cd ~/workspace'
 alias ln='ln -i'
 alias uls='cd /usr/local/share'
-alias gpg='gpg2'
-alias gpg='gpg2'
+alias gpg='gpg2 --keyid-format 0xlong'
 alias vault='$HOME/bin/mount-vault.sh /usr/local/data/vault.enc'
-alias postgres='sudo systemctl stop postgresql.service'
 alias docker-tcp='sudo systemctl stop docker; nohup sudo docker daemon -H tcp://localhost:4243 --raw-logs > /dev/null 2>&1 &'
 alias docker-rmia='docker rmi $(docker images -qf "dangling=true")'
 alias usb='udisksctl mount -b'
@@ -23,7 +22,7 @@ alias l='lein'
 alias b='boot'
 
 # Emacs
-alias vi="~/bin/emacsclient-daemon -nw"
+alias vi="~/bin/emacsclient-daemon.sh -nw"
 alias e="~/bin/emacsclient-daemon.sh -nw"
 alias em="~/bin/emacsclient-daemon.sh -c"
 
