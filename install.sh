@@ -36,7 +36,7 @@ echo -e "${LIGHT_GREEN}Installing packages...${NC}"
 sudo apt-get install rxvt-unicode i3 rofi qasmixer scrot cmake arandr silversearcher-ag zeal \
      xsel docker docker-compose exuberant-ctags openjdk-8-jdk openjdk-8-doc tree \
      rlwrap awscli markdown xclip xbacklight texinfo meld python3-pip cryptsetup global \
-     exiftool cdiff
+     exiftool cdiff texlive-latex-base texlive-latex-extra
 
 echo -e "${LIGHT_GREEN}Installing cask...${NC}"
 curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python
