@@ -49,6 +49,10 @@ echo -e "${LIGHT_GREEN}Installing leiningen...${NC}"
 curl -o- https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein > $HOME/bin/lein
 chmod +x $HOME/bin/lein
 
+echo -e "${LIGHT_GREEN}Installing boot...${NC}"
+curl -fsSLo- https://github.com/boot-clj/boot-bin/releases/download/latest/boot.sh > $HOME/bin/boot
+chmod +x $HOME/bin/boot
+
 echo -e "${LIGHT_GREEN}Installing diff-so-fancy...${NC}"
 curl -o- https://raw.githubusercontent.com/so-fancy/diff-so-fancy/master/third_party/build_fatpack/diff-so-fancy > $HOME/bin/diff-so-fancy
 chmod +x $HOME/bin/diff-so-fancy
