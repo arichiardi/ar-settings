@@ -1,9 +1,9 @@
 #!/bin/bash
 
-set -e
+set -uo pipefail
 
 MOUNT_POINT=/tmp/vault
-BKP_VAULT_BIN=$HOME/bin/backupvault
+VAULT_BKP=$HOME/bin/vault-backup
 
 ANSWER_TIMEOUT=10
 ANS="y"
@@ -18,11 +18,11 @@ if [[ "$(mount)" =~ /dev/mapper.*"$MOUNT_POINT" ]]; then
         if [[ "$ANS" =~ y|Y ]] ; then
             echo "Ok, skipping vault backup..."
         else
-           $BKP_VAULT_BIN
+           $VAULT_BKP
         fi
     else
         echo "No input received in $ANSWER_TIMEOUT seconds, backing up..."
-        $BKP_VAULT_BIN
+        $VAULT_BKP
     fi
 fi
 

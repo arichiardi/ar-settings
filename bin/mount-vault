@@ -1,18 +1,21 @@
 #!/bin/bash
 
-set -e
+set -uo pipefail
 
-LOOP_DEV=$(sudo losetup -j $1)
-if [ ! -z "$LOOP_DEV" ] ; then
-   echo -e "The vault $1 is already mounted!";
-   exit 1;
-fi
-
-DEV_LOOP=$(sudo losetup -f)
+LOOP_FILE=${1:-}
+EXISTING_LOOP=$(sudo losetup -j "$LOOP_FILE")
 MOUNT_POINT=/tmp/vault
+DEV_LOOP=""
 
-echo -e "Mounting vault on $DEV_LOOP..."
-sudo losetup $DEV_LOOP $1
+if [ -z "$EXISTING_LOOP" ] ; then
+    TMP_LOOP=$(sudo losetup -f)
+    echo -e "Mounting vault on $DEV_LOOP..."
+    sudo losetup $TMP_LOOP $LOOP_FILE
+    DEV_LOOP=$TMP_LOOP
+else
+    echo -e "The vault $LOOP_FILE is already mounted!";
+    DEV_LOOP=$(echo $EXISTING_LOOP | awk -F":" '{ print($1) }')
+fi
 
 if [ "$?" = "0" ]; then
     echo -e "Decrypting vault..."
