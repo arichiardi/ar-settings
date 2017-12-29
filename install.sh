@@ -32,11 +32,14 @@ chmod 600 $SSH_DIR/*
 echo -e "${LIGHT_GREEN}Updating apt packages...${NC}"
 sudo apt-get update
 
-echo -e "${LIGHT_GREEN}Installing packages...${NC}"
+echo -e "${LIGHT_GREEN}Installing apt packages...${NC}"
 sudo apt-get install rxvt-unicode i3 rofi qasmixer scrot cmake arandr silversearcher-ag zeal \
      xsel docker docker-compose exuberant-ctags openjdk-8-jdk openjdk-8-doc tree \
      rlwrap awscli markdown xclip xbacklight texinfo meld python3-pip cryptsetup global \
      exiftool cdiff texlive-latex-base texlive-latex-extra
+
+echo -e "${LIGHT_GREEN}Installing snap packages...${NC}"
+sudo snap install keepassxc
 
 echo -e "${LIGHT_GREEN}Installing cask...${NC}"
 curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python
