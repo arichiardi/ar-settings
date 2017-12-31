@@ -25,6 +25,7 @@ alias b='boot'
 alias vi="~/bin/emacsclient-daemon.sh -nw"
 alias e="~/bin/emacsclient-daemon.sh -nw"
 alias em="~/bin/emacsclient-daemon.sh -c"
+alias ed="~/bin/emacsclient-dired.sh"
 
 # Android SDK
 alias adbkill='sudo /usr/local/share/android-sdk/platform-tools/adb kill-server'

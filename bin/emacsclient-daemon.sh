@@ -22,15 +22,11 @@ then
     $EMACS_BIN --daemon
 fi
 
-EMACS_PARAMS="-a emacs $@"
+EMACS_PARAMS="-a emacs"
 
 if [[ ! ( ! "$EMACS_PARAMS" =~ "-c" && ! "$EMACS_PARAMS" =~ "-nw" ) ]]; then
     EMACS_PARAM="-c $EMACS_PARAMS"
 fi
 
-if [[ "$EMACS_PARAMS" =~ "-nw" ]]; then
-    echo "Using plain emacs because of https://debbugs.gnu.org/cgi/bugreport.cgi?bug=28800"
-    EMACSCLIENT_BIN=$EMACS_BIN
-fi
-
-$EMACSCLIENT_BIN $EMACS_PARAMS
+export TERM=xterm-256color
+$EMACSCLIENT_BIN "$EMACS_PARAMS" "$@"

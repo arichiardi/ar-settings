@@ -1,8 +1,10 @@
 #!/bin/bash
 #
-# Emacs is started as daemon in /etc/systemd/user
+# Emacs dired from a given dir.
 #
-# See https://bugs.launchpad.net/elementaryos/+bug/1355274
-XLIB_SKIP_ARGB_VISUALS=1
 
-emacsclient -t --alternate-editor="" --eval "(dired \"$1\")"
+set -xeuo pipefail
+
+dired_dir=${1:-$(pwd)}
+
+emacsclient-daemon.sh -nw --eval '(dired '\""$dired_dir"\"')'
