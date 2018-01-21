@@ -63,7 +63,7 @@ cp -Riv fonts/. $HOME/.fonts
 fc-cache -rv
 
 echo -e "${LIGHT_GREEN}Installing nvm (Node Version Manager)...${NC}"
-curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.32.1/install.sh | bash
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh | bash
 NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
 
