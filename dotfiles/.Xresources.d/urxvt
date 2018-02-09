@@ -1,8 +1,10 @@
+! Setting the terminal to xterm solves the emacsclient bug
+! URxvt*termName: xterm-256color
 URxvt*geometry: 95x24
 URxvt*scrollBar: false
 URxvt*saveLines: 16384
-URxvt*font: xft:Inconsolata\\-g:style=g:antialias=true:hinting=true:size=11
-URxvt*boldFont: xft:Inconsolata\\-g:style=g:bold:antialias=true:hinting=true:size=11
+URxvt*font: xft:DejaVu Sans Mono:style=g:antialias=true:hinting=true:size=11
+URxvt*boldFont: xft:DejaVu Sans Mono:style=g:bold:antialias=true:hinting=true:size=11
 URxvt*letterSpace: -1
 URxvt*reverseVideo: off
 URxvt*fading: 25
@@ -35,7 +37,7 @@ URxvt*scrollTtyKeypress: true
 
 ! extensions
 URxvt*perl-lib: /usr/lib/urxvt/perl/
-URxvt*perl-ext-common: default,selection,matcher,searchable-scrollback,url-select,font-size,keyboard-select
+URxvt*perl-ext-common: default,selection,matcher,searchable-scrollback,font-size,keyboard-select
 URxvt*url-launcher: /usr/bin/xdg-open
 ! perl:matcher settings
 URxvt*matcher.button: 1
@@ -43,10 +45,10 @@ URxvt.keysym.M-u: perl:matcher:select
 ! highlighting https://gist.github.com/r4um/2413814
 URxvt.matcher.rend.0: fg:4 Uline Bold
 ! perl:font-size
-URxvt.keysym.Mod4-Up: font-size:increase
-URxvt.keysym.Mod4-Down: font-size:decrease
-URxvt.keysym.Mod4-End: font-size:reset
-URxvt.keysym.Mod4-Home: font-size:show
+URxvt.keysym.Mod4-0x2b: perl:font-size:increase
+URxvt.keysym.Mod4-0x2d: perl:font-size:decrease
+URxvt.keysym.Mod4-End: perl:font-size:reset
+URxvt.keysym.Mod4-Home: perl:font-size:show
 ! perl:keyboard-select
 URxvt.keysym.Mod4-Escape: perl:keyboard-select:activate
 URxvt.keysym.Mod4-s: perl:keyboard-select:search
