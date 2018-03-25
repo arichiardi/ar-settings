@@ -1,11 +1,19 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
+# For skipping sections, use this trick:
+#
+#   cat >/dev/null <<HUB
+#
+# see the brilliant answer here: https://stackoverflow.com/a/45538151
+
 LIGHT_GREEN='\033[1;32m'
 LIGHT_RED='\033[1;31m'
 NC='\033[0m' # No Color
 
 SSH_DIR=$HOME/.ssh
-TEMP_DIR=$(mktemp -d -t)
+TEMP_DIR=$(mktemp -d -t "ar-settings.XXXXXXXXXX")
 
 echo -e "${LIGHT_GREEN}Create necessary dirs...${NC}"
 mkdir -p $HOME/bin
