@@ -98,3 +98,10 @@ rm -fv $TEMP_DIR/npm
 curl -o- https://raw.githubusercontent.com/github/hub/master/etc/hub.bash_completion.sh > $TEMP_DIR/hub
 sudo cp -iv --no-preserve=mode,ownership $TEMP_DIR/hub /etc/bash_completion.d/hub
 rm -fv $TEMP_DIR/hub
+
+echo -e "${LIGHT_GREEN}Installing hub...${NC}"
+cd $TEMP_DIR
+curl -OL https://github.com/github/hub/releases/download/v2.3.0-pre10/hub-linux-amd64-2.3.0-pre10.tgz \
+    && mkdir hub-deflated \
+    && tar -C hub-deflated --strip-components=1 -xvzf hub-linux-amd64-2.3.0-pre10.tgz \
+    && prefix="$HOME/.local" ./hub-deflated/install
