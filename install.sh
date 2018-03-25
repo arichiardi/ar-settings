@@ -76,11 +76,7 @@ NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
 
 echo -e "${LIGHT_RED}Installing Node.js...${NC}"
-NPM_PACKAGES="$HOME/.local/share/npm-packages"
-mkdir -p "$NPM_PACKAGES"
-nvm install node
-nvm use node
-nvm alias default node
+nvm install --lts && nvm use node
 
 echo -e "${LIGHT_RED}Installing bash completions...${NC}"
 curl -o- https://raw.githubusercontent.com/docker/compose/$(docker-compose version --short)/contrib/completion/bash/docker-compose > $TEMP_DIR/docker-compose
