@@ -2,10 +2,10 @@
 
 set -uo pipefail
 
-main_xrandr=$(xrandr --query | grep -E 'eDP[0-9]+ connected')
+main_xrandr=$(xrandr --query | grep -E 'eDP[0-9]+ connected' | sed -e "s/[[:blank:]]primary//")
 main_name=$(echo "$main_xrandr" | awk -F '[ x+]' '/\<connected\>/{print $1}')
-main_width=$(echo "$main_xrandr" | awk -F '[ x+]' '/\<connected\>/{print $4}')
-main_height=$(echo "$main_xrandr" | awk -F '[ x+]' '/\<connected\>/{print $5}')
+main_width=$(echo "$main_xrandr" | awk -F '[ x+]' '/\<connected\>/{print $3}')
+main_height=$(echo "$main_xrandr" | awk -F '[ x+]' '/\<connected\>/{print $4}')
 main_resolution=$main_width"x"$main_height
 
 # detecting external monitors
@@ -18,7 +18,7 @@ if [ -z "$external_name" ]; then
     exit 1
 fi
 
-external_xrandr=$(xrandr --query | grep "$external_name")
+external_xrandr=$(xrandr --query | grep "$external_name" | sed -e "s/[[:blank:]]primary//")
 external_width=$(echo "$external_xrandr" | awk -F '[ x+]' '/\<connected\>/{print $3}')
 external_height=$(echo "$external_xrandr" | awk -F '[ x+]' '/\<connected\>/{print $4}')
 
