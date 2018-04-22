@@ -2,10 +2,13 @@
 
 set -uo pipefail
 
-# This can be either an index in the xrandr size table or width x height
-external_size=${1:-"0"}
+# The name assigned to the main monitor (usually the laptop's)
+main_id=${1:-}
 
-main_xrandr=$(xrandr --query | grep -E 'eDP[0-9]+ connected' | sed -e "s/[[:blank:]]primary//")
+# This can be either an index in the xrandr size table or width x height
+external_size=${2:-"0"}
+
+main_xrandr=$(xrandr --query | grep -E "$main_id"'-?[0-9]+ connected' | sed -e "s/[[:blank:]]primary//")
 main_name=$(echo "$main_xrandr" | awk -F '[ x+]' '/\<connected\>/{print $1}')
 main_width=$(echo "$main_xrandr" | awk -F '[ x+]' '/\<connected\>/{print $3}')
 main_height=$(echo "$main_xrandr" | awk -F '[ x+]' '/\<connected\>/{print $4}')

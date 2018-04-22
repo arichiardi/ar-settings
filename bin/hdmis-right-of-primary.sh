@@ -2,7 +2,10 @@
 
 set -uo pipefail
 
-main_name=$(xrandr --query | grep -E "eDP[0-9]+ connected" | sed -e "s/\([A-Z0-9]\+\) connected.*/\1/")
+# The name assigned to the main monitor (usually the laptop's)
+main_id=${1:-}
+
+main_name=$(xrandr --query | grep -E "$main_id"'-?[0-9]+ connected' | sed -e "s/\([A-Z0-9]\+\) connected.*/\1/")
 
 # detecting external monitors
 external_name=$(xrandr --query | grep -E "DP1-?[0-9]+ connected" | sed -e "s/\([A-Z0-9]\+\) connected.*/\1/")
