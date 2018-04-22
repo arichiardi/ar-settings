@@ -4,6 +4,10 @@ set -uo pipefail
 
 # The name assigned to the main monitor (usually the laptop's)
 main_id=${1:-}
+if [ -z $main_id ]; then
+    echo "Failed: you need to specify a monitor id as first parameter."
+    exit 1
+fi
 
 main_name=$(xrandr --query | grep -E "$main_id"'-?[0-9]+ connected' | sed -e "s/\([A-Z0-9]\+\) connected.*/\1/")
 

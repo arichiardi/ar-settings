@@ -4,6 +4,10 @@ set -uo pipefail
 
 # The name assigned to the main monitor (usually the laptop's)
 main_id=${1:-}
+if [ -z $main_id ]; then
+    echo "Failed: you need to specify a monitor id as first parameter."
+    exit 1
+fi
 
 # This can be either an index in the xrandr size table or width x height
 external_size=${2:-"0"}
