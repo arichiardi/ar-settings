@@ -246,8 +246,8 @@ hide_edge_borders vertical
 set $mode_display Ext Screen (x) MAIN ONLY, (1) 1 HDMI RIGHT, (2) 2 HDMI LEFT
 mode "$mode_display" {
   bindsym x exec --no-startup-id ~/bin/lvds1-only.sh
-  bindsym 1 exec --no-startup-id ~/bin/hdmi1-right-of-lvds1.sh
-  bindsym 2 exec --no-startup-id ~/bin/hdmi1-left-of-lvds1.sh
+  bindsym 1 exec --no-startup-id ~/bin/hdmi1-right-of-lvds1.sh REPLACE_ME
+  bindsym 2 exec --no-startup-id ~/bin/hdmi1-left-of-lvds1.sh REPLACE_ME
 
   # back to normal: Enter or Escape
   bindsym Return mode "default"
@@ -282,4 +282,4 @@ exec --no-startup-id rfkill block bluetooth
 exec --no-startup-id ~/bin/battery-notifier.sh
 
 # Setup the right screen layout
-exec --no-startup-id ~/bin/hdmis-right-of-primary.sh
+exec --no-startup-id ~/bin/hdmi-right-of-primary.sh REPLACE_ME
