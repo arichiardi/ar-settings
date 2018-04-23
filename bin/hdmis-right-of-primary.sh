@@ -9,12 +9,12 @@ if [ -z $main_id ]; then
     exit 1
 fi
 
-main_name=$(xrandr --query | grep -E "$main_id"'-?[0-9]+ connected' | sed -e "s/\([A-Z0-9]\+\) connected.*/\1/")
+main_name=$(xrandr --query | grep -E "$main_id"'-?[0-9]* connected' | sed -e "s/\([A-Z0-9]\+\) connected.*/\1/")
 
 # detecting external monitors
-external_name=$(xrandr --query | grep -E "DP1-?[0-9]+ connected" | sed -e "s/\([A-Z0-9]\+\) connected.*/\1/")
+external_name=$(xrandr --query | grep -E "^DP1-?[0-9]* connected" | sed -e "s/\([A-Z0-9]\+\) connected.*/\1/")
 if [ -z $external_name ]; then
-    external_name=$(xrandr --query | grep -E "HDMI-?[0-9]+ connected" | sed -e "s/\([A-Z0-9]\+\) connected.*/\1/")
+    external_name=$(xrandr --query | grep -E "^HDMI-?[0-9]* connected" | sed -e "s/\([A-Z0-9]\+\) connected.*/\1/")
 fi
 if [ -z $external_name ]; then
     echo "Failed: cannot find external monitors."

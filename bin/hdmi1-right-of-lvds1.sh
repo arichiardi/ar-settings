@@ -12,16 +12,16 @@ fi
 # This can be either an index in the xrandr size table or width x height
 external_size=${2:-"0"}
 
-main_xrandr=$(xrandr --query | grep -E "$main_id"'-?[0-9]+ connected' | sed -e "s/[[:blank:]]primary//")
+main_xrandr=$(xrandr --query | grep -E "$main_id"'-?[0-9]* connected' | sed -e "s/[[:blank:]]primary//")
 main_name=$(echo "$main_xrandr" | awk -F '[ x+]' '/\<connected\>/{print $1}')
 main_width=$(echo "$main_xrandr" | awk -F '[ x+]' '/\<connected\>/{print $3}')
 main_height=$(echo "$main_xrandr" | awk -F '[ x+]' '/\<connected\>/{print $4}')
 main_resolution=$main_width"x"$main_height
 
 # detecting external monitors
-external_name=$(xrandr --query | grep -E "DP1-?[0-9]+ connected" | sed -e "s/\([A-Z0-9]\+\) connected.*/\1/")
+external_name=$(xrandr --query | grep -E "^DP1-?[0-9]* connected" | sed -e "s/\([A-Z0-9]\+\) connected.*/\1/")
 if [ -z "$external_name" ]; then
-    external_name=$(xrandr --query | grep -E "HDMI-?[0-9]+ connected" | sed -e "s/\([A-Z0-9]\+\) connected.*/\1/")
+    external_name=$(xrandr --query | grep -E "^HDMI-?[0-9]* connected" | sed -e "s/\([A-Z0-9]\+\) connected.*/\1/")
 fi
 
 if [ -z "$external_name" ]; then
