@@ -42,7 +42,7 @@ sudo apt-get update
 
 echo -e "${LIGHT_GREEN}Installing apt packages...${NC}"
 sudo apt-get install rxvt-unicode i3 rofi qasmixer scrot cmake arandr silversearcher-ag zeal \
-     xsel docker docker-compose exuberant-ctags openjdk-8-jdk openjdk-8-doc tree \
+     xsel docker docker-compose exuberant-ctags openjdk-8-jdk openjdk-8-doc tree byzanz \
      rlwrap awscli markdown xclip xbacklight texinfo meld python3-pip cryptsetup global \
      exiftool cdiff texlive-latex-base texlive-latex-extra wicd-cli wicd-curses wich-gdk \
 
