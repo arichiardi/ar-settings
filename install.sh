@@ -45,6 +45,7 @@ sudo apt-get install rxvt-unicode i3 rofi qasmixer scrot cmake arandr silversear
      xsel docker docker-compose exuberant-ctags openjdk-8-jdk openjdk-8-doc tree byzanz \
      rlwrap awscli markdown xclip xbacklight texinfo meld python3-pip cryptsetup global \
      exiftool cdiff texlive-latex-base texlive-latex-extra wicd-cli wicd-curses wich-gdk \
+     console-data
 
 echo -e "${LIGHT_GREEN}Installing snap packages...${NC}"
 sudo snap install keepassxc skype
