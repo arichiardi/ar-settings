@@ -2,6 +2,8 @@
 
 set -xeuo pipefail
 
+external_id=DP-1
+
 # The name assigned to the main monitor (usually the laptop's)
 main_id=${1:-}
 if [ -z $main_id ]; then
@@ -13,6 +15,10 @@ set +e
 main_name=$(xrandr --query | grep -E "$main_id"'-?[0-9]* connected' | sed -e "s/\([A-Z0-9]\+\) connected.*/\1/")
 set -e
 
+if [ -z "$main_name" ]; then
+    echo "Failed: cannot find main monitors."
+    exit 1
+fi
 
 # The blank space, which is part of the IFS shell variable, is used by default
 # in arrays assignment. The external_name var will contain a space separated
@@ -20,14 +26,8 @@ set -e
 declare -a external_array
 
 set +e
-external_array=($(xrandr --query | grep -E "^DP1-?[0-9]* connected" | sed -e "s/\([A-Z0-9]\+\) connected.*/\1/"))
+external_array=($(xrandr --query | grep -E "^$external_id-?[0-9]* connected" | sed -e "s/\([A-Z0-9]\+\) connected.*/\1/"))
 set -e
-
-if [ ${#external_array[@]} -eq 0 ]; then
-    set +e
-    external_array=($(xrandr --query | grep -E "^HDMI-?[0-9]* connected" | sed -e "s/\([A-Z0-9]\+\) connected.*/\1/"))
-    set -e
-fi
 
 if [ ${#external_array[@]} -eq 0 ]; then
     echo "Failed: cannot find external monitors."
