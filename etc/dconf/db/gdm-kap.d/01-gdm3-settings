@@ -1,0 +1,7 @@
+[org/gnome/login-screen]
+logo='/usr/share/icons/hicolor/256x256/apps/ubuntu-logo-icon.png'
+fallback-logo='/usr/share/icons/hicolor/256x256/apps/ubuntu-logo-icon.png'
+
+[org/gnome/login-screen]
+disable-user-list=true
+
