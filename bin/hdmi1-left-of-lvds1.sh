@@ -30,7 +30,15 @@ if [ -z "$external_name" ]; then
     exit 1
 fi
 
-external_resolution=${2:-}
+external_resolution=
+
+# grepping the list of resolutions for the highest resolution
+if [[ ! "$external_resolution" =~ [0-9]+[xX]{1}[0-9]+ ]]; then
+    set +e
+    external_first_mode=$(xrandr --query | grep -A 2 "$external_name" | tail -n +2 | head -n 1)
+    set -e
+    external_resolution=$(echo "$external_first_mode" | awk -F ' ' '{print $1}')
+fi
 
 # grepping the resolution in the "connected" line
 if [[ ! "$external_resolution" =~ ^[0-9]+[xX]{1}[0-9]+ ]]; then
@@ -42,14 +50,6 @@ if [[ ! "$external_resolution" =~ ^[0-9]+[xX]{1}[0-9]+ ]]; then
     external_resolution=$computed_width"x"$computed_height
     unset computed_width
     unset external_height
-fi
-
-# grepping the list of resolutions for the first mode
-if [[ ! "$external_resolution" =~ [0-9]+[xX]{1}[0-9]+ ]]; then
-    set +e
-    external_first_mode=$(xrandr --query | grep -A 2 "$external_name" | tail -n +2 | head -n 1)
-    set -e
-    external_resolution=$(echo "$external_first_mode" | awk -F ' ' '{print $1}')
 fi
 
 # has to be specified
