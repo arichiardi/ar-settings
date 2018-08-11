@@ -1,0 +1,3 @@
+XKBLAYOUT=us,us
+XKBVARIANT=colemak,
+XKBOPTIONS=grp:rctrl_rshift_toggle
