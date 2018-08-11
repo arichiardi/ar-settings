@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=2017.3
+Type=Application
+Terminal=false
+Icon[en_US]=/home/arichiardi/.local/share/ideaIC2017.3/bin/idea.png
+Name[en_US]=IntelliJ
+Exec=/home/arichiardi/.local/share/ideaIC2017.3/bin/idea.sh
+Name=IntelliJ
+Icon=/home/arichiardi/.local/share/ideaIC2017.3/bin/idea.png
