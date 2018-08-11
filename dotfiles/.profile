@@ -8,22 +8,24 @@
 # for ssh logins, install and configure the libpam-umask package.
 #umask 022
 
-LOG="$HOME/profile-log"
+LOG="${TMPDIR:=/tmp}/profile-$USER"o
+
 echo "-----" >>$LOG
-echo "SHELL: $SHELL">>$LOG
+echo "Caller: $0" >>$LOG
+echo " DESKTOP_SESSION: $DESKTOP_SESSION" >>$LOG
+echo " GDMSESSION: $GDMSESSION" >>$LOG
+echo " SHELL: $SHELL">>$LOG
 
 # if running bash
 if [ "$BASH" ] && [ "$BASH" != "/bin/sh" ]; then
     # include .bashrc if it exists
     if [ -f "$HOME/.bashrc" ]; then
         echo "Sourcing: $HOME/.bashrc" >>$LOG
-	. "$HOME/.bashrc"
+	    . "$HOME/.bashrc"
     fi
 fi
 
 # set PATH so it includes user's private bin directories
 PATH="$HOME/bin:$HOME/.local/bin:$PATH"
 
-echo "Caller: $0" >>$LOG
-echo "DESKTOP_SESSION: $DESKTOP_SESSION" >>$LOG
-echo "GDMSESSION: $GDMSESSION" >>$LOG
+if [ -e /home/arichiardi/.nix-profile/etc/profile.d/nix.sh ]; then . /home/arichiardi/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
