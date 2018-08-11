@@ -1,9 +1,5 @@
-# This comes from disparate sources and it is necessary for using ctags in
-# global, see the following links:
 #
-# * https://www.reddit.com/r/emacs/comments/3pni17/ctags_etags_or_gtags/?st=j5qit11k&sh=87f9a00c
-#
-# Copyright (c) 1998, 1999, 2000, 2001, 2002, 2003
+# Copyright (c) 1998, 1999, 2000, 2001, 2002, 2003, 2010, 2011, 2013
 #	Tama Communications Corporation
 #
 # This file is part of GNU GLOBAL.
@@ -27,63 +23,443 @@
 # 'default' is default target.
 # You can specify target with GTAGSLABEL environment variable.
 #
-# Variable 'suffixes' is obsoleted but is acceptable because it is needed
-# for plugged-in parser. If you use gtags-parser(1) then you should use
-# variable 'langmap' instead.
-#
 default:\
+	:tc=universal-ctags:tc=pygments:
+native:\
 	:tc=gtags:tc=htags:
+user:\
+	:tc=user-custom:tc=htags:
+ctags:\
+	:tc=universal-ctags:tc=htags:
+pygments:\
+	:tc=pygments-parser:tc=htags:
 #---------------------------------------------------------------------
 # Configuration for gtags(1)
 # See gtags(1).
 #---------------------------------------------------------------------
 common:\
-	:skip=GPATH,GTAGS,GRTAGS,GSYMS,HTML/,HTML.pub/,html/,tags,TAGS,ID,y.tab.c,y.tab.h,.notfunction,cscope.out,cscope.po.out,cscope.in.out,.gdbinit,SCCS/,RCS/,CVS/,CVSROOT/,{arch}/,.svn/,.git/,.cvsrc,.cvsignore,.gitignore,.cvspass,.cvswrappers,.deps/,autom4te.cache/,.snprj/:\
-	:langmap=c\:.c.h,yacc\:.y,asm\:.s.S,java\:.java,cpp\:.c++.cc.cpp.cxx.hxx.hpp.C.H,php\:.php.php3.phtml:
+	:skip=HTML/,HTML.pub/,tags,TAGS,ID,y.tab.c,y.tab.h,cscope.out,cscope.po.out,cscope.in.out,SCCS/,RCS/,CVS/,CVSROOT/,{arch}/,.svn/,.git/,autom4te.cache/,target/,out/:
 #
-# [gtags-parser]
-#
-# This command is distributed as part of GLOBAL.
-# The %s is replaced with the path of source file.
-# You need not use --langmap=xxx option. Gtags-parser(1) get the value
-# from environment variable.
+# Built-in parsers.
 #
 gtags:\
 	:tc=common:\
-	:GTAGS=gtags-parser %s:\
-	:GRTAGS=gtags-parser -r %s:\
-	:GSYMS=gtags-parser -s %s:
+	:tc=builtin-parser:
+builtin-parser:\
+	:langmap=c\:.c.h,yacc\:.y,asm\:.s.S,java\:.java,cpp\:.c++.cc.hh.cpp.cxx.hxx.hpp.C.H,php\:.php.php3.phtml:
 #
-# [Exuberant Ctags]
+# skeleton for user's custom parser.
 #
-# This ctags is distributed as a part of Vim editor.
-#
-# [Installation]
-# % cd <Vim source directory>/src/ctags
-# % make
-# # cp ctags /usr/local/bin/ctags-exuberant
-#
-ctags-exuberant|Exuberant Ctags|ctags by Darren Hiebert:\
+user-custom|User custom plugin parser:\
 	:tc=common:\
-	:suffixes=s,a,sa,asm,C,H,cpp,cxx,hxx,hpp,cc,c,h,y,clj,cljs,js,ts:\
-	:extractmethod:\
-	:GTAGS=/usr/bin/ctags -xu %s | perl -ne '\
-		if (/^operator \\S+\\s+function\\s/) { s/^operator //; }\
-		($name, $type, $no, $path, $line) = split(/[ \\t]+/, $_, 5);\
-		printf(STDOUT "%-16s %4d %-16s %s", $name, $no, $path, $line);':
+	:langmap=c\:.c.h:\
+	:gtags_parser=c\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/user-custom.la:
+#
+# Plug-in parser to use Universal Ctags.
+#
+# Add these when necessary: http://docs.ctags.io/en/latest/news.html#fully-rewritten-parsers
+universal-ctags|plugin-example|setting to use Universal Ctags plug-in parser:\
+	:tc=common:\
+	:langmap=Asm\:.asm.ASM.s.S:\
+	:langmap=Asp\:.asp.asa:\
+	:langmap=Awk\:.awk.gawk.mawk:\
+	:langmap=Basic\:.bas.bi.bb.pb:\
+	:langmap=BETA\:.bet:\
+	:langmap=C\:.c:\
+	:langmap=C++\:.c++.cc.cp.cpp.cxx.h.h++.hh.hp.hpp.hxx.C.H:\
+	:langmap=C#\:.cs:\
+    :langmap=Clojure\:.clj.cljs.cljc:\
+	:langmap=Cobol\:.cbl.cob.CBL.COB:\
+	:langmap=DosBatch\:.bat.cmd:\
+	:langmap=Eiffel\:.e:\
+	:langmap=Erlang\:.erl.ERL.hrl.HRL:\
+	:langmap=Flex\:.as.mxml:\
+	:langmap=Fortran\:.f.for.ftn.f77.f90.f95.F.FOR.FTN.F77.F90.F95:\
+	:langmap=HTML\:.htm.html:\
+	:langmap=Java\:.java:\
+	:langmap=JavaScript\:.js:\
+	:langmap=Lisp\:.cl.clisp.el.l.lisp.lsp:\
+	:langmap=Lua\:.lua:\
+	:langmap=MatLab\:.m:\
+	:langmap=OCaml\:.ml.mli:\
+	:langmap=Pascal\:.p.pas:\
+	:langmap=Perl\:.pl.pm.plx.perl:\
+	:langmap=PHP\:.php.php3.phtml:\
+	:langmap=Python\:.py.pyx.pxd.pxi.scons:\
+	:langmap=REXX\:.cmd.rexx.rx:\
+	:langmap=Ruby\:.rb.ruby:\
+	:langmap=Scheme\:.SCM.SM.sch.scheme.scm.sm:\
+	:langmap=Sh\:.sh.SH.bsh.bash.ksh.zsh:\
+	:langmap=SLang\:.sl:\
+	:langmap=SML\:.sml.sig:\
+	:langmap=SQL\:.sql:\
+	:langmap=Tcl\:.tcl.tk.wish.itcl:\
+	:langmap=Tex\:.tex:\
+	:langmap=Vera\:.vr.vri.vrh:\
+	:langmap=Verilog\:.v:\
+	:langmap=VHDL\:.vhdl.vhd:\
+	:langmap=Vim\:.vim:\
+	:langmap=YACC\:.y:\
+	:gtags_parser=Asm\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=Asp\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=Awk\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=Basic\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=BETA\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=C\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=C++\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=C#\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+  	:gtags_parser=Clojure\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=Cobol\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=DosBatch\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=Eiffel\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=Erlang\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=Flex\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=Fortran\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=HTML\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=Java\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=JavaScript\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=Lisp\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=Lua\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=MatLab\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=OCaml\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=Pascal\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=Perl\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=PHP\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=Python\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=REXX\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=Ruby\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=Scheme\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=Sh\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=SLang\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=SML\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=SQL\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=Tcl\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=Tex\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=Vera\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=Verilog\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=VHDL\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=Vim\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:\
+	:gtags_parser=YACC\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/universal-ctags.la:
+
+pygments-parser|Pygments plug-in parser:\
+	:tc=common:\
+	:langmap=ABAP\:.abap:\
+	:langmap=ANTLR\:.G.g:\
+	:langmap=ActionScript3\:.as:\
+	:langmap=Ada\:.adb.ads.ada:\
+	:langmap=AppleScript\:.applescript:\
+	:langmap=AspectJ\:.aj:\
+	:langmap=Aspx-cs\:.aspx.asax.ascx.ashx.asmx.axd:\
+	:langmap=Asymptote\:.asy:\
+	:langmap=AutoIt\:.au3:\
+	:langmap=Awk\:.awk.gawk.mawk:\
+	:langmap=BUGS\:.bug:\
+	:langmap=Bash\:.sh.ksh.bash.ebuild.eclass:\
+	:langmap=Bat\:.bat.cmd:\
+	:langmap=BlitzMax\:.bmx:\
+	:langmap=Boo\:.boo:\
+	:langmap=Bro\:.bro:\
+	:langmap=C#\:.cs:\
+	:langmap=C++\:.c++.cc.cp.cpp.cxx.h.h++.hh.hp.hpp.hxx.C.H:\
+	:langmap=COBOLFree\:.cbl.CBL:\
+	:langmap=COBOL\:.cob.COB.cpy.CPY:\
+	:langmap=CUDA\:.cu.cuh:\
+	:langmap=C\:.c.h:\
+	:langmap=Ceylon\:.ceylon:\
+	:langmap=Cfm\:.cfm.cfml.cfc:\
+	:langmap=Clojure\:.clj:\
+	:langmap=CoffeeScript\:.coffee:\
+	:langmap=Common-Lisp\:.cl.lisp.el:\
+	:langmap=Coq\:.v:\
+	:langmap=Croc\:.croc:\
+	:langmap=Csh\:.tcsh.csh:\
+	:langmap=Cython\:.pyx.pxd.pxi:\
+	:langmap=Dart\:.dart:\
+	:langmap=Dg\:.dg:\
+	:langmap=Duel\:.duel.jbst:\
+	:langmap=Dylan\:.dylan.dyl.intr:\
+	:langmap=ECL\:.ecl:\
+	:langmap=EC\:.ec.eh:\
+	:langmap=ERB\:.erb:\
+	:langmap=Elixir\:.ex.exs:\
+	:langmap=Erlang\:.erl.hrl.es.escript:\
+	:langmap=Evoque\:.evoque:\
+	:langmap=FSharp\:.fs.fsi:\
+	:langmap=Factor\:.factor:\
+	:langmap=Fancy\:.fy.fancypack:\
+	:langmap=Fantom\:.fan:\
+	:langmap=Felix\:.flx.flxh:\
+	:langmap=Fortran\:.f.f90.F.F90:\
+	:langmap=GAS\:.s.S:\
+	:langmap=GLSL\:.vert.frag.geo:\
+	:langmap=Genshi\:.kid:\
+	:langmap=Gherkin\:.feature:\
+	:langmap=Gnuplot\:.plot.plt:\
+	:langmap=Go\:.go:\
+	:langmap=GoodData-CL\:.gdc:\
+	:langmap=Gosu\:.gs.gsx.gsp.vark:\
+	:langmap=Groovy\:.groovy:\
+	:langmap=Gst\:.gst:\
+	:langmap=HaXe\:.hx:\
+	:langmap=Haml\:.haml:\
+	:langmap=Haskell\:.hs:\
+	:langmap=Hxml\:.hxml:\
+	:langmap=Hybris\:.hy.hyb:\
+	:langmap=IDL\:.pro:\
+	:langmap=Io\:.io:\
+	:langmap=Ioke\:.ik:\
+	:langmap=JAGS\:.jag.bug:\
+	:langmap=Jade\:.jade:\
+	:langmap=JavaScript\:.js:\
+	:langmap=Java\:.java:\
+	:langmap=Jsp\:.jsp:\
+	:langmap=Julia\:.jl:\
+	:langmap=Koka\:.kk.kki:\
+	:langmap=Kotlin\:.kt:\
+	:langmap=LLVM\:.ll:\
+	:langmap=Lasso\:.lasso:\
+	:langmap=Literate-Haskell\:.lhs:\
+	:langmap=LiveScript\:.ls:\
+	:langmap=Logos\:.x.xi.xm.xmi:\
+	:langmap=Logtalk\:.lgt:\
+	:langmap=Lua\:.lua.wlua:\
+	:langmap=MOOCode\:.moo:\
+	:langmap=MXML\:.mxml:\
+	:langmap=Mako\:.mao:\
+	:langmap=Mason\:.m.mhtml.mc.mi:\
+	:langmap=Matlab\:.m:\
+	:langmap=Modelica\:.mo:\
+	:langmap=Modula2\:.mod:\
+	:langmap=Monkey\:.monkey:\
+	:langmap=MoonScript\:.moon:\
+	:langmap=MuPAD\:.mu:\
+	:langmap=Myghty\:.myt:\
+	:langmap=NASM\:.asm.ASM:\
+	:langmap=NSIS\:.nsi.nsh:\
+	:langmap=Nemerle\:.n:\
+	:langmap=NewLisp\:.lsp.nl:\
+	:langmap=Newspeak\:.ns2:\
+	:langmap=Nimrod\:.nim.nimrod:\
+	:langmap=OCaml\:.ml.mli.mll.mly:\
+	:langmap=Objective-C++\:.mm.hh:\
+	:langmap=Objective-C\:.m.h:\
+	:langmap=Objective-J\:.j:\
+	:langmap=Octave\:.m:\
+	:langmap=Ooc\:.ooc:\
+	:langmap=Opa\:.opa:\
+	:langmap=OpenEdge\:.p.cls:\
+	:langmap=PHP\:.php.php3.phtml:\
+	:langmap=Pascal\:.pas:\
+	:langmap=Perl\:.pl.pm:\
+	:langmap=PostScript\:.ps.eps:\
+	:langmap=PowerShell\:.ps1:\
+	:langmap=Prolog\:.prolog.pro.pl:\
+	:langmap=Python\:.py.pyw.sc.tac.sage:\
+	:langmap=QML\:.qml:\
+	:langmap=REBOL\:.r.r3:\
+	:langmap=RHTML\:.rhtml:\
+	:langmap=Racket\:.rkt.rktl:\
+	:langmap=Ragel\:.rl:\
+	:langmap=Redcode\:.cw:\
+	:langmap=RobotFramework\:.robot:\
+	:langmap=Ruby\:.rb.rbw.rake.gemspec.rbx.duby:\
+	:langmap=Rust\:.rs.rc:\
+	:langmap=S\:.S.R:\
+	:langmap=Scala\:.scala:\
+	:langmap=Scaml\:.scaml:\
+	:langmap=Scheme\:.scm.ss:\
+	:langmap=Scilab\:.sci.sce.tst:\
+	:langmap=Smalltalk\:.st:\
+	:langmap=Smarty\:.tpl:\
+	:langmap=Sml\:.sml.sig.fun:\
+	:langmap=Snobol\:.snobol:\
+	:langmap=SourcePawn\:.sp:\
+	:langmap=Spitfire\:.spt:\
+	:langmap=Ssp\:.ssp:\
+	:langmap=Stan\:.stan:\
+	:langmap=SystemVerilog\:.sv.svh:\
+	:langmap=Tcl\:.tcl:\
+	:langmap=TeX\:.tex.aux.toc:\
+	:langmap=Tea\:.tea:\
+	:langmap=Treetop\:.treetop.tt:\
+	:langmap=TypeScript\:.ts:\
+	:langmap=UrbiScript\:.u:\
+	:langmap=VB.net\:.vb.bas:\
+	:langmap=VGL\:.rpf:\
+	:langmap=Vala\:.vala.vapi:\
+	:langmap=Velocity\:.vm.fhtml:\
+	:langmap=Verilog\:.v:\
+	:langmap=Vhdl\:.vhdl.vhd:\
+	:langmap=Vim\:.vim:\
+	:langmap=XBase\:.PRG.prg:\
+	:langmap=XQuery\:.xqy.xquery.xq.xql.xqm:\
+	:langmap=XSLT\:.xsl.xslt.xpl:\
+	:langmap=Xtend\:.xtend:\
+	:gtags_parser=ABAP\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=ANTLR\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=ActionScript3\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Ada\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=AppleScript\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=AspectJ\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Aspx-cs\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Asymptote\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=AutoIt\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Awk\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=BUGS\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Bash\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Bat\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=BlitzMax\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Boo\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Bro\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=C#\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=C++\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=COBOLFree\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=COBOL\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=CUDA\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=C\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Ceylon\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Cfm\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Clojure\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=CoffeeScript\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Common-Lisp\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Coq\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Croc\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Csh\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Cython\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Dart\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Dg\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Duel\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Dylan\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=ECL\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=EC\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=ERB\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Elixir\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Erlang\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Evoque\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=FSharp\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Factor\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Fancy\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Fantom\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Felix\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Fortran\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=GAS\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=GLSL\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Genshi\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Gherkin\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Gnuplot\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Go\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=GoodData-CL\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Gosu\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Groovy\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Gst\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=HaXe\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Haml\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Haskell\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Hxml\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Hybris\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=IDL\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Io\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Ioke\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=JAGS\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Jade\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=JavaScript\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Java\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Jsp\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Julia\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Koka\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Kotlin\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=LLVM\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Lasso\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Literate-Haskell\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=LiveScript\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Logos\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Logtalk\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Lua\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=MAQL\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=MOOCode\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=MXML\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Mako\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Mason\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Matlab\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=MiniD\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Modelica\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Modula2\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Monkey\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=MoonScript\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=MuPAD\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Myghty\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=NASM\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=NSIS\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Nemerle\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=NewLisp\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Newspeak\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Nimrod\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=OCaml\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Objective-C++\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Objective-C\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Objective-J\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Octave\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Ooc\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Opa\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=OpenEdge\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=PHP\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Pascal\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Perl\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=PostScript\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=PowerShell\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Prolog\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Python\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=QML\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=REBOL\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=RHTML\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Racket\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Ragel\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Redcode\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=RobotFramework\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Ruby\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Rust\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=S\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Scala\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Scaml\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Scheme\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Scilab\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Smalltalk\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Smarty\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Sml\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Snobol\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=SourcePawn\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Spitfire\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Ssp\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Stan\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=SystemVerilog\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Tcl\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=TeX\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Tea\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Treetop\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=TypeScript\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=UrbiScript\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=VB.net\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=VGL\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Vala\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Velocity\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Verilog\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Vhdl\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Vim\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=XBase\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=XQuery\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=XSLT\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:\
+	:gtags_parser=Xtend\:/nix/store/w7bxgm1q09sh4wblcw6f9g45ymyan22r-global-6.5.7/lib/gtags/pygments-parser.la:
+
+#
+# Drupal configuration.
+#
+# drupal|Drupal content management platform:\
+# 	:tc=common:\
+# 	:langmap=php\:.php.module.inc.profile.install.test:
 #---------------------------------------------------------------------
 # Configuration for htags(1)
 # Let's paint hypertext with your favorite colors!
 # See htags(1).
 #---------------------------------------------------------------------
 htags:\
-	:body_begin=<body text='#191970' bgcolor='#f5f5dc' vlink='gray'>:body_end=</body>:\
-	:table_begin=<table>:table_end=</table>:\
-	:title_begin=<h1><font color='#cc0000'>:title_end=</font></h1>:\
-	:comment_begin=<i><font color='green'>:comment_end=</font></i>:\
-	:sharp_begin=<font color='darkred'>:sharp_end=</font>:\
-	:brace_begin=<font color='red'>:brace_end=</font>:\
-	:warned_line_begin=<span style='background-color\:yellow'>:warned_line_end=</span>:\
-	:reserved_begin=<b>:reserved_end=</b>:script_alias=/cgi-bin/:\
-	:ncol#4:tabs#8:normal_suffix=html:gzipped_suffix=ghtml:\
-	:definition_header=no:
+	:script_alias=/cgi-bin/:ncol#4:tabs#8:normal_suffix=html:gzipped_suffix=ghtml:

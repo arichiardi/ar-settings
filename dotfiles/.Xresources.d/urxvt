@@ -44,8 +44,8 @@ URxvt*matcher.button: 1
 URxvt.keysym.M-u: perl:matcher:select
 ! highlighting https://gist.github.com/r4um/2413814
 URxvt.matcher.rend.0: fg:4 Uline Bold
-! perl:font-size
-URxvt.keysym.Mod4-0x2b: perl:font-size:increase
+! perl:font-size - equal and minus
+URxvt.keysym.Mod4-0x3d: perl:font-size:increase
 URxvt.keysym.Mod4-0x2d: perl:font-size:decrease
 URxvt.keysym.Mod4-End: perl:font-size:reset
 URxvt.keysym.Mod4-Home: perl:font-size:show

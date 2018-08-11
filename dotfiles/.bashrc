@@ -37,20 +37,13 @@ case "$TERM" in
     xterm*|rxvt*) color_prompt=yes;;
 esac
 
-# uncomment for a colored prompt, if the terminal has the capability; turned
-# off by default to not distract the user: the focus in a terminal window
-# should be on the output of commands, not on the prompt
-# force_color_prompt=yes
-
-if [ -n "$force_color_prompt" ]; then
-    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-	    # We have color support; assume it's compliant with Ecma-48
-	    # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-	    # a case would tend to support setf rather than setaf.)
-	    color_prompt=yes
-    else
-	    color_prompt=
-    fi
+if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+	# We have color support; assume it's compliant with Ecma-48
+	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+	# a case would tend to support setf rather than setaf.)
+	color_prompt=yes
+else
+	color_prompt=
 fi
 
 # AR uncomment to use the git prompt
@@ -91,7 +84,7 @@ else
     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w'$PS1_TAIL
 fi
 
-unset color_prompt force_color_prompt
+unset color_prompt
 
 # If this is an xterm set the title to user@host:dir
 case "$TERM" in
@@ -155,50 +148,18 @@ if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
 
-SSH_ENV="$HOME/.ssh/environment"
+# Enable gpg-agent if it is not running
+GPG_AGENT_SOCKET=$(gpgconf --list-dirs | grep agent-socket | cut -d ":" -f 2)
+if [ ! -S $GPG_AGENT_SOCKET ]; then
+  gpgconf --launch gpg-agent
+  export GPG_TTY=$(tty)
+fi
 
-# start the ssh-agent
-function start_agent {
-    echo "Initializing new SSH agent..."
-    # spawn ssh-agent
-    ssh-agent | sed 's/^echo/#echo/' > "$SSH_ENV"
-    echo succeeded
-    chmod 600 "$SSH_ENV"
-    . "$SSH_ENV" > /dev/null
-    ssh-add
-}
-
-# test for identities
-function test_identities {
-    # test whether standard identities have been added to the agent already
-    ssh-add -l | grep "The agent has no identities" > /dev/null
-    if [ $? -eq 0 ]; then
-        ssh-add
-        # $SSH_AUTH_SOCK broken so we start a new proper agent
-        if [ $? -eq 2 ];then
-            start_agent
-        fi
-    fi
-}
-
-# check for running ssh-agent with proper $SSH_AGENT_PID
-if [ -n "$SSH_AGENT_PID" ]; then
-    ps -ef | grep "$SSH_AGENT_PID" | grep ssh-agent > /dev/null
-    if [ $? -eq 0 ]; then
-        test_identities
-    fi
-    # if $SSH_AGENT_PID is not properly set, we might be able to load one from
-    # $SSH_ENV
-else
-    if [ -f "$SSH_ENV" ]; then
-        . "$SSH_ENV" > /dev/null
-    fi
-    ps -ef | grep "$SSH_AGENT_PID" | grep -v grep | grep ssh-agent > /dev/null
-    if [ $? -eq 0 ]; then
-        test_identities
-    else
-        start_agent
-    fi
+# Set SSH to use gpg-agent if it is configured to do so
+GNUPGCONFIG=${GNUPGHOME:-"$HOME/.gnupg/gpg-agent.conf"}
+if grep -q enable-ssh-support "$GNUPGCONFIG"; then
+  unset SSH_AGENT_PID
+  export SSH_AUTH_SOCK=$GPG_AGENT_SOCKET.ssh
 fi
 
 # From https://superuser.com/questions/509950/why-are-unicode-characters-not-rendering-correctly
@@ -249,22 +210,27 @@ export MAVEN_JMX="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.
 # Idea
 # From http://stackoverflow.com/questions/5124368/gradle-doesnt-work-in-intellij-problems-with-java-home
 IDEA_JDK=$JAVA_HOME
+PATH=$PATH:~/.local/share/ideaIC2017.3/bin
 
 # Path additions
 # PATH=$PATH:...
 
 # Clojure
-export CLOJURE_EXT=$HOME/.m2/repository/org/clojure/clojure/1.8.0/clojure-1.8.0.jar
+export CLOJURE_JAR=$HOME/.m2/repository/org/clojure/clojure/1.9.0/clojure-1.9.0.jar
+export CLOJURE_EXT=$CLOJURE_JAR
 export CLOJURE_OPTS="-Xms128M -Xmx512M -server"
-export CLOJURE_JAR=$HOME/.m2/repository/org/clojure/clojure/1.8.0/clojure-1.8.0.jar
 
 # Emacs default editor
 export ALTERNATE_EDITOR=""
-export EDITOR="emacsclient -t"
-export VISUAL="emacsclient -c -a emacs"
+export EDITOR="emacsclient -a emacs -nw"
+export VISUAL="emacsclient -a emacs -c"
+export EA_EDITOR="$HOME/bin/emacsclient-daemon.sh -c"
+export PATH="$HOME/.cask/bin:$PATH"
 
 # Misc
 export XMLLINT_INDENT="  "
+
+# GPG
 export GPGKEY=5BB502F6
 export GPGKEYID=5BB502F6
 
@@ -311,6 +277,32 @@ export PATH=$PATH:"$ANDROID_STUDIO/bin":"$ANDROID_HOME/tools":"$ANDROID_HOME/pla
 export NVM_DIR="/home/arichiardi/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
 
-# Ctags + global
+# gtags + global
 export GTAGSCONF=~/.globalrc
-export GTAGSLABEL=ctags-exuberant
+export GTAGSLABEL=ctags
+
+# tabtab source for serverless package
+# uninstall by removing these lines or running `tabtab uninstall serverless`
+[ -f /home/arichiardi/git/logpoc/node_modules/tabtab/.completions/serverless.bash ] && . /home/arichiardi/git/logpoc/node_modules/tabtab/.completions/serverless.bash
+# tabtab source for sls package
+# uninstall by removing these lines or running `tabtab uninstall sls`
+[ -f /home/arichiardi/git/logpoc/node_modules/tabtab/.completions/sls.bash ] && . /home/arichiardi/git/logpoc/node_modules/tabtab/.completions/sls.bash
+
+## nix package manager
+. $HOME/.nix-profile/etc/profile.d/nix.sh
+
+# Google Cloud SDK
+PATH=$PATH:"/usr/local/share/google-cloud-sdk/bin"
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/usr/local/share/google-cloud-sdk/completion.bash.inc' ]; then source '/usr/local/share/google-cloud-sdk/completion.bash.inc'; fi
+
+# Custom load config
+export LD_LIBRARY_PATH="$HOME/.local/lib"
+
+# Yarn
+PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+
+# VSTS
+export PATH=$PATH:/home/arichiardi/.local/lib/vsts-cli/bin
+source '/home/arichiardi/.local/lib/vsts-cli/vsts.completion'

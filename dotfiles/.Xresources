@@ -55,19 +55,10 @@ xterm*metaSendsEscape: true
 xterm*eightBitInput: false
 xterm*charClass: 33:48,35-38:48,39:43,42-47:48,58-59:48,61:48,63-64:48,126:48
 
-! YeahConsole settings
-yeahconsole*term:urxvt
-yeahconsole*toggleKey:None+F4
-yeahconsole*keyBigger:ControlAlt+equal
-yeahconsole*keySmaller:ControlAlt+minus
-yeahconsole*font: xft:Deja Vu Sans Mono:style=g:antialias=false:hinting=false:size=12
-yeahconsole*consoleHeight: 18
-yeahconsole*aniDelay: 0
-yeahconsole*stepSize: 2
 ! Emacs
 ! Emacs.FontBackend: xft
 Emacs.font: Deja Vu Sans Mono 11
 
 ! X Colors settings
-#include "/home/kapitan/.Xresources.d/theme"
-#include "/home/kapitan/.Xresources.d/urxvt"
+#include "/home/.../.Xresources.d/theme"
+#include "/home/.../.Xresources.d/urxvt"
