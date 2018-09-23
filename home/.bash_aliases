@@ -2,6 +2,9 @@
 alias o='xdg-open'
 alias cd..='cd ..'
 alias ln='ln -i'
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
 alias uls='cd /usr/local/share'
 alias gpg='gpg2'
 alias vault='$HOME/bin/mount-vault /usr/local/data/vault.enc && cd /tmp/vault'
@@ -46,9 +49,6 @@ alias gitalias="git config --get-regexp ^alias\."
 # Docker shortcuts
 alias vsts='docker run -t microsoft/vsts-cli:latest vsts'
 
-# Python virtualenv
-alias aws-env='source /usr/local/share/aws-env/bin/activate'
-alias az-env='source /usr/local/share/az-env/bin/activate'
 
 # Maven
 alias mvn='notify-after mvn'
