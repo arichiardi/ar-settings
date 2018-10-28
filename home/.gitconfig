@@ -1,9 +1,9 @@
-[user]
-    email = "a.richiardi.work@gmail.com"
-    name = "Andrea Richiardi"
-    signingkey = 0x5BB502F6
+[include]
+    path = ~/.gitidentities/a.richiardi.work
 [gpg]
     program = gpg2
+[commit]
+    gpgSign = true
 [color]
     filemode = false
     diff = auto
@@ -23,8 +23,6 @@
     autosquash = true
 [branch]
     autosetuprebase = always
-[include]
-    path = ~/.gitidentities/a.richiardi.work@gmail.com
 [merge]
     tool = meld-merge-script
 [mergetool "meld-merge-script"]
@@ -38,12 +36,6 @@
 [diff "jpeg"]
     binary = true
     textconv = hexdump -v -C
-[diff-so-fancy]
-    markEmptyLines = true
-    changeHunkIndicators = false
-    stripLeadingSymbols = false
-[pager]
-    diff = diff-so-fancy | less --tabs=4 -RFX --pattern '^(Date|added|deleted|modified): '
 [alias]
     apr = "apply --reject"
     co = "checkout"
