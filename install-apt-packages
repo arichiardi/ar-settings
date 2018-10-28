@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# For skipping sections, use this trick:
+#
+#   cat >/dev/null <<HUB
+#
+# see the brilliant answer here: https://stackoverflow.com/a/45538151
+
+LIGHT_GREEN='\033[1;32m'
+LIGHT_RED='\033[1;31m'
+NC='\033[0m' # No Color
+
+echo -e "${LIGHT_GREEN}Updating apt packages...${NC}"
+sudo apt update
+
+echo -e "${LIGHT_GREEN}Installing packages...${NC}"
+sudo apt install rxvt-unicode qasmixer scrot cmake arandr silversearcher-ag zeal \
+     xsel docker docker-compose exuberant-ctags tree byzanz \
+     rlwrap markdown xclip xbacklight texinfo meld python3-pip cryptsetup global \
+     exiftool cdiff texlive-latex-base texlive-latex-extra wicd-cli wicd-curses wich-gdk \
+     console-data
+
+echo -e "${LIGHT_GREEN}Installing i3 packages...${NC}"
+sudo apt install i3 rofi
+
+echo -e "${LIGHT_GREEN}Installing emacs compilation packages...${NC}"
+sudo apt install libgnutls28-dev libgtk-3-dev libwebkitgtk-3.0-dev # or libwebkit2gtk-4.0-dev
+

@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# For skipping sections, use this trick:
+#
+#   cat >/dev/null <<HUB
+#
+# see the brilliant answer here: https://stackoverflow.com/a/45538151
+
+LIGHT_GREEN='\033[1;32m'
+LIGHT_RED='\033[1;31m'
+NC='\033[0m' # No Color
+
+# TEMP_DIR=$(mktemp -d -t "ar-settings.XXXXXXXXXX")
+
+echo -e "${LIGHT_GREEN}Create necessary dirs...${NC}"
+mkdir -p $HOME/bin
+mkdir -p $HOME/tmp
+
+echo -e "${LIGHT_GREEN}Copying bin scripts...${NC}"
+for f in $(find ./bin/ -type f); do
+    set +e
+    diff "$HOME/$f" "$f"
+    set -e
+    cp -iv "$f" "$HOME/$f"
+    echo -e "${LIGHT_GREEN}---${NC}"
+done
+
+echo -e "${LIGHT_RED}Copying dot files...${NC}"
+old_pwd=$(pwd)
+cd home
+for f in $(find . -type f); do
+    # better to diff them
+    set +e
+    meld "$HOME/$f" "$f"
+    set -e
+done
+
+home_ssh=$HOME/.ssh
+
+echo -e "${LIGHT_RED}Setup $home_ssh...${NC}"
+mkdir -p $home_ssh
+
+cd home
+for f in $(find ./.ssh -type f); do
+    set +e
+    diff "$HOME/$f" "$home_ssh/$f"
+    set -e
+    cp -iv "$home_ssh/$f" "$HOME/$f"
+    echo -e "${LIGHT_RED}---${NC}"
+done
+
+echo -e "${LIGHT_GREEN}Decrypt GPG key...${NC}"
+bin/secret -r -s ./.ssh/5BB502F6_rsa.enc -d "$home_ssh/5BB502F6_rsa"
+chmod 600 "$home_ssh/5BB502F6_rsa"
+
+cd - 
