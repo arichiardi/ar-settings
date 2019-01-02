@@ -8,20 +8,20 @@
 # for ssh logins, install and configure the libpam-umask package.
 #umask 022
 
-LOG="${TMPDIR:=/tmp}/profile-$USER"o
+# LOG="${TMPDIR:=/tmp}/profile-$USER"o
 
-echo "-----" >>$LOG
-echo "Caller: $0" >>$LOG
-echo " DESKTOP_SESSION: $DESKTOP_SESSION" >>$LOG
-echo " GDMSESSION: $GDMSESSION" >>$LOG
-echo " SHELL: $SHELL">>$LOG
+# echo "-----" >>$LOG
+# echo "Caller: $0" >>$LOG
+# echo " DESKTOP_SESSION: $DESKTOP_SESSION" >>$LOG
+# echo " GDMSESSION: $GDMSESSION" >>$LOG
+# echo " SHELL: $SHELL">>$LOG
 
 # if running bash
 if [ "$BASH" ] && [ "$BASH" != "/bin/sh" ]; then
     # include .bashrc if it exists
     if [ -f "$HOME/.bashrc" ]; then
-        echo "Sourcing: $HOME/.bashrc" >>$LOG
-	    . "$HOME/.bashrc"
+        # echo "Sourcing: $HOME/.bashrc" >>$LOG
+	source "$HOME/.bashrc"
     fi
 fi
 
