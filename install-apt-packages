@@ -20,11 +20,10 @@ sudo apt install rxvt-unicode qasmixer scrot cmake arandr silversearcher-ag zeal
      xsel docker docker-compose exuberant-ctags tree byzanz \
      rlwrap markdown xclip xbacklight texinfo meld python3-pip cryptsetup global \
      exiftool cdiff texlive-latex-base texlive-latex-extra wicd-cli wicd-curses wich-gdk \
-     console-data
+     console-data shellcheck
 
 echo -e "${LIGHT_GREEN}Installing i3 packages...${NC}"
 sudo apt install i3 rofi
 
 echo -e "${LIGHT_GREEN}Installing emacs compilation packages...${NC}"
 sudo apt install libgnutls28-dev libgtk-3-dev libwebkitgtk-3.0-dev # or libwebkit2gtk-4.0-dev
-
