@@ -93,5 +93,12 @@
     rshhh = "reset --hard"
     sa = "stash apply"
     sl = "stash list"
-    ski = "stash save --keep-index"
-    rmsub = "!f(){ git rm --cached \"$1\";rm -rv \"$1\";rm -rfv \".git/modules/$1\";git config -f .gitmodules --remove-section \"submodule.$1\";git config -f .git/config --remove-section \"submodule.$1\";git add .gitmodules; }; f"
+	ski = "stash save --keep-index"
+[protocol "keybase"]
+	allow = always
+#[diff-so-fancy]
+#    markEmptyLines = true
+#    changeHunkIndicators = false
+#    stripLeadingSymbols = false
+#[pager]
+#    diff = diff-so-fancy | less --tabs=4 -RFX --pattern '^(Date|added|deleted|modified): '
