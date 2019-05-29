@@ -1,0 +1,42 @@
+#!/bin/bash
+
+set -uo pipefail
+
+LOOP_FILE=${1:-}
+EXISTING_LOOP=$(sudo losetup -j "$LOOP_FILE")
+MOUNT_POINT=/tmp/vault
+DEV_LOOP=""
+
+if [ -z "$EXISTING_LOOP" ] ; then
+    TMP_LOOP=$(sudo losetup -f)
+    echo -e "Mounting vault on $DEV_LOOP..."
+    sudo losetup $TMP_LOOP $LOOP_FILE
+    DEV_LOOP=$TMP_LOOP
+else
+    echo -e "The vault $LOOP_FILE is already mounted!";
+    DEV_LOOP=$(echo $EXISTING_LOOP | awk -F":" '{ print($1) }')
+fi
+
+if [ "$?" = "0" ]; then
+    echo -e "Decrypting vault..."
+    sudo cryptsetup luksOpen $DEV_LOOP vault
+
+    if [ "$?" = "0" ]; then
+        echo -e "Mounting vault..."
+        mkdir -p $MOUNT_POINT
+        sudo mount /dev/mapper/vault $MOUNT_POINT
+
+        if [ "$?" = "0" ]; then
+            echo -e "Completed, vault mounted on $MOUNT_POINT"
+        else
+            echo -e "Error: mount exited with $?"
+        fi
+
+    else
+        echo -e "Error: cryptsetup exited with $?"
+    fi
+else
+    echo -e "Error: losetup exited with $?"
+fi
+
+exit $?
