@@ -12,16 +12,16 @@ LIGHT_GREEN='\033[1;32m'
 NC='\033[0m' # No Color
 
 echo -e "${LIGHT_GREEN}Installing vpn-slice...${NC}"
-sudo pamac build vpn-slice-git
+pamac build vpn-slice-git
 
 echo -e "${LIGHT_GREEN}Installing openpyn-nordvpn...${NC}"
-sudo pamac build openpyn-nordvpn
+pamac build openpyn-nordvpn
 
 echo -e "${LIGHT_GREEN}Installing adr-tools...${NC}"
-sudo pamac build adr-tools
+pamac build adr-tools
 
 echo -e "${LIGHT_GREEN}Installing cask...${NC}"
-sudo pamac build cask
+pamac build cask
 
 echo -e "${LIGHT_GREEN}Installing yarn...${NC}"
-sudo pamac build yarn
+pamac build yarn
