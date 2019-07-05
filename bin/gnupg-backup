@@ -1,9 +1,11 @@
 #!/bin/bash
 
+script_name=$(basename "$0")
+
 do_usage() {
     echo -n
     echo "Usage:"
-    echo "backupgpg.sh* *destination folder*"
+    echo "$script_name *destination folder*"
     exit 1
 }
 [ 1 -ne $# ] && do_usage
