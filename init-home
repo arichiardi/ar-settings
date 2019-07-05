@@ -28,8 +28,9 @@ for f in $(find ./bin/ -type f); do
 done
 
 echo -e "${LIGHT_RED}Copying dot files...${NC}"
-old_pwd=$(pwd)
-cd home
+
+pushd home
+
 for f in $(find . -type f); do
     # better to diff them
     set +e
@@ -42,7 +43,6 @@ home_ssh=$HOME/.ssh
 echo -e "${LIGHT_RED}Setup $home_ssh...${NC}"
 mkdir -p $home_ssh
 
-cd home
 for f in $(find ./.ssh -type f); do
     set +e
     diff "$HOME/$f" "$home_ssh/$f"
@@ -55,4 +55,4 @@ echo -e "${LIGHT_GREEN}Decrypt GPG key...${NC}"
 bin/secret -r -s ./.ssh/5BB502F6_rsa.enc -d "$home_ssh/5BB502F6_rsa"
 chmod 600 "$home_ssh/5BB502F6_rsa"
 
-cd - 
+popd

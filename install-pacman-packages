@@ -9,7 +9,6 @@ set -euo pipefail
 # see the brilliant answer here: https://stackoverflow.com/a/45538151
 
 LIGHT_GREEN='\033[1;32m'
-LIGHT_RED='\033[1;31m'
 NC='\033[0m' # No Color
 
 echo -e "${LIGHT_GREEN}Installing packages...${NC}"
@@ -19,6 +18,3 @@ sudo pacman -S rxvt-unicode qastools scrot cmake arandr the_silver_searcher \
                colordiff texlive-latexextra wicd-patched wicd-gtk
 
 # not found from apt: markdown global texlive-base-extra console-data
-
-# echo -e "${LIGHT_GREEN}Installing i3 packages...${NC}"
-# sudo pacman -Ss i3 rofi i3-scrot
