@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# For skipping sections, use this trick:
+#
+#   cat >/dev/null <<HUB
+#
+# see the brilliant answer here: https://stackoverflow.com/a/45538151
+
+LIGHT_GREEN='\033[1;32m'
+NC='\033[0m' # No Color
+
+echo -e "${LIGHT_GREEN}Installing vpn-slice...${NC}"
+sudo pamac build vpn-slice-git
+
+echo -e "${LIGHT_GREEN}Installing openpyn-nordvpn...${NC}"
+sudo pamac build openpyn-nordvpn
+
+echo -e "${LIGHT_GREEN}Installing adr-tools...${NC}"
+sudo pamac build adr-tools
+
+echo -e "${LIGHT_GREEN}Installing cask...${NC}"
+sudo pamac build cask
+
+echo -e "${LIGHT_GREEN}Installing yarn...${NC}"
+sudo pamac build yarn

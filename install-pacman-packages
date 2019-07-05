@@ -15,6 +15,6 @@ echo -e "${LIGHT_GREEN}Installing packages...${NC}"
 sudo pacman -S rxvt-unicode qastools scrot cmake arandr the_silver_searcher \
                zeal xsel docker docker-compose tree byzanz perl-image-exiftool \
                rlwrap xclip xorg-xbacklight texinfo meld python-pip cryptsetup \
-               colordiff texlive-latexextra wicd-patched wicd-gtk
+               colordiff texlive-latexextra wicd-patched wicd-gtk kubectl
 
 # not found from apt: markdown global texlive-base-extra console-data
