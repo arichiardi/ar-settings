@@ -93,9 +93,9 @@
     rshhh = "reset --hard"
     sa = "stash apply"
     sl = "stash list"
-	ski = "stash save --keep-index"
+    ski = "stash save --keep-index"
 [protocol "keybase"]
-	allow = always
+    allow = always
 #[diff-so-fancy]
 #    markEmptyLines = true
 #    changeHunkIndicators = false
