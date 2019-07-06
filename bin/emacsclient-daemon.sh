@@ -7,13 +7,13 @@
 # It accepts the same parameters as emacs, adding -c if no -c or -nw is
 # supplied (effectively defaulting to the graphical version of emacs).
 
-set -ex
+set -e
 
 XLIB_SKIP_ARGB_VISUALS=1
 
 EMACS_BIN=$(which emacs)
 EMACSCLIENT_BIN=$(which emacsclient)
-EMACS_ICON=/usr/share/icons/hicolor/scalable/apps/emacs25.svg
+EMACS_ICON=$HOME/.icons/emacs25.svg
 
 if [ 0 -eq $(pgrep --exact --count emacs) ]
 then
@@ -28,5 +28,4 @@ if [[ ! ( ! "$EMACS_PARAMS" =~ "-c" && ! "$EMACS_PARAMS" =~ "-nw" ) ]]; then
     EMACS_PARAM="-c $EMACS_PARAMS"
 fi
 
-export TERM=xterm-256color
 $EMACSCLIENT_BIN "$EMACS_PARAMS" "$@"

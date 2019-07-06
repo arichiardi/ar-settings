@@ -3,7 +3,7 @@
 # Emacs dired from a given dir.
 #
 
-set -xeuo pipefail
+set -euo pipefail
 
 dired_dir=${1:-$(pwd)}
 
