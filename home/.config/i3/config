@@ -9,16 +9,12 @@
 #
 # Please see http://i3wm.org/docs/userguide.html for a complete reference!
 
-set $mod Mod3
+set $mod Mod4
 set $main-color "#162140"
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
-#font pango:monospace 8
-
-# This font is widely installed, provides lots of unicode glyphs, right-to-left
-# text rendering and scalability on retina/hidpi displays {thanks to pango}.
-font pango:Deja Vu Sans Mono 9
+font xft:DejaVu Sans Mono 9
 
 # Before i3 v4.8, we used to recommend this one as the default:
 # font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
@@ -135,27 +131,19 @@ bindsym $mod+Shift+c reload
 bindsym $mod+Shift+p restart
 
 # exit i3 (logs you out of your X session)
-bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
+bindsym $mod+Mod1+l exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
 
 # Set shut down, restart and locking features
 bindsym $mod+Shift+q mode "$mode_system"
-set $mode_system (l)ock, (e)xit, switch_(u)ser, (
-s)uspend, (h)ibernate, (r)eboot, (Shift+s)hutdown
+set $mode_system (l)ock, (e)xit, switch_(u)ser, (s)uspend, (h)ibernate, (r)eboot, (Shift+s)hutdown
 mode "$mode_system" {
-    bindsym l exec --no-startup-id i3exit lock, m
-ode "default"
-    bindsym s exec --no-startup-id i3exit suspend
-, mode "default"
-    bindsym u exec --no-startup-id i3exit switch_
-user, mode "default"
-    bindsym e exec --no-startup-id i3exit logout,
- mode "default"
-    bindsym h exec --no-startup-id i3exit hiberna
-te, mode "default"
-    bindsym r exec --no-startup-id i3exit reboot,
- mode "default"
-    bindsym Shift+s exec --no-startup-id i3exit s
-hutdown, mode "default"
+    bindsym l exec --no-startup-id i3exit lock, mode "default"
+    bindsym s exec --no-startup-id i3exit suspend, mode "default"
+    bindsym u exec --no-startup-id i3exit switch_user, mode "default"
+    bindsym e exec --no-startup-id i3exit logout, mode "default"
+    bindsym h exec --no-startup-id i3exit hibernate, mode "default"
+    bindsym r exec --no-startup-id i3exit reboot, mode "default"
+    bindsym Shift+s exec --no-startup-id i3exit shutdown, mode "default"
 
     # exit system mode: "Enter" or "Escape"
     bindsym Return mode "default"
@@ -240,42 +228,25 @@ mode "focused" {
 
 bindsym $mod+Shift+f mode "focused"
 
-# Custom bindings
-bindsym $mod+Mod1+e exec "$HOME/bin/emacsclient-daemon.sh -c"
-bindsym $mod+Mod1+h exec "gentoo -1 ~/Downloads -2 ~"
-bindsym $mod+Mod1+v exec "gentoo -1 /tmp/vault -2 ~"
-bindsym $mod+Mod1+p exec "keepassxc"
-bindsym $mod+F4 exec "rhythmbox-client --play-pause"
-bindsym $mod+F5 exec "rhythmbox-client --next"
-bindsym $mod+F6 exec "rhythmbox-client --previous"
-bindsym $mod+F7 exec "rhythmbox-client --clear-queue"
-bindsym --release Print exec --no-startup-id scrot
-bindsym --release Shift+Print exec --no-startup-id scrot -s
-bindsym XF86MonBrightnessDown exec "xbacklight -dec 20"
-bindsym XF86MonBrightnessUp exec "xbacklight -inc 20"
-bindsym XF86AudioRaiseVolume exec "amixer -D pulse sset Master 5%+"
-bindsym XF86AudioLowerVolume exec "amixer -D pulse sset Master 5%-"
-bindsym XF86AudioMute exec "amixer -D pulse sset Master toggle"
-# Mic
-bindsym Shift+XF86AudioRaiseVolume exec "amixer -D pulse set Capture 10%+"
-bindsym Shift+XF86AudioLowerVolume exec "amixer -D pulse set Capture 10%-"
-bindsym XF86AudioMicMute exec ~/bin/mute-mic
-
 # class                 border  backgr. text    indicator child_border
 client.focused          #285577 #0f2c4c #ffffff #90220f   #285577
 
-# Custom options
+##########
+# Custom #
+##########
+
 for_window [class="urxvt"] border pixel 0
 hide_edge_borders vertical
 
-## Manual management of external displays
-# https://wiki.archlinux.org/index.php/i3
-# Set the shortcuts and what they do
-set $mode_display Ext Screen (x) MAIN ONLY, (1) 1 HDMI RIGHT, (2) 2 HDMI LEFT
+# Display management
+set_from_resource $main-display-output i3wm.mainDisplayOutput eDP1
+
+set $mode_display HDMI display (a)uto, (m)ain only, (r)ight of main, (l)eft of main
 mode "$mode_display" {
-  bindsym x exec --no-startup-id ~/bin/main-only.sh MAIN_MONITOR_ID
-  bindsym 1 exec --no-startup-id ~/bin/hdmi1-right-of-lvds1.sh MAIN_MONITOR_ID
-  bindsym 2 exec --no-startup-id ~/bin/hdmi1-left-of-lvds1.sh MAIN_MONITOR_ID
+  bindsym a exec --no-startup-id xrandr --auto
+  bindsym m exec --no-startup-id main-only.sh $main-display-output
+  bindsym r exec --no-startup-id hdmi1-right-of-main.sh $main-display-output
+  bindsym l exec --no-startup-id hdmi1-left-of-main.sh $main-display-output
 
   # back to normal: Enter or Escape
   bindsym Return mode "default"
@@ -283,9 +254,11 @@ mode "$mode_display" {
 }
 
 # Declare here the shortcut to bring the display selection menu
-bindsym $mod+x mode "$mode_display"
+bindsym $mod+Shift+h mode "$mode_display"
 
-# System startup (Ubuntu)
+# System startup for Ubuntu
+# https://askubuntu.com/questions/1083637/file-xmodmap-is-not-sourced-on-startup-in-18-04
+exec --no-startup-id xmodmap ~/.Xmodmap
 exec --no-startup-id /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1
 exec --no-startup-id gnome-settings-daemon --start --components=secrets
 exec --no-startup-id /usr/lib/at-spi2-core/at-spi-bus-launcher --launch-immediately
@@ -306,5 +279,27 @@ exec --no-startup-id qasmixer --tray
 exec --no-startup-id rfkill block bluetooth
 exec --no-startup-id ~/bin/battery-notifier.sh
 
-# Setup the right screen layout
-exec --no-startup-id ~/bin/hdmis-right-of-primary.sh MAIN_MONITOR_ID
+# Bindings
+bindsym $mod+Mod1+e exec "$HOME/bin/emacsclient-daemon.sh -c"
+bindsym $mod+Mod1+h exec "gentoo -1 ~/Downloads -2 ~"
+bindsym $mod+Mod1+v exec "gentoo -1 /tmp/vault -2 ~"
+bindsym $mod+Mod1+p exec "keepassxc"
+bindsym $mod+F4 exec "rhythmbox-client --play-pause"
+bindsym $mod+F5 exec "rhythmbox-client --next"
+bindsym $mod+F6 exec "rhythmbox-client --previous"
+bindsym $mod+F7 exec "rhythmbox-client --clear-queue"
+bindsym --release Print exec --no-startup-id scrot
+bindsym --release Shift+Print exec --no-startup-id scrot -s
+bindsym XF86MonBrightnessDown exec "xbacklight -dec 20"
+bindsym XF86MonBrightnessUp exec "xbacklight -inc 20"
+bindsym XF86AudioRaiseVolume exec "amixer -D pulse sset Master 5%+"
+bindsym XF86AudioLowerVolume exec "amixer -D pulse sset Master 5%-"
+bindsym XF86AudioMute exec "amixer -D pulse sset Master toggle"
+
+# Microphone
+bindsym Shift+XF86AudioRaiseVolume exec "amixer -D pulse set Capture 10%+"
+bindsym Shift+XF86AudioLowerVolume exec "amixer -D pulse set Capture 10%-"
+bindsym XF86AudioMicMute exec ~/bin/mute-mic
+
+# Setup default screen layout in case of multiple monitors
+exec --no-startup-id hdmis-right-of-main.sh $main-display-output
