@@ -46,46 +46,6 @@ else
 	color_prompt=
 fi
 
-# AR uncomment to use the git prompt
-git_prompt=1
-
-# Git
-
-PS1_TAIL='\$ '
-PROMPT_COMMAND_HEAD=
-
-if [ ! -z "$git_prompt" ]; then
-    source ~/bin/git/git-prompt.sh
-
-    GIT_PS1_SHOWUPSTREAM="verbose"
-    GIT_PS1_SHOWUNTRACKEDFILES=1
-    GIT_PS1_SHOWSTASHSTATE=1
-    GIT_PS1_SHOWDIRTYSTATE=1
-    GIT_PS1_DESCRIBE_STYLE="describe"
-    PS1_TAIL='$(__git_ps1 " (%s)")\$ '
-    if [ "$color_prompt" = yes ]; then
-        GIT_PS1_SHOWCOLORHINTS=1
-        PROMPT_COMMAND='__git_ps1 "${debian_chroot:+($debian_chroot)}\[$BOLD\]\u@\h\[$NC\] \[$BLUE\]\w\[$NC\]" "\\$ "'
-    else
-        PROMPT_COMMAND='__git_ps1 "${debian_chroot:+($debian_chroot)}\u@\h \w" "\\$ "'
-    fi
-fi
-
-RED=`tput setaf 1`
-GREEN=`tput setaf 10`
-NC=`tput sgr0`
-BOLD=`tput bold`
-BLUE=`tput setaf 4`
-ORANGE=`tput setaf 202`
-
-if [ "$color_prompt" = yes ]; then
-    PS1='${debian_chroot:+($debian_chroot)}\[$BOLD\]\u@\h\[$NC\]:\[$BLUE\]\w\[$NC\]'$PS1_TAIL
-else
-    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w'$PS1_TAIL
-fi
-
-unset color_prompt
-
 # If this is an xterm set the title to user@host:dir
 case "$TERM" in
     xterm*|rxvt*)
