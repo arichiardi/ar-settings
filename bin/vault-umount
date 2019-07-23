@@ -49,7 +49,6 @@ if [ "$?" = "0" ]; then
             PWD=$(pwd)
             cd $(dirname $VAULT_FILE)
             sha1sum $(basename $VAULT_FILE) > $VAULT_FILE.sha1
-            sudo chown root:backup $VAULT_FILE.sha1
             sha1sum -c $VAULT_FILE.sha1
             cd $PWD
             echo -e "Completed!"
