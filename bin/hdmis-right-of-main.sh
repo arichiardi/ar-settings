@@ -2,7 +2,7 @@
 
 set -xeuo pipefail
 
-external_id=DP-1
+external_id=DP1
 
 # The name assigned to the main monitor (usually the laptop's)
 main_id=${1:-}

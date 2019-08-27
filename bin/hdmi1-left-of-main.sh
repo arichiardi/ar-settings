@@ -15,9 +15,11 @@ main_width=$(echo "$main_xrandr" | awk -F '[ x+]' '/\<connected\>/{print $3}')
 main_height=$(echo "$main_xrandr" | awk -F '[ x+]' '/\<connected\>/{print $4}')
 main_resolution=$main_width"x"$main_height
 
+external_id=DP1
+
 # detecting external monitors
 set +e
-external_name=$(xrandr --query | grep -E "^DP1-?[0-9]* connected" | sed -e "s/\([A-Z0-9]\+\) connected.*/\1/")
+external_name=$(xrandr --query | grep -E "^$external_id-?[0-9]* connected" | sed -e "s/\([A-Z0-9]\+\) connected.*/\1/")
 set -e
 
 if [ -z "$external_name" ]; then
