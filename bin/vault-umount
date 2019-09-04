@@ -26,7 +26,7 @@ if [[ "$(mount)" =~ /dev/mapper.*"$MOUNT_POINT" ]]; then
     fi
 fi
 
-echo -e "Umounting vault from $MOUNT_POINT..."
+echo -e "Unmounting vault from $MOUNT_POINT..."
 sudo umount $MOUNT_POINT
 
 echo -e "Remove all executable flags..."
