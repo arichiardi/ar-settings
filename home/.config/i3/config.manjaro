@@ -283,7 +283,7 @@ bindsym Mod4+Mod1+l exec --no-startup-id blurlock
 
 # Autostart applications
 exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
-exec --no-startup-id nitrogen --restore; sleep 1; compton -b
+exec --no-startup-id "nitrogen --restore; sleep 1; compton -b"
 #exec --no-startup-id manjaro-hello
 exec --no-startup-id nm-applet
 exec --no-startup-id xfce4-power-manager
@@ -432,11 +432,11 @@ set_from_resource $main-display-output i3wm.mainDisplayOutput eDP1
 
 set $mode_display HDMI display (a)uto, (m)ain only, (r)ight of main, (l)eft of main, (t)wo right of main
 mode "$mode_display" {
-  bindsym a exec --no-startup-id xrandr --auto; sleep 1; nitrogen --restore
-  bindsym m exec --no-startup-id main-only.sh $main-display-output; sleep 1; nitrogen --restore
-  bindsym r exec --no-startup-id hdmi1-right-of-main.sh $main-display-output; sleep 1; nitrogen --restore
-  bindsym l exec --no-startup-id hdmi1-left-of-main.sh $main-display-output; sleep 1; nitrogen --restore
-  bindsym t exec --no-startup-id hdmis-right-of-main.sh $main-display-output; sleep 1; nitrogen --restore
+  bindsym a exec --no-startup-id "xrandr --auto; sleep 1; nitrogen --restore"
+  bindsym m exec --no-startup-id "main-only.sh $main-display-output; sleep 1; nitrogen --restore"
+  bindsym r exec --no-startup-id "hdmi1-right-of-main.sh $main-display-output; sleep 1; nitrogen --restore"
+  bindsym l exec --no-startup-id "hdmi1-left-of-main.sh $main-display-output; sleep 1; nitrogen --restore"
+  bindsym t exec --no-startup-id "hdmis-right-of-main.sh $main-display-output; sleep 1; nitrogen --restore"
 
   # back to normal: Enter or Escape
   bindsym Return mode "default"
@@ -464,7 +464,7 @@ bindsym XF86AudioMute exec "amixer -D pulse sset Master toggle"
 # Microphone
 bindsym Shift+XF86AudioRaiseVolume exec "amixer -D pulse set Capture 10%+"
 bindsym Shift+XF86AudioLowerVolume exec "amixer -D pulse set Capture 10%-"
-bindsym XF86AudioMicMute exec ~/bin/mute-mic
+bindsym XF86AudioMicMute exec mute-mic
 
 # Setup default screen layout in case of multiple monitors
-exec --no-startup-id hdmis-right-of-main.sh $main-display-output; sleep 1; nitrogen --restore
+exec --no-startup-id "hdmis-right-of-main.sh $main-display-output; sleep 1; nitrogen --restore"
