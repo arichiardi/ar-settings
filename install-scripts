@@ -12,6 +12,8 @@ LIGHT_GREEN='\033[1;32m'
 LIGHT_RED='\033[1;31m'
 NC='\033[0m' # No Color
 
+TEMP_DIR=$(mktemp -d -t "ar-settings-install-scripts.XXXXXXXXXX")
+
 echo -e "${LIGHT_GREEN}Installing cask...${NC}"
 curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python
 ln -si $HOME/.cask/bin/cask $HOME/bin/cask
@@ -21,7 +23,7 @@ curl -o- https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein
 chmod +x $HOME/bin/lein
 
 echo -e "${LIGHT_GREEN}Installing Clojure CLI...${NC}"
-curl -fsSLoO https://download.clojure.org/install/linux-install-1.9.0.397.sh > $TEMP_DIR/clojure-linux-install.sh 
+curl -fsSLoO https://download.clojure.org/install/linux-install-1.9.0.397.sh > $TEMP_DIR/clojure-linux-install.sh
 chmod +x $TEMP_DIR/clojure-linux-install.sh
 ./$TEMP_DIR/clojure-linux-install.sh --prefix=.local
 
@@ -59,8 +61,18 @@ sudo cp -iv --no-preserve=mode,ownership $TEMP_DIR/hub-completion.bash /etc/bash
 rm -fv $TEMP_DIR/hub
 
 echo -e "${LIGHT_GREEN}Installing hub...${NC}"
-cd $TEMP_DIR
+pushd $TEMP_DIR
 curl -OL https://github.com/github/hub/releases/download/v2.3.0-pre10/hub-linux-amd64-2.3.0-pre10.tgz \
     && mkdir hub-deflated \
     && tar -C hub-deflated --strip-components=1 -xvzf hub-linux-amd64-2.3.0-pre10.tgz \
     && prefix="$HOME/.local" ./hub-deflated/install
+popd
+
+# https://www.quicklisp.org/beta/#installation
+echo -e "${LIGHT_GREEN}Installing quicklisp...${NC}"
+pushd $TEMP_DIR
+gpg --keyserver pool.sks-keyservers.net --receive-keys "0x307965AB028B5FF7" \
+    && curl -OL https://beta.quicklisp.org/quicklisp.lisp \
+    && curl -OL https://beta.quicklisp.org/quicklisp.lisp.asc \
+    && gpg --verify quicklisp.lisp.asc quicklisp.lisp
+popd
