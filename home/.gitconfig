@@ -1,5 +1,5 @@
 [include]
-    path = ~/.gitidentities/a.richiardi.work
+    path = $HOME/.gitidentities/a.richiardi.work
 [gpg]
     program = gpg2
 [commit]
@@ -15,7 +15,7 @@
 [push]
     default = simple
 [core]
-    editor = emacsclient -t
+    editor = emacsclient -a '' -nw
     autocrlf = false
 [rebase]
     tool = meld184
@@ -26,7 +26,7 @@
 [merge]
     tool = meld-merge-script
 [mergetool "meld-merge-script"]
-    cmd = ~/bin/meld-merge-script \"$LOCAL\" \"$REMOTE\" \"$MERGED\" \"$BASE\"
+    cmd = $HOME/bin/meld-merge-script \"$LOCAL\" \"$REMOTE\" \"$MERGED\" \"$BASE\"
     trustExitCode = true
 [diff]
     compactionHeuristic = true
