@@ -1,3 +1,6 @@
+!! see .i3/config
+i3wm.mainDisplayOutput: eDP1
+
 Xft.dpi:       96
 Xft.antialias: true
 Xft.hinting:   true
