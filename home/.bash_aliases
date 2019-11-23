@@ -35,20 +35,20 @@ alias e="~/bin/emacsclient-daemon.sh -nw"
 alias em="~/bin/emacsclient-daemon.sh -c"
 alias ed="~/bin/emacsclient-dired.sh"
 
-# Android SDK
-alias adbkill='sudo /usr/local/share/android-sdk/platform-tools/adb kill-server'
-alias adbstart='sudo /usr/local/share/android-sdk/platform-tools/adb start-server'
-alias adbrestart='adbkill;adbstart'
-
 # Git
 alias g='hub'
 
 # from http://stackoverflow.com/questions/7066325/how-to-list-show-git-aliases
 alias gitalias="git config --get-regexp ^alias\."
 
-# Docker shortcuts
-alias vsts='docker run -t microsoft/vsts-cli:latest vsts'
+# Tarsnap
+TARSNAP_CONF=$HOME/.backup/vault.tarsnap
+alias tarsnap='tarsnap --configfile "$TARSNAP_CONF"'
+alias tarsnap-latest='tarsnap --configfile "$TARSNAP_CONF" \
+                              -f $(tarsnap --configfile "$TARSNAP_CONF" --list-archives | sort -r | head -1)'
 
+# Backblaze
+alias backup-pics='function pic-bkp { backblaze-b2 sync --threads 3 --replaceNewer --excludeRegex "(.*\.DS_Store)|(.*\.Spotlight-V100)|(.*\.Trash.*)" --excludeAllSymlinks $1 b2://pics-iurah1ae; }; pic-bkp'
 
 # Maven
 alias mvn='notify-after mvn'
