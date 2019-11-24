@@ -7,20 +7,15 @@ alias la='ls -A'
 alias l='ls -CF'
 alias uls='cd /usr/local/share'
 alias gpg='gpg2'
-alias vault='$HOME/bin/vault-mount /usr/local/data/vault.enc && cd /tmp/vault'
-alias uvault='$HOME/bin/vault-umount ~/tmp/vault'
 alias docker-tcp='sudo systemctl stop docker; nohup sudo docker daemon -H tcp://localhost:4243 --raw-logs > /dev/null 2>&1 &'
 alias docker-rmia='docker rmi $(docker images -qf "dangling=true")'
 alias udmb='udisksctl mount -b'
 alias udub='udisksctl unmount -b'
 alias btreset='sudo rmmod btusb && sudo modprobe btusb'
-alias tarsnap='tarsnap --configfile ~/.backup/tarsnap.conf'
 alias yarn-upi='yarn upgrade-interactive --latest'
 alias yarn-gupi='yarn global upgrade-interactive --latest'
 alias head1='head -n1'
 alias tail1='tail -n1'
-alias emacs-resurrect='kill -CONT $(pgrep emacs | xargs)'
-alias emacs-packs='cd $HOME/.emacs.d/packs'
 alias load-env='function load-env { export $(cat $1 | grep -v ^# | xargs); }; load-env'
 
 # Clojure
@@ -34,21 +29,15 @@ alias vi="~/bin/emacsclient-daemon.sh -nw"
 alias e="~/bin/emacsclient-daemon.sh -nw"
 alias em="~/bin/emacsclient-daemon.sh -c"
 alias ed="~/bin/emacsclient-dired.sh"
+alias emacs-resurrect='kill -CONT $(pgrep emacs | xargs)'
+alias emacs-packs='cd $HOME/.emacs.d/packs'
+alias emacs-ar-pack='cd $HOME/.emacs.d/.live-packs/ar-emacs-pack'
 
 # Git
 alias g='hub'
 
 # from http://stackoverflow.com/questions/7066325/how-to-list-show-git-aliases
 alias gitalias="git config --get-regexp ^alias\."
-
-# Tarsnap
-TARSNAP_CONF=$HOME/.backup/vault.tarsnap
-alias tarsnap='tarsnap --configfile "$TARSNAP_CONF"'
-alias tarsnap-latest='tarsnap --configfile "$TARSNAP_CONF" \
-                              -f $(tarsnap --configfile "$TARSNAP_CONF" --list-archives | sort -r | head -1)'
-
-# Backblaze
-alias backup-pics='function pic-bkp { backblaze-b2 sync --threads 3 --replaceNewer --excludeRegex "(.*\.DS_Store)|(.*\.Spotlight-V100)|(.*\.Trash.*)" --excludeAllSymlinks $1 b2://pics-iurah1ae; }; pic-bkp'
 
 # Maven
 alias mvn='notify-after mvn'
