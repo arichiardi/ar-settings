@@ -11,6 +11,10 @@ if ${use_color} ; then
    GIT_PS1_SHOWCOLORHINTS=1
 fi
 
+# Git
+source /usr/share/bash-completion/completions/git
+__git_complete g __git_main
+
 PS1_TAIL='\$ '
 PROMPT_COMMAND_HEAD=
 
@@ -61,9 +65,6 @@ if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
 
-source ~/bin/git/git-completion.bash
-__git_complete g __git_main
-
 function urxvt-keyboard-select {
     local C=$(tput setaf 6)
     local NC=$(tput sgr0)
@@ -99,18 +100,18 @@ notify-after () {
     BUILD_CMD=`basename $CMD`
     if [ $RETCODE -eq 0 ]
     then
-        notify-send -c $BUILD_CMD -i emblem-default -t 1800000 "$BUILD_DIR: $BUILD_CMD successful" "$(date)"
+        notify-send -c $BUILD_CMD -i emblem-default -t 1000 "$BUILD_DIR: $BUILD_CMD successful" "$(date)"
     elif [ $RETCODE -eq 130 ]
     then
-        notify-send -c $BUILD_CMD -i emblem-ohno -t 1800000 "$BUILD_DIR: $BUILD_CMD canceled" "$(date)"
+        notify-send -c $BUILD_CMD -i emblem-ohno -t 1000 "$BUILD_DIR: $BUILD_CMD canceled" "$(date)"
     else
-        notify-send -c $BUILD_CMD -i emblem-important -t 1800000 "$BUILD_DIR: $BUILD_CMD failed" "$(date)"
+        notify-send -c $BUILD_CMD -i emblem-important -t 1000 "$BUILD_DIR: $BUILD_CMD failed" "$(date)"
     fi
     return $RETCODE
 }
 
 # Java
-export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export JAVA_HOME=/usr/lib/jvm/default
 export NASHORN_HOME=$JAVA_HOME/bin
 export M2_HOME=/usr/share/maven
 export M2=$M2_HOME/bin
@@ -124,8 +125,8 @@ export CLOJURE_OPTS="-Xms128M -Xmx512M -server"
 
 # Emacs default editor
 export ALTERNATE_EDITOR=""
-export EDITOR="emacsclient -a emacs -nw"
-export VISUAL="emacsclient -a emacs -c"
+export EDITOR="$HOME/bin/emacsclient-daemon.sh -nw"
+export VISUAL="$HOME/bin/emacsclient-daemon.sh -c"
 export EA_EDITOR="$HOME/bin/emacsclient-daemon.sh -c"
 
 # Misc
@@ -134,6 +135,9 @@ export XMLLINT_INDENT="  "
 # GPG
 export GPGKEY=5BB502F6
 export GPGKEYID=5BB502F6
+
+# Private Stuff
+. "$HOME/.bashrc_priv"
 
 ## From https://stackoverflow.com/questions/10081293/install-npm-into-home-directory-with-distribution-nodejs-package-ubuntu
 # NPM_PACKAGES="$HOME/.local/share/npm-packages"
@@ -157,40 +161,13 @@ export BOOT_GPG_COMMAND=gpg2
 # AWS completion
 complete -C '/usr/bin/aws_completer' aws
 
-export GIT_HOME=~/git
-
-# Android Studio
-# export ANDROID_STUDIO=/usr/local/share/android-studio
-# export ANDROID_HOME=/usr/local/share/android-sdk
-# export GENYMOTION_HOME=/usr/local/share/genymotion
-# export PATH=$PATH:"$ANDROID_STUDIO/bin":"$ANDROID_HOME/tools":"$ANDROID_HOME/platform-tools":"$GENYMOTION_HOME"
-
-# opam init
-. $HOME/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true
+export GIT_HOME="$HOME/git"
 
 export NVM_DIR="/home/arichiardi/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
 
-## nix package manager
-. $HOME/.nix-profile/etc/profile.d/nix.sh
-
-# Google Cloud SDK
-PATH=$PATH:"/usr/local/share/google-cloud-sdk/bin"
-
-# The next line enables shell command completion for gcloud.
-if [ -f '/usr/local/share/google-cloud-sdk/completion.bash.inc' ]; then source '/usr/local/share/google-cloud-sdk/completion.bash.inc'; fi
-
 # Custom load config
 export LD_LIBRARY_PATH="$HOME/.local/lib"
-
-# Yarn
-PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
-
-# ADR
-export PATH=$PATH:/home/arichiardi/git/adr-tools/src
-
-# Cask
-export PATH="$PATH:$HOME/.cask/bin"
 
 # Local bins always take precedence
 export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
@@ -200,6 +177,3 @@ export GTAGSLABEL=universal-ctags
 
 # Kubernetes
 source <(kubectl completion bash)
-
-# Elastic Path
-. "$HOME/.bash_elasticpath"
