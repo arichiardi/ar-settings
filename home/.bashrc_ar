@@ -169,9 +169,6 @@ export NVM_DIR="/home/arichiardi/.nvm"
 # Custom load config
 export LD_LIBRARY_PATH="$HOME/.local/lib"
 
-# Local bins always take precedence
-export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
-
 # Gtags & ctags
 export GTAGSLABEL=universal-ctags
 
