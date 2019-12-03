@@ -1,31 +1,15 @@
-# ~/.profile: executed by the command interpreter for login shells.
-# This file is not read by bash(1), if ~/.bash_profile or ~/.bash_login
-# exists.
-# see /usr/share/doc/bash/examples/startup-files for examples.
-# the files are located in the bash-doc package.
-
-# the default umask is set in /etc/profile; for setting the umask
-# for ssh logins, install and configure the libpam-umask package.
-#umask 022
-
-# LOG="${TMPDIR:=/tmp}/profile-$USER"o
-
-# echo "-----" >>$LOG
-# echo "Caller: $0" >>$LOG
-# echo " DESKTOP_SESSION: $DESKTOP_SESSION" >>$LOG
-# echo " GDMSESSION: $GDMSESSION" >>$LOG
-# echo " SHELL: $SHELL">>$LOG
-
-# if running bash
-if [ "$BASH" ] && [ "$BASH" != "/bin/sh" ]; then
-    # include .bashrc if it exists
-    if [ -f "$HOME/.bashrc" ]; then
-        # echo "Sourcing: $HOME/.bashrc" >>$LOG
-	source "$HOME/.bashrc"
-    fi
-fi
+export QT_QPA_PLATFORMTHEME="qt5ct"
+export EDITOR=/usr/bin/nano
+export GTK2_RC_FILES="$HOME/.gtkrc-2.0"
+# fix "xdg-open fork-bomb" export your preferred browser from here
+export BROWSER=/usr/bin/firefox
 
 # set PATH so it includes user's private bin directories
 PATH="$HOME/bin:$HOME/.local/bin:$PATH"
 
-if [ -e /home/arichiardi/.nix-profile/etc/profile.d/nix.sh ]; then . /home/arichiardi/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
+# gpg-agent - duplicated from .bashrc because we need it in Emacs.
+# https://wiki.archlinux.org/index.php/GnuPG#SSH_agent
+unset SSH_AGENT_PID
+if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]; then
+  export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+fi
