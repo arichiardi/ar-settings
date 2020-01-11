@@ -24,7 +24,7 @@
     cmd = $HOME/bin/ediff-merge-script \"$LOCAL\" \"$REMOTE\" \"$MERGED\" \"$BASE\"
     trustExitCode = true
 [merge]
-	conflictstyle = diff3
+    conflictstyle = diff3
     tool = meld
 [rebase]
     tool = meld
