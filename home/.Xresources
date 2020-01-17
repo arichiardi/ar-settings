@@ -1,11 +1,20 @@
+!! see .i3/config
+! i3wm.mainDisplayOutput: xrandr will show this
+
+!! Emacs - https://www.gnu.org/software/emacs/manual/html_node/emacs/X-Resources.html
+Emacs.menuBar:     0
+Emacs.toolBar:     0
+Emacs.font:        Deja Vu Sans Mono-11
+
 ! Xft settings ---------------------------------------------------------------
 
-Xft.dpi:        96
-Xft.antialias:  true
-Xft.rgba:       rgba
-Xft.hinting:    true
-Xft.hintstyle:  hintfull
-Xft.lcdfilter:  lcddefault
+Xft.dpi:       96
+Xft.antialias: true
+Xft.hinting:   true
+Xft.rgba:      rgba
+Xft.autohint:  false
+Xft.hintstyle: hintfull
+Xft.lcdfilter: lcddefault
 
 ! xscreensaver ---------------------------------------------------------------
 
@@ -54,10 +63,6 @@ xterm*termName: xterm-256color
 xterm*metaSendsEscape: true
 xterm*eightBitInput: false
 xterm*charClass: 33:48,35-38:48,39:43,42-47:48,58-59:48,61:48,63-64:48,126:48
-
-! Emacs
-! Emacs.FontBackend: xft
-Emacs.font: Deja Vu Sans Mono 11
 
 ! X Colors settings
 #include "/home/.../.Xresources.d/theme"

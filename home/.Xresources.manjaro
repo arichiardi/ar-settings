@@ -1,5 +1,10 @@
 !! see .i3/config
-i3wm.mainDisplayOutput: eDP1
+! i3wm.mainDisplayOutput: xrandr will show this
+
+!! Emacs - https://www.gnu.org/software/emacs/manual/html_node/emacs/X-Resources.html
+Emacs.menuBar:     0
+Emacs.toolBar:     0
+Emacs.font:        Deja Vu Sans Mono-11
 
 Xft.dpi:       96
 Xft.antialias: true
