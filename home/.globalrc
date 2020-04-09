@@ -76,6 +76,7 @@ universal-ctags|plugin-example|setting to use Universal Ctags plug-in parser:\
 	:langmap=Flex\:.as.mxml:\
 	:langmap=Fortran\:.f.for.ftn.f77.f90.f95.F.FOR.FTN.F77.F90.F95:\
 	:langmap=HTML\:.htm.html:\
+	:langmap=Go\:.go:\
 	:langmap=Java\:.java:\
 	:langmap=JavaScript\:.js:\
 	:langmap=Lisp\:.cl.clisp.el.l.lisp.lsp:\
@@ -116,6 +117,7 @@ universal-ctags|plugin-example|setting to use Universal Ctags plug-in parser:\
 	:gtags_parser=Flex\:/usr/lib/gtags/universal-ctags.so:\
 	:gtags_parser=Fortran\:/usr/lib/gtags/universal-ctags.so:\
 	:gtags_parser=HTML\:/usr/lib/gtags/universal-ctags.so:\
+	:gtags_parser=Go\:/usr/lib/gtags/universal-ctags.so:\
 	:gtags_parser=Java\:/usr/lib/gtags/universal-ctags.so:\
 	:gtags_parser=JavaScript\:/usr/lib/gtags/universal-ctags.so:\
 	:gtags_parser=Lisp\:/usr/lib/gtags/universal-ctags.so:\
