@@ -112,7 +112,8 @@ bindsym $mod+v split v;exec notify-send 'tile vertically'
 bindsym $mod+Shift+f fullscreen toggle
 
 # change container layout (stacked, tabbed, toggle split)
-bindsym $mod+r layout stacking # originally $mod+s
+# stacking originally $mod+s
+bindsym $mod+r layout stacking
 bindsym $mod+w layout tabbed
 bindsym $mod+t layout toggle split
 
@@ -224,6 +225,8 @@ for_window [class="Skype"] floating enable border normal
 for_window [class="Timeset-gui"] floating enable border normal
 for_window [class="(?i)virtualbox"] floating enable border normal
 for_window [class="Xfburn"] floating enable
+for_window [class="VirtualBox Machine"] floating disable
+for_window [class="VirtualBox Manager"] floating disable
 
 # switch to workspace with urgent window automatically
 for_window [urgent=latest] focus
