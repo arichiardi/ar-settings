@@ -1,5 +1,3 @@
-[include]
-    path = ~/.gitidentities/a.richiardi.work
 [gpg]
     program = gpg2
 [commit]
