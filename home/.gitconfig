@@ -15,6 +15,8 @@
 [core]
     editor = emacsclient -a '' -nw
     autocrlf = false
+[rerere]
+    enabled = true
 [mergetool "meld"]
     cmd = $HOME/bin/meld-merge-script \"$LOCAL\" \"$REMOTE\" \"$MERGED\" \"$BASE\"
     trustExitCode = true
@@ -104,3 +106,7 @@
 #    stripLeadingSymbols = false
 #[pager]
 #    diff = diff-so-fancy | less --tabs=4 -RFX --pattern '^(Date|added|deleted|modified): '
+[credential]
+    # Compile the git-credential-netrc helper from the git repo
+    # https://andrearichiardi.com/blog/posts/git-credential-netrc.html
+    helper = netrc
