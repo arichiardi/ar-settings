@@ -11,17 +11,21 @@ set -euo pipefail
 LIGHT_GREEN='\033[1;32m'
 NC='\033[0m' # No Color
 
-echo -e "${LIGHT_GREEN}Installing vpn-slice...${NC}"
-pamac build vpn-slice-git
+declare -a packages
+packages=(gp-saml-gui-git vpn-slice \
+          yarn-completion-git leiningen-completions \
+          adr-tools pandoc-bin zeal backblaze-b2 gtk-recordmydesktop \
+          nordvpn-bin \
+          emacs-git cask)
 
-echo -e "${LIGHT_GREEN}Installing openpyn-nordvpn...${NC}"
-pamac build openpyn-nordvpn
+for pkg in "${packages[@]}"; do
+    echo -n "Install $pkg from AUR (y/n)? "
+    stty raw -echo ; answer=$(head -c 1) ; stty sane
 
-echo -e "${LIGHT_GREEN}Installing adr-tools...${NC}"
-pamac build adr-tools
-
-echo -e "${LIGHT_GREEN}Installing cask...${NC}"
-pamac build cask
-
-echo -e "${LIGHT_GREEN}Installing yarn...${NC}"
-pamac build yarn
+    if echo "$answer" | grep -iq "^y" ;then
+        echo -e "\n${LIGHT_GREEN}Installing $pkg...${NC}"
+        pamac build "$pkg"
+    else
+        echo -e "Skipping."
+    fi
+done

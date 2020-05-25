@@ -12,10 +12,11 @@ LIGHT_GREEN='\033[1;32m'
 NC='\033[0m' # No Color
 
 echo -e "${LIGHT_GREEN}Installing packages...${NC}"
-sudo pacman -S rxvt-unicode qastools scrot cmake arandr the_silver_searcher \
-               zeal xsel docker docker-compose tree byzanz perl-image-exiftool \
-               rlwrap xclip xorg-xbacklight texinfo meld python-pip cryptsetup \
-               colordiff texlive-latexextra kubectl hub yarn keybase kbfs \
-               keybase-gui tk jq maven discount
+sudo pamac install \
+     rxvt-unicode qastools scrot cmake arandr the_silver_searcher \
+     xsel docker docker-compose tree byzanz perl-image-exiftool \
+     rlwrap xclip xorg-xbacklight texinfo meld python-pip cryptsetup \
+     colordiff texlive-latexextra kubectl hub keybase kbfs \
+     keybase-gui tk jq maven discount
 
 # not found from apt: global texlive-base-extra console-data
