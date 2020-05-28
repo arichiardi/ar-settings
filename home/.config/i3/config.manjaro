@@ -124,10 +124,10 @@ bindsym $mod+grave floating toggle
 bindsym $mod+Mod1+grave focus mode_toggle
 
 # focus the parent container
-bindsym $mod+p focus parent
+bindsym $mod+a focus parent
 
-# focus the child container
-bindsym $mod+Shift+p focus child
+# focus the child container (kap - not using it for now)
+# bindsym $mod+Shift+a focus child
 
 # move the currently focused window to the scratchpad
 bindsym $mod+Shift+minus move scratchpad
