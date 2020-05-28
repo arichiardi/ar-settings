@@ -45,7 +45,7 @@ URxvt*url-launcher: /usr/bin/xdg-open
 URxvt.keyboard-select.clipboard: true
 ! perl:matcher settings
 URxvt*matcher.button: 1
-URxvt.keysym.Mod4-u: perl:matcher:select
+URxvt.keysym.Mod1-u: perl:matcher:select
 ! highlighting https://gist.github.com/r4um/2413814
 URxvt.matcher.rend.0: fg:4 Uline Bold
 ! perl:font-size - equal and minus
@@ -54,8 +54,8 @@ URxvt.keysym.Mod4-0x2d: perl:font-size:decrease
 URxvt.keysym.Mod4-End: perl:font-size:reset
 URxvt.keysym.Mod4-Home: perl:font-size:show
 ! perl:keyboard-select
-URxvt.keysym.Mod4-a: perl:keyboard-select:activate
-URxvt.keysym.Mod4-S: perl:keyboard-select:search
+URxvt.keysym.Mod1-a: perl:keyboard-select:activate
+URxvt.keysym.Mod1-S: perl:keyboard-select:search
 
 ! settings documentation --------------------------------------------------------------
 ! URxvt*termName:                       string
