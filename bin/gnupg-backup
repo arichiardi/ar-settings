@@ -5,20 +5,55 @@ script_name=$(basename "$0")
 do_usage() {
     echo -n
     echo "Usage:"
-    echo "$script_name *destination folder*"
+    echo "$script_name [-s|--secret] -d|--dest *destination folder*"
     exit 1
 }
-[ 1 -ne $# ] && do_usage
 
-STAMP=$(date "+%Y%m%d")
-tar -cf $HOME/gnupg-backup.tar -C $HOME .gnupg
+set +e
+TEMP=`getopt -o hsd: --long help,dest:,secret -n "$script_name" -- "$@"`
+set -e
+eval set -- "$TEMP"
 
-DEST_FILE=gnugp-backup-$STAMP.tar.enc
+is_secret=false
+dest_dir=
 
-if [ ! -d $1 ] ; then
-    echo "Destination folder $1 not found."
+# extract options and their arguments into variables.
+while true ; do
+    case "$1" in
+        -s|--secret) is_secret=true ; shift ;;
+        -d|--dest) dest_dir="$2" ; shift 2 ;;
+        -h|--help) shift ; do_usage ; break ;;
+        --) shift ; break ;;
+        :) echo "Error: -${OPTARG} requires an argument." ; do_usage ;;
+        *) do_usage ; exit 1 ;;
+    esac
+done
+
+if [ -z "$dest_dir" ] ; then
+    echo "Destination (-d|--dest) is required."
+    do_usage
     exit 1
 fi
 
-NORMALIZED_DIR=$(readlink -e $1)
-backupsecret $HOME/gnupg-backup.tar $NORMALIZED_DIR/$DEST_FILE
+dest_dir=$(readlink -e "$dest_dir")
+
+if [ ! -d "$dest_dir" ] ; then
+    echo "Destination $dest_dir not found."
+    exit 1
+fi
+
+dest_file="$dest_dir/gnupg-backup-$(date "+%Y%m%d").tar"
+
+if [ -f "$dest_file" ] ; then
+    echo -e "File \"$dest_file\" exists.\nAborting."
+    exit 1
+fi
+
+tar -cf "$dest_file" \
+    --exclude ".#*" \
+    --exclude "*~" \
+    -C "$HOME" .gnupg
+
+if [ "$is_secret" == "true" ]; then
+    secret --backup --src "$dest_file" --dest "$dest_file".enc
+fi
