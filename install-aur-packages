@@ -11,12 +11,14 @@ set -euo pipefail
 LIGHT_GREEN='\033[1;32m'
 NC='\033[0m' # No Color
 
+# ruby-ruby_parser is needed for cucumber.el/feature-mode
+
 declare -a packages
 packages=(gp-saml-gui-git vpn-slice \
           yarn-completion-git leiningen-completions \
           adr-tools pandoc-bin zeal backblaze-b2 gtk-recordmydesktop \
           nordvpn-bin \
-          emacs-git cask)
+          emacs-git cask ruby-ruby_parser)
 
 for pkg in "${packages[@]}"; do
     echo -n "Install $pkg from AUR (y/n)? "
