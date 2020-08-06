@@ -2,28 +2,39 @@
 
 set -uo pipefail
 
-LOOP_FILE=${1:-}
-EXISTING_LOOP=$(losetup -j "$LOOP_FILE")
-MOUNT_POINT=/data/vault
-DEV_LOOP=""
+loop_file=${1:-}
+mount_point=/data/vault
 
-if [ -z "$EXISTING_LOOP" ] ; then
+dev_loop=""
+existing_loop=$(losetup -j "$loop_file")
+
+if [ -z "$existing_loop" ] ; then
     TMP_LOOP=$(sudo losetup -f)
-    echo -e "Mounting vault on $DEV_LOOP..."
-    sudo losetup $TMP_LOOP $LOOP_FILE
-    DEV_LOOP=$TMP_LOOP
+    echo -e "Mounting vault on $dev_loop..."
+    sudo losetup $TMP_LOOP $loop_file
+    if [ "$?" = 0 ]; then
+        dev_loop=$TMP_LOOP
+    fi
+else
+    dev_loop=$(echo $existing_loop | awk -F":" '{ print($1) }')
+    echo -e "The file $loop_file is already mounted on $dev_loop";
+fi
 
-    if [ "$?" = "0" ]; then
-        echo -e "Decrypting vault..."
-        sudo cryptsetup luksOpen $DEV_LOOP vault
+if [ -n "$dev_loop" ]; then
 
-        if [ "$?" = "0" ]; then
-            echo -e "Mounting vault..."
-            mkdir -p $MOUNT_POINT
-            sudo mount /dev/mapper/vault $MOUNT_POINT
+    luks_status=$(sudo cryptsetup status vault)
+    matches_count=$(echo "$luks_status" | grep -c 'read/write')
 
-            if [ "$?" = "0" ]; then
-                echo -e "Completed, vault mounted on $MOUNT_POINT"
+    if [ "$matches_count" -lt 1 ]; then
+
+        sudo cryptsetup luksOpen $dev_loop vault
+
+        if [ "$?" -eq 0 ]; then
+            mkdir -p $mount_point
+            sudo mount /dev/mapper/vault $mount_point
+
+            if [ "$?" -eq 0 ]; then
+                echo -e "Vault mounted on $mount_point"
             else
                 echo -e "Error: mount exited with $?"
             fi
@@ -32,11 +43,10 @@ if [ -z "$EXISTING_LOOP" ] ; then
             echo -e "Error: cryptsetup exited with $?"
         fi
     else
-        echo -e "Error: losetup exited with $?"
+        echo "$luks_status"
     fi
 else
-    echo -e "The vault $LOOP_FILE is already mounted!";
-    DEV_LOOP=$(echo $EXISTING_LOOP | awk -F":" '{ print($1) }')
+    echo -e "Error: cannot detect the mounted loop device"
 fi
 
 exit $?
