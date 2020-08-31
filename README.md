@@ -13,9 +13,12 @@ either be Ubuntu or Manjaro.
 If you want to compile emacs you need to clone is first and then execute:
 
 ```
-$ ./configure --with-imagemagick --with-x-toolkit=gtk3 --with-xwidgets --enable-gtk-deprecation-warnings --with-xwidgets --with-x --with-wide-int  --with-gnutls=no --without-pop --prefix "/home/arichiardi/.local" --with-xwidgets --enable-gtk-deprecation-warnings --with-xwidgets --with-x --with-wide-int  --with-gnutls=no --without-pop --prefix "/path/to/user/home/.local"
-$ make
-$ make install
+./configure --with-json --with-x-toolkit=gtk3 --with-cairo --with-xwidgets --enable-gtk-deprecation-warnings  \
+  --with-gif=ifavailable --with-jpeg=ifavailable --with-png=ifavailable --with-tiff=ifavailable --with-gnutls=no \
+  --enable-checking=structs --with-x --without-pop \
+  --prefix "$HOME/.local"
+make
+make install
 ```
 
 The `.emacs.d` folder can be cloned with:
