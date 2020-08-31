@@ -451,17 +451,3 @@ pygments-parser|Pygments plug-in parser:\
 	:gtags_parser=XQuery\:/usr/lib/gtags/pygments-parser.so:\
 	:gtags_parser=XSLT\:/usr/lib/gtags/pygments-parser.so:\
 	:gtags_parser=Xtend\:/usr/lib/gtags/pygments-parser.so:
-
-#
-# Drupal configuration.
-#
-# drupal|Drupal content management platform:\
-# 	:tc=common:\
-# 	:langmap=php\:.php.module.inc.profile.install.test:
-#---------------------------------------------------------------------
-# Configuration for htags(1)
-# Let's paint hypertext with your favorite colors!
-# See htags(1).
-#---------------------------------------------------------------------
-htags:\
-	:script_alias=/cgi-bin/:ncol#4:tabs#8:normal_suffix=html:gzipped_suffix=ghtml:
