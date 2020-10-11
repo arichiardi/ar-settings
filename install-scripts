@@ -14,22 +14,24 @@ NC='\033[0m' # No Color
 
 TEMP_DIR=$(mktemp -d -t "ar-settings-install-scripts.XXXXXXXXXX")
 
-echo -e "${LIGHT_GREEN}Installing cask...${NC}"
-curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python
-ln -si $HOME/.cask/bin/cask $HOME/bin/cask
+# Cask is in AUR
+# echo -e "${LIGHT_GREEN}Installing cask...${NC}"
+# curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python
+# ln -si $HOME/.cask/bin/cask $HOME/bin/cask
 
-echo -e "${LIGHT_GREEN}Installing leiningen...${NC}"
-curl -o- https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein > $HOME/bin/lein
-chmod +x $HOME/bin/lein
+# Leiningen is in AUR
+# echo -e "${LIGHT_GREEN}Installing leiningen...${NC}"
+# curl -o- https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein > $HOME/bin/lein \
+#    && chmod +x $HOME/bin/lein
 
 echo -e "${LIGHT_GREEN}Installing Clojure CLI...${NC}"
-curl -fsSLoO https://download.clojure.org/install/linux-install-1.9.0.397.sh > $TEMP_DIR/clojure-linux-install.sh
-chmod +x $TEMP_DIR/clojure-linux-install.sh
+curl -fsSLoO https://download.clojure.org/install/linux-install-1.10.1.708 > $TEMP_DIR/clojure-linux-install.sh \
+    && chmod +x $TEMP_DIR/clojure-linux-install.sh
 ./$TEMP_DIR/clojure-linux-install.sh --prefix=.local
 
 echo -e "${LIGHT_GREEN}Installing diff-so-fancy...${NC}"
-curl -o- https://raw.githubusercontent.com/so-fancy/diff-so-fancy/master/third_party/build_fatpack/diff-so-fancy > $HOME/bin/diff-so-fancy
-chmod +x $HOME/bin/diff-so-fancy
+curl -fsSLoO https://raw.githubusercontent.com/so-fancy/diff-so-fancy/master/third_party/build_fatpack/diff-so-fancy > $HOME/bin/diff-so-fancy \
+    && chmod +x $HOME/bin/diff-so-fancy
 
 echo -e "${LIGHT_GREEN}Installing nvm (Node Version Manager)...${NC}"
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh | bash
@@ -61,10 +63,11 @@ sudo cp -iv --no-preserve=mode,ownership $TEMP_DIR/hub-completion.bash /etc/bash
 rm -fv $TEMP_DIR/hub
 
 echo -e "${LIGHT_GREEN}Installing hub...${NC}"
+hub_version=2.14.2
 pushd $TEMP_DIR
-curl -OL https://github.com/github/hub/releases/download/v2.3.0-pre10/hub-linux-amd64-2.3.0-pre10.tgz \
+curl -OL https://github.com/github/hub/releases/download/v$hub_version/hub-linux-amd64-$hub_version.tgz \
     && mkdir hub-deflated \
-    && tar -C hub-deflated --strip-components=1 -xvzf hub-linux-amd64-2.3.0-pre10.tgz \
+    && tar -C hub-deflated --strip-components=1 -xvzf hub-linux-amd64-$hub_version.tgz \
     && prefix="$HOME/.local" ./hub-deflated/install
 popd
 
