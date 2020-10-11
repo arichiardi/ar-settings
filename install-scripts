@@ -79,3 +79,7 @@ gpg --keyserver pool.sks-keyservers.net --receive-keys "0x307965AB028B5FF7" \
     && curl -OL https://beta.quicklisp.org/quicklisp.lisp.asc \
     && gpg --verify quicklisp.lisp.asc quicklisp.lisp
 popd
+
+echo -e "${LIGHT_GREEN}Installing eldev...${NC}"
+curl -o- -fsSL https://raw.github.com/doublep/eldev/master/bin/eldev > $HOME/bin/eldev \
+    && chmod a+x $HOME/bin/eldev
