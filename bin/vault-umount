@@ -2,8 +2,15 @@
 
 set -uo pipefail
 
-mount_point=/data/vault
-vault_bkp=$HOME/bin/vault-backup
+mount_point=${1:-}
+
+if [ -z "$mount_point" ]; then
+    error_code=66
+    echo "Please pass the mount point as second parameter (error: $error_code)"
+    exit $error_code
+fi
+
+vault_bkp_bin=$HOME/bin/vault-backup
 
 answer_timeout=10
 ANS="y"
@@ -18,11 +25,11 @@ if [[ "$(mount)" =~ /dev/mapper.*"$mount_point" ]]; then
         if [[ "$ans" =~ y|Y ]] ; then
             echo "Ok, skipping vault backup..."
         else
-           $vault_bkp
+           $vault_bkp_bin $mount_point
         fi
     else
         echo "No input received in $answer_timeout seconds, backing up..."
-        $vault_bkp
+        $vault_bkp_bin $mount_point
     fi
 fi
 

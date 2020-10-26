@@ -2,29 +2,37 @@
 
 set -e
 
-tarsnap_bin=$(which tarsnap)
-if [ -z "$tarsnap_bin" ]; then
+mount_point=${1:-}
+
+if [ -z "$mount_point" ]; then
+    error_code=66
+    echo "Please pass the mount point as first parameter (error: $error_code)"
+    exit $error_code
+fi
+
+# convenience
+rebuild_cache=${2:false}
+
+TARSNAP=$(which tarsnap)
+if [ -z "$TARSNAP" ]; then
     echo "Tarsnap is not installed, see https://www.tarsnap.com/download.html"
     exit 1
 fi
 
-tarsnap_conf=$HOME/.backup/tarsnap.conf
-work_dir=/tmp
-root_dir=vault
+CONF=$HOME/.backup/vault.tarsnap
+ROOT_DIR=$mount_point
 
-$tarsnap_bin --verify-config $tarsnap_conf
+$TARSNAP --verify-config $CONF
 
-if [ "$1" = "--fsck" -o "$1" = "-f" -o "$1" = "--cache" ] ; then
+if [ "$rebuild_cache" = "true" ] ; then
     echo "Rebuilding tarsnap cache...";
-    $tarsnap_bin --fsck --configfile "$tarsnap_conf"
+    sudo $TARSNAP --fsck --configfile "$CONF";
 else
     echo "Performing tarsnap backup...";
-    $tarsnap_bin --configfile "$tarsnap_conf" \
-             -C "$work_dir" \
-             -c \
-             -v \
-             -f "$(uname -n)-$(date +%Y%m%d-%H%M%S)" \
-             "$root_dir";
+    sudo $TARSNAP \
+         --configfile "$CONF" \
+         -c \
+         -v \
+         -f "$(uname -n)-$(date +%Y%m%d-%H%M%S)" \
+         "$ROOT_DIR";
 fi
-
-cd -

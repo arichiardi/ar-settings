@@ -3,7 +3,20 @@
 set -uo pipefail
 
 loop_file=${1:-}
-mount_point=/data/vault
+
+if [ -z "$loop_file" ]; then
+    error_code=65
+    echo "Please pass the vault file path as first parameter (error: $error_code)"
+    exit $error_code
+fi
+
+mount_point=${2:-}
+
+if [ -z "$mount_point" ]; then
+    error_code=66
+    echo "Please pass the mount point as second parameter (error: $error_code)"
+    exit $error_code
+fi
 
 dev_loop=""
 existing_loop=$(losetup -j "$loop_file")
