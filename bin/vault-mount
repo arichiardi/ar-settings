@@ -5,7 +5,7 @@ set -uo pipefail
 loop_file=${1:-}
 
 if [ -z "$loop_file" ]; then
-    error_code=65
+    error_code=64
     echo "Please pass the vault file path as first parameter (error: $error_code)"
     exit $error_code
 fi
@@ -13,8 +13,20 @@ fi
 mount_point=${2:-}
 
 if [ -z "$mount_point" ]; then
-    error_code=66
+    error_code=65
     echo "Please pass the mount point as second parameter (error: $error_code)"
+    exit $error_code
+fi
+
+pushd $(dirname $loop_file) > /dev/null
+md5sum --quiet --strict --check "$loop_file.md5"
+popd > /dev/null
+
+if [ "$?" -eq 0 ]; then
+    echo -e "Digest verification for $loop_file successful"
+else
+    error_code=66
+    echo -e "Digest verification for $loop_file failed: aborting (error: $error_code)"
     exit $error_code
 fi
 
@@ -22,11 +34,15 @@ dev_loop=""
 existing_loop=$(losetup -j "$loop_file")
 
 if [ -z "$existing_loop" ] ; then
-    TMP_LOOP=$(sudo losetup -f)
-    echo -e "Mounting vault on $dev_loop..."
-    sudo losetup $TMP_LOOP $loop_file
+    tmp_loop_dev=$(sudo losetup -f)
     if [ "$?" = 0 ]; then
-        dev_loop=$TMP_LOOP
+        echo -e "Mounting vault on $dev_loop..."
+        sudo losetup $tmp_loop_dev $loop_file
+        if [ "$?" = 0 ]; then
+            dev_loop=$tmp_loop_dev
+        fi
+    else
+        echo -e "Error: cannot retrieve temporary loop device"
     fi
 else
     dev_loop=$(echo $existing_loop | awk -F":" '{ print($1) }')
@@ -34,29 +50,31 @@ else
 fi
 
 if [ -n "$dev_loop" ]; then
-
     luks_status=$(sudo cryptsetup status vault)
-    matches_count=$(echo "$luks_status" | grep -c 'read/write')
+    if [ "$?" -eq 0 -o "$?" -eq 4 ]; then
+        matches_count=$(echo "$luks_status" | grep -c 'read/write')
+        if [ "$matches_count" -lt 1 ]; then
 
-    if [ "$matches_count" -lt 1 ]; then
-
-        sudo cryptsetup luksOpen $dev_loop vault
-
-        if [ "$?" -eq 0 ]; then
-            mkdir -p $mount_point
-            sudo mount /dev/mapper/vault $mount_point
+            sudo cryptsetup luksOpen $dev_loop vault
 
             if [ "$?" -eq 0 ]; then
-                echo -e "Vault mounted on $mount_point"
-            else
-                echo -e "Error: mount exited with $?"
-            fi
+                mkdir -p $mount_point
+                sudo mount /dev/mapper/vault $mount_point
 
+                if [ "$?" -eq 0 ]; then
+                    echo -e "Vault mounted on $mount_point"
+                else
+                    echo -e "Error: mount exited with $?"
+                fi
+
+            else
+                echo -e "Error: cryptsetup exited with $?"
+            fi
         else
-            echo -e "Error: cryptsetup exited with $?"
+            echo "$luks_status"
         fi
     else
-        echo "$luks_status"
+        echo -e "Error: cannot retrieve vault status"
     fi
 else
     echo -e "Error: cannot detect the mounted loop device"

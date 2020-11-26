@@ -5,39 +5,25 @@ set -uo pipefail
 mount_point=${1:-}
 
 if [ -z "$mount_point" ]; then
-    error_code=66
+    error_code=64
     echo "Please pass the mount point as second parameter (error: $error_code)"
     exit $error_code
 fi
 
-vault_bkp_bin=$HOME/bin/vault-backup
+# AR we don't backup the contents of the mounted vault anymore
 
-answer_timeout=10
-ANS="y"
+echo -e "Remove all executable flags..."
+find $mount_point -type f \( -perm -u=x -o -perm -g=x -o -perm -o=x \) -exec sudo chmod -v -x {} ';'
 
-# AR we check mount now, but the following is useful too
-#
-# sudo losetup -Jl /dev/loop0 | jq -rC '.loopdevices[] | select(.back-file | contains("$MOUNT_POINT"))'
-if [[ "$(mount)" =~ /dev/mapper.*"$mount_point" ]]; then
-    if read -p "Skip vault backup (y/n)? " -t $answer_timeout ans;
-    then
-        ans=${ans,,}
-        if [[ "$ans" =~ y|Y ]] ; then
-            echo "Ok, skipping vault backup..."
-        else
-           $vault_bkp_bin $mount_point
-        fi
-    else
-        echo "No input received in $answer_timeout seconds, backing up..."
-        $vault_bkp_bin $mount_point
-    fi
-fi
+echo -e "Adjust file ownership..."
+find $mount_point \! -user root -exec sudo chown -v root:vault {} ';'
+
+echo -e "Adjust group permissions..."
+find $mount_point -type f -and -perm -o=rw -and \! -perm -g=rw -exec sudo chmod -v g+rw {} ';'
+find $mount_point -type d -and -perm -o=rwx -and \! -perm -g=rwx -exec sudo chmod -v g+rwx {} ';'
 
 echo -e "Unmounting vault from $mount_point..."
 sudo umount $mount_point
-
-echo -e "Remove all executable flags..."
-find $mount_point -type f \( -perm -u=x -o -perm -g=x -o -perm -o=x \) -exec sudo chmod -v -x {} ";"
 
 if [ "$?" = "0" ]; then
     echo -e "Encrypting back again..."
@@ -52,14 +38,11 @@ if [ "$?" = "0" ]; then
         sudo losetup -d $dev_loop
 
         if [ "$?" = "0" ]; then
-            echo -e "Writing sha1..."
-
+            echo -e "Generating $vault_file digest..."
             pushd $(dirname $vault_file) > /dev/null
-            sha1sum $(basename $vault_file) > $vault_file.sha1
-            sha1sum -c $vault_file.sha1
+            md5sum $(basename $vault_file) > $vault_file.md5
             popd > /dev/null
-
-            echo -e "Completed!"
+            echo "Completed!"
         else
             echo -e "Error: losetup -d exited with $?"
         fi
