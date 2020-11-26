@@ -8,18 +8,7 @@ it assumes a distro where `apt` and `snap` are available (Ubuntu).
 Slowly this is moving to a more modular approach where the distribution can
 either be Ubuntu or Manjaro.
 
-### Compile emacs
-
-If you want to compile emacs you need to clone is first and then execute:
-
-```
-./configure --with-json --with-x-toolkit=gtk3 --with-cairo --with-xwidgets --enable-gtk-deprecation-warnings  \
-  --with-gif=ifavailable --with-jpeg=ifavailable --with-png=ifavailable --with-tiff=ifavailable --with-gnutls=no \
-  --enable-checking=structs --with-x --without-pop \
-  --prefix "$HOME/.local"
-make
-make install
-```
+### Emacs.d
 
 The `.emacs.d` folder can be cloned with:
 
