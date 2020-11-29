@@ -18,15 +18,16 @@ if [ -z "$mount_point" ]; then
     exit $error_code
 fi
 
+echo -n "Verifying digest for $loop_file..."
 pushd $(dirname $loop_file) > /dev/null
 md5sum --quiet --strict --check "$loop_file.md5"
 popd > /dev/null
 
 if [ "$?" -eq 0 ]; then
-    echo -e "Digest verification for $loop_file successful"
+    echo "Completed."
 else
     error_code=66
-    echo -e "Digest verification for $loop_file failed: aborting (error: $error_code)"
+    echo "Failed (error: $error_code)."
     exit $error_code
 fi
 
@@ -36,17 +37,17 @@ existing_loop=$(losetup -j "$loop_file")
 if [ -z "$existing_loop" ] ; then
     tmp_loop_dev=$(sudo losetup -f)
     if [ "$?" = 0 ]; then
-        echo -e "Mounting vault on $dev_loop..."
+        echo "Mounting vault on $dev_loop..."
         sudo losetup $tmp_loop_dev $loop_file
         if [ "$?" = 0 ]; then
             dev_loop=$tmp_loop_dev
         fi
     else
-        echo -e "Error: cannot retrieve temporary loop device"
+        echo "Error: cannot retrieve temporary loop device"
     fi
 else
     dev_loop=$(echo $existing_loop | awk -F":" '{ print($1) }')
-    echo -e "The file $loop_file is already mounted on $dev_loop";
+    echo "The file $loop_file is already mounted on $dev_loop";
 fi
 
 if [ -n "$dev_loop" ]; then
@@ -62,22 +63,22 @@ if [ -n "$dev_loop" ]; then
                 sudo mount /dev/mapper/vault $mount_point
 
                 if [ "$?" -eq 0 ]; then
-                    echo -e "Vault mounted on $mount_point"
+                    echo "Vault mounted on $mount_point"
                 else
-                    echo -e "Error: mount exited with $?"
+                    echo "Error: mount exited with $?"
                 fi
 
             else
-                echo -e "Error: cryptsetup exited with $?"
+                echo "Error: cryptsetup exited with $?"
             fi
         else
             echo "$luks_status"
         fi
     else
-        echo -e "Error: cannot retrieve vault status"
+        echo "Error: cannot retrieve vault status"
     fi
 else
-    echo -e "Error: cannot detect the mounted loop device"
+    echo "Error: cannot detect the mounted loop device"
 fi
 
 exit $?
