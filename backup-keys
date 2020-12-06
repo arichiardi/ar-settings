@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+source_dir=$(pwd)/keys
+dest_bucket=keys-lei59e8a
+
+backblaze-b2 sync \
+             --threads 3 \
+             --replaceNewer \
+             --excludeRegex "(.*\/\..*)|(.*\/tmp)|(.*\.Trash.*)|(.*\/wip)|(.*\/WIP)" \
+             --excludeAllSymlinks \
+             "$source_dir" "b2://$dest_bucket"
