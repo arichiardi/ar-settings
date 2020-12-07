@@ -14,7 +14,7 @@ gnupg_file_name=gnupg-arichiardi.tar.enc
 gnupg_backup_url="https://f000.backblazeb2.com/file/secrets-f3ba7cb4/$gnupg_file_name"
 gnupg_temp_path="$temp_dir/$gnupg_file_name"
 gnupg_unencrypted_path=${gnupg_temp_path%.enc}
-gnupg_home="$HOME/tmp"
+gnupg_home="$HOME/.gnupg"
 
 echo -e "${LIGHT_GREEN}Download GnuPG backup to $temp_dir${NC}"
 curl -fsSLo $gnupg_temp_path $gnupg_backup_url
