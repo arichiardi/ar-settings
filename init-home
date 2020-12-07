@@ -14,7 +14,7 @@ NC='\033[0m' # No Color
 
 # TEMP_DIR=$(mktemp -d -t "ar-settings.XXXXXXXXXX")
 
-echo -e "${LIGHT_GREEN}Create necessary dirs...${NC}"
+echo -e "${LIGHT_GREEN}Creating directories...${NC}"
 mkdir -p $HOME/bin
 mkdir -p $HOME/tmp
 
@@ -40,7 +40,7 @@ done
 
 home_ssh=$HOME/.ssh
 
-echo -e "${LIGHT_RED}Setup $home_ssh...${NC}"
+echo -e "${LIGHT_RED}Setting up $home_ssh...${NC}"
 mkdir -p $home_ssh
 
 for f in $(find ./.ssh -type f); do
@@ -51,8 +51,10 @@ for f in $(find ./.ssh -type f); do
     echo -e "${LIGHT_RED}---${NC}"
 done
 
-echo -e "${LIGHT_GREEN}Decrypt GPG key...${NC}"
-bin/secret -r -s ./.ssh/5BB502F6_rsa.enc -d "$home_ssh/5BB502F6_rsa"
-chmod 600 "$home_ssh/5BB502F6_rsa"
+echo -e "${LIGHT_GREEN}Decrypting files...${NC}"
+
+for f in $(find . -type f -name '*.enc'); do
+    bin/secret -r -s "$f" -d "$home_ssh/$f"
+done
 
 popd
