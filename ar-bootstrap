@@ -14,23 +14,30 @@ gnupg_file_name=gnupg-arichiardi.tar.enc
 gnupg_backup_url="https://f000.backblazeb2.com/file/secrets-f3ba7cb4/$gnupg_file_name"
 gnupg_temp_path="$temp_dir/$gnupg_file_name"
 gnupg_unencrypted_path=${gnupg_temp_path%.enc}
-gnupg_home="$HOME/.gnupg"
+gnupg_home=$HOME
 
-echo -e "${LIGHT_GREEN}Download GnuPG backup to $temp_dir${NC}"
+echo -e "${LIGHT_GREEN}Download GnuPG backup${NC}"
 curl -fsSLo $gnupg_temp_path $gnupg_backup_url
 
 echo -e "${LIGHT_GREEN}Decrypt GnuPG backup${NC}"
 openssl enc -d -aes-256-cbc -pbkdf2 -in $gnupg_temp_path -out $gnupg_unencrypted_path
 
 if [ -d "$gnupg_home/.gnupg" ]; then
-    echo -e "${LIGHT_RED}Directory $gnupg_home already exists, aborting.${NC}"
+    echo -e "${LIGHT_RED}Directory $gnupg_home/.gnupg already exists, aborting.${NC}"
     exit 64
 fi
 
-echo -e "${LIGHT_GREEN}Expand GnuPG backup into $gnupg_home/.gnupg ${NC}"
-mkdir -p $gnupg_home
+echo -e "${LIGHT_GREEN}Expand GnuPG backup into $gnupg_home/.gnupg${NC}"
 tar -xvf $gnupg_unencrypted_path -C $gnupg_home
 
-echo -e "${LIGHT_GREEN}Clone ar-settings into $HOME/git ${NC}"
+GNUPGCONFIG=${GNUPGHOME:-"$HOME/.gnupg/gpg-agent.conf"}
+echo -e "${LIGHT_GREEN}Enable GnuPG SSH support${NC}"
+
+echo 'enable-ssh-support:0:1' | gpgconf --change-options gpg-agent
+export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
+gpgconf --reload gpg-agent
+
+echo -e "${LIGHT_GREEN}Clone ar-settings into $HOME/git${NC}"
+
 mkdir -p $HOME/git
-git clone git@github.com:arichiardi/ar-settings.git && cd $HOME/git/ar-settings
+git clone git@github.com:arichiardi/ar-settings.git $HOME/git/ar-settings && cd $HOME/git/ar-settings
