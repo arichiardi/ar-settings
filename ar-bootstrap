@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+#
+# Bootstrap a machine with Andrea Richiardi's configuration.
+# In practice it just sets up keys in order to clone ar-settings.
+set -euo pipefail
+
+LIGHT_GREEN='\033[1;32m'
+LIGHT_RED='\033[1;31m'
+NC='\033[0m' # No Color
+
+temp_dir=$(mktemp -d -t "ar-bootstrap.XXXXXXXXXX")
+
+gnupg_file_name=gnupg-arichiardi.tar.enc
+gnupg_backup_url="https://f000.backblazeb2.com/file/secrets-f3ba7cb4/$gnupg_file_name"
+gnupg_temp_path="$temp_dir/$gnupg_file_name"
+gnupg_unencrypted_path=${gnupg_temp_path%.enc}
+gnupg_home="$HOME/tmp"
+
+echo -e "${LIGHT_GREEN}Download GnuPG backup to $temp_dir${NC}"
+curl -fsSLo $gnupg_temp_path $gnupg_backup_url
+
+echo -e "${LIGHT_GREEN}Decrypt GnuPG backup${NC}"
+openssl enc -d -aes-256-cbc -pbkdf2 -in $gnupg_temp_path -out $gnupg_unencrypted_path
+
+if [ -d "$gnupg_home/.gnupg" ]; then
+    echo -e "${LIGHT_RED}Directory $gnupg_home already exists, aborting.${NC}"
+    exit 64
+fi
+
+echo -e "${LIGHT_GREEN}Expand GnuPG backup into $gnupg_home/.gnupg ${NC}"
+mkdir -p $gnupg_home
+tar -xvf $gnupg_unencrypted_path -C $gnupg_home
+
+echo -e "${LIGHT_GREEN}Clone ar-settings into $HOME/git ${NC}"
+mkdir -p $HOME/git
+git clone git@github.com:arichiardi/ar-settings.git && cd $HOME/git/ar-settings
