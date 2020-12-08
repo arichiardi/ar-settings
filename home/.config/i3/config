@@ -3,36 +3,78 @@
 
 # Set mod key (Mod1=<Alt>, Mod4=<Super>)
 set $mod Mod4
-set $main-color "#162140"
+
+# set default desktop layout (default is tiling)
+# workspace_layout tabbed <stacking|tabbed>
+
+# Configure border style <normal|1pixel|pixel xx|none|pixel>
+new_window pixel 1
+new_float normal
+
+# Hide borders
+hide_edge_borders none
+
+# change borders
+bindsym $mod+u border none
+bindsym $mod+y border pixel 1
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
-font xft:DejaVu Sans Mono 9
+font xft:JetBrains Mono 9
 
-# Before i3 v4.8, we used to recommend this one as the default:
-# font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
-# The font above is very space-efficient, that is, it looks good, sharp and
-# clear in small sizes. However, its unicode glyph coverage is limited, the old
-# X core fonts rendering does not support right-to-left and this being a bitmap
-# font, it doesn’t scale on retina/hidpi displays.
-
-# Use Mouse+$mod to drag floating windows to their wanted position
+# Use Mouse+$mod to drag floating windows
 floating_modifier $mod
 
 # start a terminal
-#bindsym $mod+Return exec i3-sensible-terminal
-bindsym $mod+Return exec urxvt
+bindsym $mod+Return exec terminal
 
 # kill focused window
 bindsym $mod+q kill
 
 # start program launcher
-# bindsym $mod+s exec --no-startup-id dmenu_run
+bindsym $mod+d exec --no-startup-id dmenu_recency
 
 # Using rofi
 bindsym $mod+Escape exec --no-startup-id rofi -show drun
 
-# Change focus
+# launch categorized menu
+#bindsym $mod+Escape exec --no-startup-id morc_menu
+
+################################################################################################
+## sound-section - DO NOT EDIT if you wish to automatically upgrade Alsa -> Pulseaudio later! ##
+################################################################################################
+
+exec --no-startup-id volumeicon
+#bindsym $mod+Ctrl+m exec terminal -e 'alsamixer'
+#exec --no-startup-id pulseaudio # not necessary, the distro does it for us
+#exec --no-startup-id pa-applet  # not that good
+bindsym $mod+Mod1+m exec pavucontrol
+
+################################################################################################
+
+# Screen brightness controls
+bindsym XF86MonBrightnessUp exec "xbacklight -inc 10; notify-send 'brightness up'"
+bindsym XF86MonBrightnessDown exec "xbacklight -dec 10; notify-send 'brightness down'"
+
+# Start Applications
+bindsym $mod+Ctrl+b exec terminal -e 'bmenu'
+# bindsym $mod+F2 exec palemoon
+# bindsym $mod+F3 exec pcmanfm
+# bindsym $mod+F3 exec ranger
+# bindsym $mod+Shift+F3 exec gksu pcmanfm
+# bindsym $mod+F5 exec terminal -e 'mocp'
+# bindsym $mod+t exec --no-startup-id pkill compton
+# bindsym $mod+Ctrl+t exec --no-startup-id compton -b
+bindsym $mod+Shift+d --release exec "killall dunst; exec notify-send 'restart dunst'"
+bindsym Print --release exec --no-startup-id i3-scrot -w
+bindsym $mod+Print --release exec --no-startup-id i3-scrot -s
+# bindsym $mod+Mod1+Print --release exec --no-startup-id i3-scrot
+#bindsym $mod+Shift+h exec xdg-open /usr/share/doc/manjaro/i3_help.pdf
+bindsym $mod+Ctrl+x --release exec --no-startup-id xkill
+
+# focus_follows_mouse no
+
+# change focus
 bindsym $mod+n focus left
 bindsym $mod+i focus down
 bindsym $mod+e focus up
@@ -56,15 +98,21 @@ bindsym $mod+Shift+Down move down
 bindsym $mod+Shift+Up move up
 bindsym $mod+Shift+Right move right
 
-# split in horizontal orientation
-bindsym $mod+h split h
+# workspace back and forth (with/without active container)
+workspace_auto_back_and_forth yes
+bindsym $mod+b workspace back_and_forth
+bindsym $mod+Shift+b move container to workspace back_and_forth; workspace back_and_forth
 
-# split in vertical orientation
-bindsym $mod+v split v
-# enter fullscreen mode for the focused container
-bindsym $mod+F11 fullscreen toggle
+# split orientation
+bindsym $mod+h split h;exec notify-send 'tile horizontally'
+bindsym $mod+v split v;exec notify-send 'tile vertically'
+#bindsym $mod+q split toggle
+
+# toggle fullscreen mode for the focused container (originally $mod+f)
+bindsym $mod+Shift+f fullscreen toggle
 
 # change container layout (stacked, tabbed, toggle split)
+# stacking originally $mod+s
 bindsym $mod+r layout stacking
 bindsym $mod+w layout tabbed
 bindsym $mod+t layout toggle split
@@ -76,10 +124,10 @@ bindsym $mod+grave floating toggle
 bindsym $mod+Mod1+grave focus mode_toggle
 
 # focus the parent container
-bindsym $mod+p focus parent
+bindsym $mod+a focus parent
 
-# focus the child container
-bindsym $mod+d focus child
+# focus the child container (kap - not using it for now)
+# bindsym $mod+Shift+a focus child
 
 # move the currently focused window to the scratchpad
 bindsym $mod+Shift+minus move scratchpad
@@ -104,6 +152,8 @@ set $ws5 5
 set $ws6 6
 set $ws7 7
 set $ws8 8
+set $ws9 9
+set $ws10 10
 
 # switch to workspace
 bindsym $mod+1 workspace $ws1
@@ -175,12 +225,14 @@ for_window [class="Skype"] floating enable border normal
 for_window [class="Timeset-gui"] floating enable border normal
 for_window [class="(?i)virtualbox"] floating enable border normal
 for_window [class="Xfburn"] floating enable
+for_window [class="VirtualBox Machine"] floating disable
+for_window [class="VirtualBox Manager"] floating disable
 
 # switch to workspace with urgent window automatically
 for_window [urgent=latest] focus
 
 # reload the configuration file
-bindsym $mod+Shift+c reload
+bindsym $mod+Mod1+c reload
 
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
 bindsym $mod+Shift+r restart
@@ -189,7 +241,7 @@ bindsym $mod+Shift+r restart
 # bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
 
 # Set shut down, restart and locking features
-bindsym $mod+Shift+q mode "$mode_system"
+bindsym $mod+Mod1+q mode "$mode_system"
 set $mode_system (l)ock, (e)xit, switch_(u)ser, (s)uspend, (h)ibernate, (r)eboot, (Shift+s)hutdown
 mode "$mode_system" {
     bindsym l exec --no-startup-id i3exit lock, mode "default"
@@ -206,7 +258,7 @@ mode "$mode_system" {
 }
 
 # Resize window (you can also use the mouse for that)
-bindsym $mod+r mode "resize"
+bindsym $mod+Mod1+r mode "resize"
 mode "resize" {
         # These bindings trigger as soon as you enter the resize mode
         # Pressing left will shrink the window’s width.
@@ -230,80 +282,163 @@ mode "resize" {
 }
 
 # Lock screen
-bindsym Mod4+Shift+l exec --no-startup-id i3lock -e -f -c $main-color
+bindsym Mod4+Mod1+l exec --no-startup-id blurlock
 
-# Start i3bar to display a workspace bar (plus the system information i3status
-# finds out, if available)
+# Autostart applications
+exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+exec --no-startup-id "nitrogen --restore; sleep 1; compton -b"
+#exec --no-startup-id manjaro-hello
+exec --no-startup-id nm-applet
+exec --no-startup-id xfce4-power-manager
+exec --no-startup-id pamac-tray
+# exec --no-startup-id clipit
+# exec --no-startup-id blueman-applet
+# exec_always --no-startup-id sbxkb
+exec --no-startup-id start_conky_kap
+exec --no-startup-id xautolock -time 10 -locker blurlock
+exec_always --no-startup-id ff-theme-util
+exec_always --no-startup-id fix_xcursor
+
+# Color palette used for the terminal ( ~/.Xresources file )
+# Colors are gathered based on the documentation:
+# https://i3wm.org/docs/userguide.html#xresources
+# Change the variable name at the place you want to match the color
+# of your terminal like this:
+# [example]
+# If you want your bar to have the same background color as your
+# terminal background change the line 362 from:
+# background #14191D
+# to:
+# background $term_background
+# Same logic applied to everything else.
+set_from_resource $term_background background
+set_from_resource $term_foreground foreground
+set_from_resource $term_color0     color0
+set_from_resource $term_color1     color1
+set_from_resource $term_color2     color2
+set_from_resource $term_color3     color3
+set_from_resource $term_color4     color4
+set_from_resource $term_color5     color5
+set_from_resource $term_color6     color6
+set_from_resource $term_color7     color7
+set_from_resource $term_color8     color8
+set_from_resource $term_color9     color9
+set_from_resource $term_color10    color10
+set_from_resource $term_color11    color11
+set_from_resource $term_color12    color12
+set_from_resource $term_color13    color13
+set_from_resource $term_color14    color14
+set_from_resource $term_color15    color15
+
+# Start i3bar to display a workspace bar (plus the system information i3status if available)
 bar {
-  status_command i3status
-  tray_output primary
-  font xft:DejaVu Sans Mono 9
+	i3bar_command i3bar
+	status_command i3status
+	position bottom
+
+## please set your primary output first. Example: 'xrandr --output eDP1 --primary'
+#	tray_output primary
+#	tray_output eDP1
+
+	bindsym button4 nop
+	bindsym button5 nop
+#   font xft:DejaVu Sans Mono 9
+	strip_workspace_numbers yes
+
+    colors {
+        background #222D31
+        statusline #F9FAF9
+        separator  #454947
+
+#                      border  backgr. text
+        focused_workspace  #F9FAF9 #16a085 #292F34
+        active_workspace   #595B5B #353836 #FDF6E3
+        inactive_workspace #595B5B #222D31 #EEE8D5
+        binding_mode       #16a085 #2C2C2C #F9FAF9
+        urgent_workspace   #16a085 #FDF6E3 #E5201D
+    }
 }
 
-# http://www.slackword.net/?p=657
-# workspace_auto_back_and_forth yes
-# bindsym $mod+z workspace back_and_forth
-# bindsym $mod+Shift+z move container to workspace back_and_forth
+# hide/unhide i3status bar
+bindsym $mod+m bar mode toggle
 
-show_marks yes
+# Theme colors
+# class                   border  backgr. text    indic.   child_border
+  client.focused          #556064 #556064 #80FFF9 #FDF6E3
+  client.focused_inactive #2F3D44 #2F3D44 #1ABC9C #454948
+  client.unfocused        #2F3D44 #2F3D44 #1ABC9C #454948
+  client.urgent           #CB4B16 #FDF6E3 #1ABC9C #268BD2
+  client.placeholder      #000000 #0c0c0c #ffffff #000000
 
-mode "focused" {
-  # hardcoded focus keybindings
-  bindsym c [title="^(?!.*Slack).*Chromium$"] focus
-  bindsym g [class="(?i)google-chrome"] focus
-  bindsym m [class="(?i)thunderbird"] focus
-  bindsym u [class="(?i)urxvt"] focus
-  bindsym t [title="(?i)telegram"] focus
-  bindsym w [title="Slack.*Chromium"] focus
+  client.background       #2B2C2B
 
-  # development stuff
-  #bindsym b [title="(?i)booma backend"] focus
-  #bindsym f [title="(?i)booma frontend"] focus
+#############################
+### settings for i3-gaps: ###
+#############################
 
-  # keybindings for marking and jumping to clients
-  bindsym a exec i3-input -F 'mark %s' -P 'Mark name: '
-  bindsym g exec i3-input -F '[con_mark=%s] focus' -P 'Go to mark: '
+# Set inner/outer gaps
+gaps inner 0 # 14
+gaps outer 0 # -2
 
-  # Assign marks to keys 1-5
-  bindsym Shift+1 mark mark1
-  bindsym Shift+2 mark mark2
-  bindsym Shift+3 mark mark3
-  bindsym Shift+4 mark mark4
-  bindsym Shift+5 mark mark5
+# Additionally, you can issue commands with the following syntax. This is useful to bind keys to changing the gap size.
+# gaps inner|outer current|all set|plus|minus <px>
+# gaps inner all set 10
+# gaps outer all plus 5
 
-  # Jump to clients marked 1-5
-  bindsym 1 [con_mark="mark1"] focus
-  bindsym 2 [con_mark="mark2"] focus
-  bindsym 3 [con_mark="mark3"] focus
-  bindsym 4 [con_mark="mark4"] focus
-  bindsym 5 [con_mark="mark5"] focus
+# Smart gaps (gaps used if only more than one container on the workspace)
+smart_gaps on
 
-  # Exit to the default mode
-  bindsym Return mode "default"
-  bindsym Escape mode "default"
+# Smart borders (draw borders around container only if it is not the only container on this workspace)
+# on|no_gaps (on=always activate and no_gaps=only activate if the gap size to the edge of the screen is 0)
+smart_borders no_gaps
+
+# Press $mod+Shift+g to enter the gap mode. Choose o or i for modifying outer/inner gaps. Press one of + / - (in-/decrement for current workspace) or 0 (remove gaps for current workspace). If you also press Shift with these keys, the change will be global for all workspaces.
+set $mode_gaps Gaps: (o) outer, (i) inner
+set $mode_gaps_outer Outer Gaps: +|-|0 (local), Shift + +|-|0 (global)
+set $mode_gaps_inner Inner Gaps: +|-|0 (local), Shift + +|-|0 (global)
+bindsym $mod+Shift+g mode "$mode_gaps"
+
+mode "$mode_gaps" {
+        bindsym o      mode "$mode_gaps_outer"
+        bindsym i      mode "$mode_gaps_inner"
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
 }
+mode "$mode_gaps_inner" {
+        bindsym plus  gaps inner current plus 5
+        bindsym minus gaps inner current minus 5
+        bindsym 0     gaps inner current set 0
 
-bindsym $mod+Shift+f mode "focused"
+        bindsym Shift+plus  gaps inner all plus 5
+        bindsym Shift+minus gaps inner all minus 5
+        bindsym Shift+0     gaps inner all set 0
 
-# class                 border  backgr. text    indicator child_border
-client.focused          #285577 #0f2c4c #ffffff #90220f   #285577
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+}
+mode "$mode_gaps_outer" {
+        bindsym plus  gaps outer current plus 5
+        bindsym minus gaps outer current minus 5
+        bindsym 0     gaps outer current set 0
 
-##########
-# Custom #
-##########
+        bindsym Shift+plus  gaps outer all plus 5
+        bindsym Shift+minus gaps outer all minus 5
+        bindsym Shift+0     gaps outer all set 0
 
-for_window [class="urxvt"] border pixel 0
-hide_edge_borders vertical
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+}
 
 # Display management
 set_from_resource $main-display-output i3wm.mainDisplayOutput eDP1
 
-set $mode_display HDMI display (a)uto, (m)ain only, (r)ight of main, (l)eft of main
+set $mode_display HDMI display (a)uto, (m)ain only, (r)ight of main, (l)eft of main, (t)wo right of main
 mode "$mode_display" {
-  bindsym a exec --no-startup-id xrandr --auto
-  bindsym m exec --no-startup-id main-only.sh $main-display-output
-  bindsym r exec --no-startup-id hdmi1-right-of-main.sh $main-display-output
-  bindsym l exec --no-startup-id hdmi1-left-of-main.sh $main-display-output
+  bindsym a exec --no-startup-id "xrandr --auto; sleep 1; nitrogen --restore"
+  bindsym m exec --no-startup-id "main-only.sh $main-display-output; sleep 1; nitrogen --restore"
+  bindsym r exec --no-startup-id "hdmi1-right-of-main.sh $main-display-output; sleep 1; nitrogen --restore"
+  bindsym l exec --no-startup-id "hdmi1-left-of-main.sh $main-display-output; sleep 1; nitrogen --restore"
+  bindsym t exec --no-startup-id "hdmis-right-of-main.sh $main-display-output; sleep 1; nitrogen --restore"
 
   # back to normal: Enter or Escape
   bindsym Return mode "default"
@@ -311,44 +446,17 @@ mode "$mode_display" {
 }
 
 # Declare here the shortcut to bring the display selection menu
-bindsym $mod+Mod+d mode "$mode_display"
-
-# System startup for Ubuntu
-# https://askubuntu.com/questions/1083637/file-xmodmap-is-not-sourced-on-startup-in-18-04
-exec --no-startup-id xmodmap ~/.Xmodmap
-exec --no-startup-id /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1
-exec --no-startup-id gnome-settings-daemon --start --components=secrets
-exec --no-startup-id /usr/lib/at-spi2-core/at-spi-bus-launcher --launch-immediately
-exec --no-startup-id xdg-user-dirs-gtk-update
-exec --no-startup-id a11y-profile-manager-indicator
-exec --no-startup-id gsettings-data-convert
-exec --no-startup-id /usr/bin/gnome-software --gapplication-service
-exec --no-startup-id /usr/lib/vino/vino-server --sm-disable
-exec --no-startup-id /usr/lib/x86_64-linux-gnu/deja-dup/deja-dup-monitor
-exec --no-startup-id /usr/lib/gnome-user-share/gnome-user-share-obexpush
-exec --no-startup-id system-config-printer-applet
-exec --no-startup-id start-pulseaudio-x11
-exec --no-startup-id xscreensaver -no-splash
-exec --no-startup-id xsetroot -solid $main-color
-exec --no-startup-id wicd-gtk -t
-exec --no-startup-id blueman-applet
-exec --no-startup-id qasmixer --tray
-exec --no-startup-id rfkill block bluetooth
-exec --no-startup-id ~/bin/battery-notifier.sh
+bindsym $mod+Mod1+d mode "$mode_display"
 
 # Bindings
-bindsym $mod+Mod1+e exec emacsclient-daemon.sh -c
-bindsym $mod+Mod1+h exec "gentoo -1 ~/Downloads -2 ~"
-bindsym $mod+Mod1+v exec "gentoo -1 /tmp/vault -2 ~"
+bindsym $mod+Mod1+e exec "emacsclient-daemon.sh -c"
+bindsym $mod+Mod1+h exec "pcmanfm ~"
+bindsym $mod+Mod1+v exec "pcmanfm /tmp/vault"
 bindsym $mod+Mod1+p exec "keepassxc"
 bindsym $mod+F4 exec "rhythmbox-client --play-pause"
 bindsym $mod+F5 exec "rhythmbox-client --next"
 bindsym $mod+F6 exec "rhythmbox-client --previous"
 bindsym $mod+F7 exec "rhythmbox-client --clear-queue"
-bindsym --release Print exec --no-startup-id scrot
-bindsym --release Shift+Print exec --no-startup-id scrot -s
-bindsym XF86MonBrightnessDown exec "xbacklight -dec 20"
-bindsym XF86MonBrightnessUp exec "xbacklight -inc 20"
 bindsym XF86AudioRaiseVolume exec "amixer -D pulse sset Master 5%+"
 bindsym XF86AudioLowerVolume exec "amixer -D pulse sset Master 5%-"
 bindsym XF86AudioMute exec "amixer -D pulse sset Master toggle"
@@ -356,7 +464,10 @@ bindsym XF86AudioMute exec "amixer -D pulse sset Master toggle"
 # Microphone
 bindsym Shift+XF86AudioRaiseVolume exec "amixer -D pulse set Capture 10%+"
 bindsym Shift+XF86AudioLowerVolume exec "amixer -D pulse set Capture 10%-"
-bindsym XF86AudioMicMute exec ~/bin/mute-mic
+bindsym XF86AudioMicMute exec mute-mic
 
-# Setup default screen layout in case of multiple monitors
-exec --no-startup-id hdmis-right-of-main.sh $main-display-output
+# Battery
+exec --no-startup-id i3-battery-popup -n -m 'Battery level is getting low' -i /usr/share/icons/Vibrancy-Colors/status/scalable/battery-low-symbolic.svg
+
+# Display
+exec --no-startup-id "hdmis-right-of-main.sh $main-display-output; sleep 1; nitrogen --restore"

@@ -7,8 +7,6 @@ alias la='ls -A'
 alias l='ls -CF'
 alias uls='cd /usr/local/share'
 alias gpg='gpg2'
-alias docker-tcp='sudo systemctl stop docker; nohup sudo docker daemon -H tcp://localhost:4243 --raw-logs > /dev/null 2>&1 &'
-alias docker-rmia='docker rmi $(docker images -qf "dangling=true")'
 alias udmb='udisksctl mount -b'
 alias udub='udisksctl unmount -b'
 alias btreset='sudo rmmod btusb && sudo modprobe btusb'
@@ -17,6 +15,7 @@ alias yarn-gupi='yarn global upgrade-interactive --latest'
 alias head1='head -n1'
 alias tail1='tail -n1'
 alias load-env='function load-env { export $(cat $1 | grep -v ^# | xargs); }; load-env'
+alias commit-ts='function commit-ts-fn { local datetime=$(date --iso-8601=second); local submodule_message="Commit on $datetime"; git add . ; git commit -m "$submodule_message"; }; commit-ts-fn'
 
 # Clojure
 alias l='lein'
@@ -41,7 +40,11 @@ alias gitalias="git config --get-regexp ^alias\."
 
 # Maven
 alias mvn='notify-after mvn'
-alias mc='mvn --quiet clean'
-alias mci='mvn --quiet clean install'
-alias mcist='mvn --quiet clean install -DskipAllTests -T3 -Dmaven.test.skip=true'
-alias mcisst='mvn --quiet clean install -DskipTests -DskipITests -DskipAllTests -Dskip.checkstyle -Dcheckstyle.skip -Dpmd.skip -Djacoco.skip -T3'
+alias mc='mvn clean'
+alias mci='mvn clean install'
+alias mcist='mvn clean install -DskipAllTests -T3 -Dmaven.test.skip=true'
+alias mcisst='mvn clean install -DskipTests -DskipITests -DskipAllTests -Dskip.checkstyle -Dcheckstyle.skip -Dpmd.skip -Djacoco.skip -T3'
+
+# Docker
+alias docker-tcp='sudo systemctl stop docker; nohup sudo docker daemon -H tcp://localhost:4243 --raw-logs > /dev/null 2>&1 &'
+alias docker-rmia='docker rmi $(docker images -qf "dangling=true")'

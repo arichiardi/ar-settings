@@ -26,7 +26,7 @@
 default:\
     :tc=universal-ctags:tc=pygments:
 native:\
-    :tc=gtags:tc=htags:
+    :tc=gtags
 user:\
     :tc=user-custom:tc=htags:
 ctags:\
