@@ -12,49 +12,43 @@ LIGHT_GREEN='\033[1;32m'
 LIGHT_RED='\033[1;31m'
 NC='\033[0m' # No Color
 
-# TEMP_DIR=$(mktemp -d -t "ar-settings.XXXXXXXXXX")
+temp_dir=$(mktemp -d -t "ar-settings.XXXXXXXXXX")
 
 echo -e "${LIGHT_GREEN}Creating directories...${NC}"
 mkdir -p $HOME/bin
 mkdir -p $HOME/tmp
 
 echo -e "${LIGHT_GREEN}Copying bin scripts...${NC}"
-for f in $(find ./bin/ -type f); do
+for f in $(find ./bin/ -type f -and -not -name '*.enc'); do
     set +e
-    diff "$HOME/$f" "$f"
+    (set -x; diff --new-file "$HOME/$f" "$f")
     set -e
+
+    mkdir -p $(dirname "$HOME/$f")
     cp -iv "$f" "$HOME/$f"
     echo -e "${LIGHT_GREEN}---${NC}"
 done
 
-echo -e "${LIGHT_RED}Copying dot files...${NC}"
+echo -e "${LIGHT_RED}Diffing plain text dot files...${NC}"
 
 pushd home
 
-for f in $(find . -type f); do
+for f in $(find . -type f -and -not -name '*.enc'); do
     # better to diff them
     set +e
     meld "$HOME/$f" "$f"
     set -e
 done
 
-home_ssh=$HOME/.ssh
-
-echo -e "${LIGHT_RED}Setting up $home_ssh...${NC}"
-mkdir -p $home_ssh
-
-for f in $(find ./.ssh -type f); do
-    set +e
-    diff "$HOME/$f" "$home_ssh/$f"
-    set -e
-    cp -iv "$home_ssh/$f" "$HOME/$f"
-    echo -e "${LIGHT_RED}---${NC}"
-done
-
-echo -e "${LIGHT_GREEN}Decrypting files...${NC}"
+echo -e "${LIGHT_GREEN}Diffing encrypted dot files...${NC}"
 
 for f in $(find . -type f -name '*.enc'); do
-    bin/secret -r -s "$f" -d "$home_ssh/$f"
+    unencrypted_f="$temp_dir/home/${f%.enc}"
+    ../bin/secret -r -s "$f" -d "$unencrypted_f"
+    set +e
+    meld "$HOME/$f" $unencrypted_f
+    set -e
+    shred -u -n 19 $unencrypted_f
 done
 
 popd
