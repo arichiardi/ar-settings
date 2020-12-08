@@ -5,9 +5,9 @@
 Emacs.menuBar:     0
 Emacs.toolBar:     0
 Emacs.font:        Deja Vu Sans Mono-11
+Emacs.lineSpacing: 1.2
 
 ! Xft settings ---------------------------------------------------------------
-
 Xft.dpi:       96
 Xft.antialias: true
 Xft.hinting:   true
@@ -16,54 +16,34 @@ Xft.autohint:  false
 Xft.hintstyle: hintfull
 Xft.lcdfilter: lcddefault
 
-! xscreensaver ---------------------------------------------------------------
+XTerm*background:        #222D31
+XTerm*foreground:        #d8d8d8
+XTerm*pointerColor:      #1ABB9B
+XTerm*faceName:          Fixed
+XTerm*faceSize:          11
+XTerm*reverseVideo:      on
+XTerm*selectToClipboard: true
 
-!font settings
-xscreensaver.Dialog.headingFont:        -*-dina-bold-r-*-*-10-*-*-*-*-*-*-*
-xscreensaver.Dialog.bodyFont:           -*-dina-medium-r-*-*-10-*-*-*-*-*-*-*
-xscreensaver.Dialog.labelFont:          -*-dina-medium-r-*-*-10-*-*-*-*-*-*-*
-xscreensaver.Dialog.unameFont:          -*-dina-medium-r-*-*-10-*-*-*-*-*-*-*
-xscreensaver.Dialog.buttonFont:         -*-dina-bold-r-*-*-10-*-*-*-*-*-*-*
-xscreensaver.Dialog.dateFont:           -*-dina-medium-r-*-*-10-*-*-*-*-*-*-*
-xscreensaver.passwd.passwdFont:         -*-dina-bold-r-*-*-10-*-*-*-*-*-*-*
-!general dialog box (affects main hostname, username, password text)
-xscreensaver.Dialog.foreground:         #EDEDED
-xscreensaver.Dialog.background:         #202020
-xscreensaver.Dialog.topShadowColor:     #202024
-xscreensaver.Dialog.bottomShadowColor:  #202024
-xscreensaver.Dialog.Button.foreground:  #EDEDFF
-xscreensaver.Dialog.Button.background:  #444
-!username/password input box and date text colour
-xscreensaver.Dialog.text.foreground:    #EDEDFF
-xscreensaver.Dialog.text.background:    #444
-xscreensaver.Dialog.internalBorderWidth:24
-xscreensaver.Dialog.borderWidth:        20
-xscreensaver.Dialog.shadowThickness:    2
-!timeout bar (background is actually determined by Dialog.text.background)
-xscreensaver.passwd.thermometer.foreground:  #A9B7C4
-xscreensaver.passwd.thermometer.background:  #202020
-xscreensaver.passwd.thermometer.width:       8
-!datestamp format--see the strftime(3) manual page for details
-xscreensaver.dateFormat:    %I:%M%P %a %b %d, %Y
-! VT100 settings
-*VT100.Translations: #override \
-              ~Ctrl ~Meta Mod4 <Key>space: string("\033[32;16~")
-!*VT100.geometry: 105x25
-! XTerm settings --------------------------------------------------------------
-xterm*ttyModes: erase ^?
-xterm*visualBell: false
-xterm*scrollBar: false
-xterm*saveLines: 16384
-xterm*faceName: Deja Vu Sans Mono
-xterm*faceSize: 16
-!xterm*font:
-xterm*reverseVideo: off
-xterm*bellIsUrgent: true
-xterm*termName: xterm-256color
-xterm*metaSendsEscape: true
-xterm*eightBitInput: false
-xterm*charClass: 33:48,35-38:48,39:43,42-47:48,58-59:48,61:48,63-64:48,126:48
+Xcursor.theme: xcursor-breeze
+Xcursor.size:  0
+
+! The Terminus font uses the following X-names:
+! -xos4-terminus-medium-r-normal--12-120-72-72-c-60-iso10646-1
+! -xos4-terminus-medium-r-normal--14-140-72-72-c-80-iso10646-1
+! -xos4-terminus-medium-r-normal--16-160-72-72-c-80-iso10646-1
+! -xos4-terminus-medium-r-normal--20-200-72-72-c-100-iso10646-1
+! -xos4-terminus-medium-r-normal--22-220-72-72-c-110-iso10646-1
+! -xos4-terminus-medium-r-normal--24-240-72-72-c-120-iso10646-1
+! -xos4-terminus-medium-r-normal--28-280-72-72-c-140-iso10646-1
+! -xos4-terminus-medium-r-normal--32-320-72-72-c-160-iso10646-1
+! -xos4-terminus-bold-r-normal--12-120-72-72-c-60-iso10646-1
+! -xos4-terminus-bold-r-normal--14-140-72-72-c-80-iso10646-1
+! -xos4-terminus-bold-r-normal--16-160-72-72-c-80-iso10646-1
+! -xos4-terminus-bold-r-normal--20-200-72-72-c-100-iso10646-1
+! -xos4-terminus-bold-r-normal--24-240-72-72-c-120-iso10646-1
+! -xos4-terminus-bold-r-normal--28-280-72-72-c-140-iso10646-1
+! -xos4-terminus-bold-r-normal--32-320-72-72-c-160-iso10646-1
 
 ! X Colors settings
-#include "/home/.../.Xresources.d/theme"
-#include "/home/.../.Xresources.d/urxvt"
+#include "/home/kapitan/.Xresources.d/theme"
+#include "/home/kapitan/.Xresources.d/urxvt"

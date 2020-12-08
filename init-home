@@ -8,8 +8,9 @@ set -euo pipefail
 #
 # see the brilliant answer here: https://stackoverflow.com/a/45538151
 
-LIGHT_GREEN='\033[1;32m'
-LIGHT_RED='\033[1;31m'
+LIGHT_YELLOW='\033[1;93m'
+LIGHT_GREEN='\033[1;92m'
+LIGHT_RED='\033[1;91m'
 NC='\033[0m' # No Color
 
 temp_dir=$(mktemp -d -t "ar-settings.XXXXXXXXXX")
@@ -21,20 +22,22 @@ mkdir -p $HOME/tmp
 echo -e "${LIGHT_GREEN}Copying bin scripts...${NC}"
 for f in $(find ./bin/ -type f -and -not -name '*.enc'); do
     set +e
-    (set -x; diff --new-file "$HOME/$f" "$f")
+    (set -x; diff --new-file "$HOME/$f" "$f" > /dev/null)
+    exit_code=$?
     set -e
 
-    mkdir -p $(dirname "$HOME/$f")
-    cp -iv "$f" "$HOME/$f"
-    echo -e "${LIGHT_GREEN}---${NC}"
+    case $exit_code in
+        0) echo -e "${LIGHT_GREEN}File $HOME/$f already up-to-date${NC}.";;
+        1) echo -e "${LIGHT_YELLOW}File $HOME/$f is outdated, comparing...${NC}"; set +e; meld "$HOME/$f" "$f"; set -e;;
+        *) echo -e "${LIGHT_RED}Unidentified $f diff failure, skipping.${NC}";;
+    esac
 done
 
-echo -e "${LIGHT_RED}Diffing plain text dot files...${NC}"
+echo -e "${LIGHT_GREEN}Diffing plain text dot files...${NC}"
 
-pushd home
+pushd home > /dev/null
 
 for f in $(find . -type f -and -not -name '*.enc'); do
-    # better to diff them
     set +e
     meld "$HOME/$f" "$f"
     set -e
@@ -42,13 +45,16 @@ done
 
 echo -e "${LIGHT_GREEN}Diffing encrypted dot files...${NC}"
 
-for f in $(find . -type f -name '*.enc'); do
+for f in $(find . -type f -and -name '*.enc'); do
+    encrypted_f=$(readlink -f "$f")
     unencrypted_f="$temp_dir/home/${f%.enc}"
-    ../bin/secret -r -s "$f" -d "$unencrypted_f"
     set +e
-    meld "$HOME/$f" $unencrypted_f
-    set -e
+    ../bin/secret -r -s "$encrypted_f" -d "$unencrypted_f"
+    if [ $? -eq 0 ]; then
+        meld "$HOME/$f" $unencrypted_f
+    fi
     shred -u -n 19 $unencrypted_f
+    set -e
 done
 
 popd

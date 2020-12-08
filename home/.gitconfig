@@ -15,6 +15,7 @@
 [core]
     editor = emacsclient -a '' -nw
     autocrlf = false
+    excludesfile = /home/kapitan/.config/git/ignore
 [rerere]
     enabled = true
 [mergetool "meld"]
@@ -100,12 +101,8 @@
     ski = "stash save --keep-index"
 [protocol "keybase"]
     allow = always
-#[diff-so-fancy]
-#    markEmptyLines = true
-#    changeHunkIndicators = false
-#    stripLeadingSymbols = false
-#[pager]
-#    diff = diff-so-fancy | less --tabs=4 -RFX --pattern '^(Date|added|deleted|modified): '
+[hub]
+    host = github.elasticpath.net
 [credential]
     # Compile the git-credential-netrc helper from the git repo
     # https://andrearichiardi.com/blog/posts/git-credential-netrc.html

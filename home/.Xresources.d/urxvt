@@ -30,11 +30,12 @@ URxvt*keysym.Mod4-t: \033[32;74~
 ! disable yellow box on Ctrl-Shift
 URxvt.iso14755: false
 URxvt.iso14755_52: false
+! https://superuser.com/questions/1415969/how-to-disable-urxvt-autoscroll-on-output
 ! https://wiki.archlinux.org/index.php/Rxvt-unicode$
-! do not scroll with output$
-URxvt*scrollTtyOutput: false$
+! do not scroll with output
+URxvt*scrollTtyOutput: false
 ! scroll in relation to buffer (with mouse scroll or Shift+Page Up)$
-URxvt*scrollWithBuffer: true$
+URxvt*scrollWithBuffer: true
 ! scroll back to the bottom on keypress$
 URxvt*scrollTtyKeypress: true
 ! extensions
