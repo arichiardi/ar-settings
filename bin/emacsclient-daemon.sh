@@ -9,23 +9,22 @@
 
 set -e
 
-XLIB_SKIP_ARGB_VISUALS=1
+export XLIB_SKIP_ARGB_VISUALS=1
 
-EMACS_BIN=$(which emacs)
-EMACSCLIENT_BIN=$(which emacsclient)
-EMACS_ICON=$HOME/.icons/emacs25.svg
+emacs_bin=$(which emacs)
+emacsclient_bin=$(which emacsclient)
+emacs_icon=$HOME/.icons/emacs.svg
 
-if [ 0 -eq $(pgrep --exact --count emacs) ]
-then
+if [ 0 -eq $(pgrep --exact --count emacs) ]; then
     echo "Starting server."
-    notify-send -i "$EMACS_ICON" -u normal -h int:transient:1 "Starting server" "Please wait."
-    $EMACS_BIN --daemon
+    notify-send -i "$emacs_icon" -u normal -h "int:transient:1" "Starting server" "Please wait."
+    $emacs_bin --no-splash --daemon
 fi
 
-EMACS_PARAMS="-a emacs"
+emacs_params="-a emacs"
 
-if [[ ! ( ! "$EMACS_PARAMS" =~ "-c" && ! "$EMACS_PARAMS" =~ "-nw" ) ]]; then
-    EMACS_PARAM="-c $EMACS_PARAMS"
+if [[ ! ( ! "$emacs_params" =~ "-c" && ! "$emacs_params" =~ "-nw" ) ]]; then
+    emacs_param="-c $EMACS_PARAMS"
 fi
 
-$EMACSCLIENT_BIN "$EMACS_PARAMS" "$@"
+$emacsclient_bin $emacs_params $@
