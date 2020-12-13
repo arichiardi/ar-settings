@@ -32,6 +32,9 @@ alias emacs-resurrect='kill -CONT $(pgrep emacs | xargs)'
 alias emacs-packs='cd $HOME/.emacs.d/packs'
 alias emacs-ar-pack='cd $HOME/.emacs.d/.live-packs/ar-emacs-pack'
 
+# Lsp
+alias lsp-java-tail="tail -f ~/.emacs.d/etc/workspace/.metadata/.log"
+
 # Git
 alias g='hub'
 
