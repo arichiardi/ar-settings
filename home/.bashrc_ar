@@ -150,10 +150,11 @@ export M2=$M2_HOME/bin
 export MAVEN_OPTS="-Xmx2048m -Xms512m -XX:MaxPermSize=312M -XX:ReservedCodeCacheSize=128m -Dsun.lang.ClassLoader.allowArraySyntax=true -ea -Dfile.encoding=UTF-8"
 export MAVEN_JMX="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=6969 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false"
 
-# Clojure
+# clojure
 export CLOJURE_JAR=$HOME/.m2/repository/org/clojure/clojure/1.9.0/clojure-1.9.0.jar
 export CLOJURE_EXT=$CLOJURE_JAR
 export CLOJURE_OPTS="-Xms128M -Xmx512M -server"
+export MANPATH=/home/kapitan/.local/share/man
 
 # Emacs default editor
 export ALTERNATE_EDITOR=""
