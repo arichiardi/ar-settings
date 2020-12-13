@@ -20,8 +20,8 @@ alias commit-ts='function commit-ts-fn { local datetime=$(date --iso-8601=second
 # Clojure
 alias l='lein'
 alias b='boot'
-alias clj-repl='function do_repl { clojure -J-Dclojure.server.repl="{:port ${1:-5555} :accept clojure.core.server/repl}" -A:rebel; }; do_repl'
-alias cljs-node-repl='function do_repl { clojure -J-Dclojure.server.repl="{:port ${1:-5555} :accept cljs.server.node/repl}" -R:cljs-canary -A:rebel-cljs -m cljs.main -re node -r; }; do_repl'
+alias clj-repl='function do_repl { clojure -J-Dclojure.server.repl="{:port ${1:-5555} :accept clojure.core.server/repl}" -M:rebel; }; do_repl'
+alias cljs-node-repl='function do_repl { clojure -J-Dclojure.server.repl="{:port ${1:-5555} :accept cljs.server.node/repl}" -R:cljs-canary -M:rebel-cljs -m cljs.main -re node -r; }; do_repl'
 
 # Emacs
 alias vi="~/bin/emacsclient-daemon.sh -nw"
