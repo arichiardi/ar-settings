@@ -19,8 +19,8 @@ echo "Adjust file ownership..."
 find $mount_point \! -user root -exec sudo chown -v root:vault {} ';'
 
 echo "Adjust group permissions..."
-find $mount_point -type f -and -perm -o=rw -and \! -perm -g=rw -exec sudo chmod -v g+rw {} ';'
-find $mount_point -type d -and -perm -o=rwx -and \! -perm -g=rwx -exec sudo chmod -v g+rwx {} ';'
+find $mount_point -type f -and -perm -o=rw -and \! -perm -g=rw -exec sudo chmod -v 644 {} ';'
+find $mount_point -type d -and -perm -o=rwx -and \! -perm -g=rwx -exec sudo chmod -v 2775 {} ';'
 
 echo "Unmounting vault from $mount_point..."
 sudo umount $mount_point
