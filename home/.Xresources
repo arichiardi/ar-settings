@@ -13,7 +13,7 @@ Xft.antialias: true
 Xft.hinting:   true
 Xft.rgba:      rgba
 Xft.autohint:  false
-Xft.hintstyle: hintfull
+Xft.hintstyle: hintslight
 Xft.lcdfilter: lcddefault
 
 XTerm*background:        #222D31
