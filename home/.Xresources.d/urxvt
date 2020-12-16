@@ -5,7 +5,7 @@ URxvt*scrollBar: false
 URxvt*saveLines: 16384
 URxvt*font: xft:JetBrains Mono:style=g:antialias=true:hinting=true:size=11
 URxvt*boldFont: xft:JetBrains Mono:style=g:bold:antialias=true:hinting=true:size=11
-URxvt.letterSpace: -1
+URxvt*lineSpace: -1
 URxvt*reverseVideo: off
 URxvt*fading: 25
 URxvt*fadeColor: black
