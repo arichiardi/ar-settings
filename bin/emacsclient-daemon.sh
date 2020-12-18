@@ -9,8 +9,6 @@
 
 set -e
 
-export XLIB_SKIP_ARGB_VISUALS=1
-
 emacs_bin=$(which emacs)
 emacsclient_bin=$(which emacsclient)
 emacs_icon=$HOME/.icons/emacs.svg
