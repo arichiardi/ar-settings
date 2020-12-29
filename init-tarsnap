@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+LIGHT_GREEN='\033[1;92m'
+NC='\033[0m' # No Color
+
+secrets_dir=$(pwd)/secrets
+system_dir=/var/lib/tarsnap
+
+echo -e "${LIGHT_GREEN}Install Tarsnap...${NC}"
+sudo pamac install tarsnap
+
+echo -e "${LIGHT_GREEN}Creating dirs...${NC}"
+sudo mkdir $system_dir
+sudo mkdir $system_dir/cache
+sudo mkdir /etc/tarsnap
+
+echo -e "${LIGHT_GREEN}Copying keys in /root...${NC}"
+sudo cp -iv "$secrets_dir"/tarsnap_* /root
+
+echo -e "${LIGHT_GREEN}Copying configuration file...${NC}"
+../bin/secret -r -s etc/tarsnap/tarsnap.conf.enc -d etc/tarsnap/tarsnap.conf
+sudo mv -iv tarsnap.conf /etc/tarsnap
+shred -u -n 19 tarsnap.conf
