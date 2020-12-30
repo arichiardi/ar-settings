@@ -1,0 +1,44 @@
+#!/bin/bash
+#
+# Very simple script to remove a submodule given its potentially relative path
+# The code is taken mainly from the following SO question:
+#   https://stackoverflow.com/questions/1260748/how-do-i-remove-a-submodule
+#
+# In case of error it leaves the repo in a bad state, so it needs refinement.
+
+set -euo pipefail
+
+git_root=$(git rev-parse --show-toplevel)
+git_submodule_path=${1:-}
+
+# need to escape for grep
+git_submodule_path_for_grep=$(echo $git_submodule_path | sed -e 's/\//\\\//g')
+
+set +e
+gitmodules_count=$(grep --count -E "\[submodule \"$git_submodule_path_for_grep\"\]" .gitmodules)
+set -e
+if [[ "$gitmodules_count" == 0 ]]; then
+    echo "Cannot find a submodule for $git_submodule_path in your current dir.";
+    exit 1;
+elif [[ "$gitmodules_count" > 1 ]]; then
+    echo "Too many modules found for $git_submodule_path in your current dir.";
+    exit 2
+fi
+
+git submodule deinit --force "$git_submodule_path" && \
+    rm -rf ".git/modules/$git_submodule_path" && \
+    git rm -rf "$git_submodule_path"
+
+set +e
+config_file_path="$git_root/.git/config"
+echo "Backing up $config_file_path to $config_file_path.bak"
+cp -v "$config_file_path" "$config_file_path.bak"
+git config -f "$config_file_path" --remove-section "submodule.$git_submodule_path"
+set -e
+
+echo
+echo "Success!"
+
+echo "Note that if you restore the modules, for example using git checkout, you will need to run:"
+echo
+echo "git submodule init $git_submodule_path"

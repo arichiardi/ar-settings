@@ -1,0 +1,56 @@
+#!/bin/bash
+
+set -uo pipefail
+
+mount_point=${1:-}
+
+if [ -z "$mount_point" ]; then
+    error_code=64
+    echo "Please pass the mount point as second parameter (error: $error_code)"
+    exit $error_code
+fi
+
+# AR we don't backup the contents of the mounted vault anymore
+
+echo "Remove all executable flags..."
+find $mount_point -type f \( -perm -u=x -o -perm -g=x -o -perm -o=x \) -exec sudo chmod -v -x {} ';'
+
+echo "Adjust file ownership..."
+find $mount_point \! -user root -exec sudo chown -v root:vault {} ';'
+
+echo "Adjust group permissions..."
+find $mount_point -type f -and -perm -o=rw -and \! -perm -g=rw -exec sudo chmod -v 664 {} ';'
+find $mount_point -type d -and -perm -o=rwx -and \! -perm -g=rwx -exec sudo chmod -v 2775 {} ';'
+
+echo "Unmounting vault from $mount_point..."
+sudo umount $mount_point
+
+if [ "$?" = "0" ]; then
+    echo "Encrypting vault..."
+    sudo cryptsetup luksClose vault
+
+    if [ "$?" = "0" ]; then
+        vault_losetup=$(sudo losetup -a | grep vault)
+        vault_file=$(echo "$vault_losetup" | grep -o '(.*)' | cut -d \( -f 2 | cut -d \) -f 1)
+        dev_loop=$(echo "$vault_losetup" | awk -F ':' '{ print($1) }')
+
+        echo "Umounting $dev_loop..."
+        sudo losetup -d $dev_loop
+
+        if [ "$?" = "0" ]; then
+            echo -n "Generating $vault_file digest..."
+            pushd $(dirname $vault_file) > /dev/null
+            md5sum $(basename $vault_file) > $vault_file.md5
+            popd > /dev/null
+            echo "Completed."
+        else
+            echo "Error: losetup -d exited with $?"
+        fi
+    else
+        echo "Error: cryptsetup exited with $?"
+    fi
+else
+    echo "Error: umount exited with $?"
+fi
+
+exit $?

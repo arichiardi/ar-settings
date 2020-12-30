@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+
+muted_icon=/usr/share/icons/suru/devices/scalable/audio-input-microphone-muted-symbolic.svg
+unmuted_icon=/usr/share/icons/suru/devices/scalable/audio-input-microphone-symbolic.svg
+notify_cmd="notify-send -u critical -h string:x-canonical-private-synchronous:anything"
+
+amixer -D pulse set Capture toggle | grep '\[off\]' && $($notify_cmd -i $muted_icon "Microphone" "muted") || $($notify_cmd -i $unmuted_icon "Microphone" "unmuted")
