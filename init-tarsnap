@@ -22,7 +22,7 @@ echo -e "${LIGHT_GREEN}Copying keys in /root...${NC}"
 for f in $(find "$secrets_dir" -type f -and -name 'tarsnap*.enc'); do
     encrypted_f=$(readlink -f "$f")
     temp_f=$temp_dir/${f%.enc}
-    root_f=/root/$(basename "$unencrypted_f")
+    root_f=/root/$(basename "$temp_f")
 
     $secret_bin -r -s "$encrypted_f" -d "$temp_f"
     sudo mv -iv "$temp_f" "$root_f"
