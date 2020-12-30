@@ -31,6 +31,6 @@ for f in $(find "$secrets_dir" -type f -and -name 'tarsnap*.enc'); do
 done
 
 echo -e "${LIGHT_GREEN}Copying configuration file...${NC}"
-$secret_bin -r -s etc/tarsnap/tarsnap.conf.enc -d etc/tarsnap/tarsnap.conf
-sudo mv -iv tarsnap.conf /etc/tarsnap
-shred -u -n 19 tarsnap.conf
+$secret_bin -r -s etc/tarsnap/tarsnap.conf.enc -d "$temp_dir/tarsnap.conf"
+sudo mv -iv "$temp_dir/tarsnap.conf" /etc/tarsnap
+shred -u -n 19 "$temp_dir/tarsnap.conf"
