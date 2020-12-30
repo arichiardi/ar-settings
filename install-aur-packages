@@ -14,8 +14,7 @@ NC='\033[0m' # No Color
 # ruby-ruby_parser is needed for cucumber.el/feature-mode
 
 declare -a packages
-packages=(gp-saml-gui-git vpn-slice \
-          yarn-completion-git leiningen-completions \
+packages=(yarn-completion-git leiningen-completions \
           adr-tools pandoc-bin zeal backblaze-b2 gtk-recordmydesktop \
           nordvpn-bin \
           emacs-git cask ruby-ruby_parser)

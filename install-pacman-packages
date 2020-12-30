@@ -13,10 +13,11 @@ NC='\033[0m' # No Color
 
 echo -e "${LIGHT_GREEN}Installing packages...${NC}"
 sudo pamac install \
-     rxvt-unicode qastools scrot cmake arandr the_silver_searcher \
+     rxvt-unicode bash-completion \
+     qastools scrot cmake arandr the_silver_searcher \
      xsel docker docker-compose tree byzanz perl-image-exiftool \
      rlwrap xclip xorg-xbacklight texinfo meld python-pip cryptsetup \
      colordiff texlive-latexextra kubectl hub keybase kbfs \
-     keybase-gui tk jq maven discount
+     keybase-gui tk jq discount
 
 # not found from apt: global texlive-base-extra console-data
