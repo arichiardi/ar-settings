@@ -47,13 +47,13 @@ echo -e "${LIGHT_GREEN}Diffing encrypted dot files...${NC}"
 
 for f in $(find . -type f -and -name '*.enc'); do
     encrypted_f=$(readlink -f "$f")
-    unencrypted_f="$temp_dir/home/${f%.enc}"
+    unencrypted_f=$temp_dir/home/${f%.enc}
     set +e
     $secret_bin -r -s "$encrypted_f" -d "$unencrypted_f"
     if [ $? -eq 0 ]; then
-        meld "$HOME/$f" $unencrypted_f
+        meld "$HOME/$f" "$unencrypted_f"
     fi
-    shred -u -n 19 $unencrypted_f
+    shred -u -n 19 "$unencrypted_f"
     set -e
 done
 
