@@ -1,5 +1,5 @@
 # Git Prompt
-source "$HOME/bin/git-prompt.sh"
+source "/usr/share/git/completion/git-prompt.sh"
 
 GIT_PS1_SHOWUPSTREAM="verbose"
 GIT_PS1_SHOWUNTRACKEDFILES=1

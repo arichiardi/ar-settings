@@ -15,33 +15,32 @@ NC='\033[0m' # No Color
 
 temp_dir=$(mktemp -d -t "ar-settings.XXXXXXXXXX")
 
+echo -e "${LIGHT_GREEN}Installing dependencies...${NC}"
+sudo pamac install meld
+
 echo -e "${LIGHT_GREEN}Creating directories...${NC}"
-mkdir -p $HOME/bin
+mkdir -p $HOME/.local/bin
 mkdir -p $HOME/tmp
 
-echo -e "${LIGHT_GREEN}Copying bin scripts...${NC}"
-for f in $(find ./bin/ -type f -and -not -name '*.enc'); do
+echo -e "${LIGHT_GREEN}Diffing unencrypted home files...${NC}"
+
+pushd home > /dev/null
+for f in $(find . -type f -and -not -name '*.enc'); do
+    local_home_f=$(readlink --no-newline --canonicalize-missing "$HOME/$f")
     set +e
-    (set -x; diff --new-file "$HOME/$f" "$f" > /dev/null)
+    (set -x; diff --new-file "$local_home_f" "$f" > /dev/null)
     exit_code=$?
     set -e
 
     case $exit_code in
-        0) echo -e "${LIGHT_GREEN}File $HOME/$f already up-to-date${NC}.";;
-        1) echo -e "${LIGHT_YELLOW}File $HOME/$f is outdated, comparing...${NC}"; set +e; meld "$HOME/$f" "$f"; set -e;;
+        0) echo -e "${LIGHT_GREEN}File $local_home_f already up-to-date${NC}.";;
+        1) echo -e "${LIGHT_YELLOW}File $local_home_f is outdated or missing, opening diff tool...${NC}"; set +e; meld "$local_home_f" "$f"; set -e;;
         *) echo -e "${LIGHT_RED}Unidentified $f diff failure, skipping.${NC}";;
     esac
 done
 
-echo -e "${LIGHT_GREEN}Diffing plain text dot files...${NC}"
-
-pushd home > /dev/null
-
-for f in $(find . -type f -and -not -name '*.enc'); do
-    set +e
-    meld "$HOME/$f" "$f"
-    set -e
-done
+echo -e "${LIGHT_GREEN}Making $HOME/.local/bin files executable...${NC}"
+find "$HOME/.local/bin" -type f -executable -exec chmod u+x {} ';'
 
 echo -e "${LIGHT_GREEN}Diffing encrypted dot files...${NC}"
 
@@ -49,7 +48,7 @@ for f in $(find . -type f -and -name '*.enc'); do
     encrypted_f=$(readlink -f "$f")
     unencrypted_f="$temp_dir/home/${f%.enc}"
     set +e
-    ../bin/secret -r -s "$encrypted_f" -d "$unencrypted_f"
+    .local/bin/secret -r -s "$encrypted_f" -d "$unencrypted_f"
     if [ $? -eq 0 ]; then
         meld "$HOME/$f" $unencrypted_f
     fi

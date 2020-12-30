@@ -24,10 +24,10 @@ alias clj-repl='function do_repl { clojure -J-Dclojure.server.repl="{:port ${1:-
 alias cljs-node-repl='function do_repl { clojure -J-Dclojure.server.repl="{:port ${1:-5555} :accept cljs.server.node/repl}" -R:cljs-canary -M:rebel-cljs -m cljs.main -re node -r; }; do_repl'
 
 # Emacs
-alias vi="~/bin/emacsclient-daemon.sh -nw"
-alias e="~/bin/emacsclient-daemon.sh -nw"
-alias em="~/bin/emacsclient-daemon.sh -c"
-alias ed="~/bin/emacsclient-dired.sh"
+alias vi="emacsclient-daemon.sh -nw"
+alias e="emacsclient-daemon.sh -nw"
+alias em="emacsclient-daemon.sh -c"
+alias ed="emacsclient-dired.sh"
 alias emacs-resurrect='kill -CONT $(pgrep emacs | xargs)'
 alias emacs-packs='cd $HOME/.emacs.d/packs'
 alias emacs-ar-pack='cd $HOME/.emacs.d/.live-packs/ar-emacs-pack'
