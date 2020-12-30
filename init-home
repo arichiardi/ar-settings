@@ -13,7 +13,8 @@ LIGHT_GREEN='\033[1;92m'
 LIGHT_RED='\033[1;91m'
 NC='\033[0m' # No Color
 
-temp_dir=$(mktemp -d -t "ar-settings.XXXXXXXXXX")
+secret_bin=$(pwd)/home/.local/bin/secret
+temp_dir=$(mktemp -d -t "ar-init-home.XXXXXXXXXX")
 
 echo -e "${LIGHT_GREEN}Installing dependencies...${NC}"
 sudo pamac install meld
@@ -48,7 +49,7 @@ for f in $(find . -type f -and -name '*.enc'); do
     encrypted_f=$(readlink -f "$f")
     unencrypted_f="$temp_dir/home/${f%.enc}"
     set +e
-    .local/bin/secret -r -s "$encrypted_f" -d "$unencrypted_f"
+    $secret_bin -r -s "$encrypted_f" -d "$unencrypted_f"
     if [ $? -eq 0 ]; then
         meld "$HOME/$f" $unencrypted_f
     fi
