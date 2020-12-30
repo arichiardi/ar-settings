@@ -2,9 +2,12 @@
 
 set -euo pipefail
 
+temp_dir=$(mktemp -d -t "ar-init-tarsnap.XXXXXXXXXX")
+
 LIGHT_GREEN='\033[1;92m'
 NC='\033[0m' # No Color
 
+secret_bin=$(pwd)/home/.local/bin/secret
 secrets_dir=$(pwd)/secrets
 system_dir=/var/lib/tarsnap
 
@@ -16,9 +19,17 @@ sudo mkdir -p $system_dir/cache
 sudo mkdir -p /etc/tarsnap
 
 echo -e "${LIGHT_GREEN}Copying keys in /root...${NC}"
-sudo cp -iv "$secrets_dir"/tarsnap_* /root
+for f in $(find "$secrets_dir" -type f -and -name 'tarsnap*.enc'); do
+    encrypted_f=$(readlink -f "$f")
+    temp_f=$temp_dir/${f%.enc}
+    root_f=/root/$(basename "$unencrypted_f")
+
+    $secret_bin -r -s "$encrypted_f" -d "$temp_f"
+    sudo mv -iv "$temp_f" "$root_f"
+    sudo chmod 600 "$root_f"
+done
 
 echo -e "${LIGHT_GREEN}Copying configuration file...${NC}"
-$(pwd)/home/.local/bin/secret -r -s etc/tarsnap/tarsnap.conf.enc -d etc/tarsnap/tarsnap.conf
+$secret_bin -r -s etc/tarsnap/tarsnap.conf.enc -d etc/tarsnap/tarsnap.conf
 sudo mv -iv tarsnap.conf /etc/tarsnap
 shred -u -n 19 tarsnap.conf
