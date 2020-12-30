@@ -19,6 +19,6 @@ echo -e "${LIGHT_GREEN}Copying keys in /root...${NC}"
 sudo cp -iv "$secrets_dir"/tarsnap_* /root
 
 echo -e "${LIGHT_GREEN}Copying configuration file...${NC}"
-../bin/secret -r -s etc/tarsnap/tarsnap.conf.enc -d etc/tarsnap/tarsnap.conf
+$(pwd)/home/.local/bin/secret -r -s etc/tarsnap/tarsnap.conf.enc -d etc/tarsnap/tarsnap.conf
 sudo mv -iv tarsnap.conf /etc/tarsnap
 shred -u -n 19 tarsnap.conf
