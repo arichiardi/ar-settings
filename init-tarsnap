@@ -14,7 +14,7 @@ sudo pamac install tarsnap
 echo -e "${LIGHT_GREEN}Creating dirs...${NC}"
 sudo mkdir $system_dir
 sudo mkdir $system_dir/cache
-sudo mkdir /etc/tarsnap
+sudo mkdir -p /etc/tarsnap
 
 echo -e "${LIGHT_GREEN}Copying keys in /root...${NC}"
 sudo cp -iv "$secrets_dir"/tarsnap_* /root
