@@ -12,8 +12,7 @@ echo -e "${LIGHT_GREEN}Install Tarsnap...${NC}"
 sudo pamac install tarsnap
 
 echo -e "${LIGHT_GREEN}Creating dirs...${NC}"
-sudo mkdir $system_dir
-sudo mkdir $system_dir/cache
+sudo mkdir -p $system_dir/cache
 sudo mkdir -p /etc/tarsnap
 
 echo -e "${LIGHT_GREEN}Copying keys in /root...${NC}"
