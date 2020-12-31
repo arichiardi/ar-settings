@@ -15,4 +15,4 @@ setxkbmap -model pc105 -layout "us,us,ru" -variant "colemak,," -option "caps:sup
 export XENVIRONMENT="${HOME}/.Xresources"
 
 # Local bins always take precedence
-PATH="$HOME/bin:$HOME/.local/bin:$PATH"
+PATH=$HOME/.local/bin:$PATH
