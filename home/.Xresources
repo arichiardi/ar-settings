@@ -45,5 +45,5 @@ Xcursor.size:  0
 ! -xos4-terminus-bold-r-normal--32-320-72-72-c-160-iso10646-1
 
 ! X Colors settings
-#include "/home/kapitan/.Xresources.d/theme"
-#include "/home/kapitan/.Xresources.d/urxvt"
+#include ".Xresources.d/theme"
+#include ".Xresources.d/urxvt"
