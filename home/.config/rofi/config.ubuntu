@@ -5,8 +5,8 @@ rofi.lines:                          15
 rofi.columns:                        1
 rofi.font:                           DejaVu Sans Mono 11
 rofi.color-enabled:                  true
-rofi.color-normal:                   #222d31,#d8d8d8,#222d31,#585858,#d8d8d8
-rofi.color-window:                   #222d31,#1abb9b,#1abb9b
+rofi.color-normal:                   #0c0d0d,#eee8d5,#0c0d0d,#444b4b,#eee8d5
+rofi.color-window:                   #0c0d0d,#0f2c4c,#0f2c4c
 rofi.bw:                             1
 rofi.location:                       0
 rofi.terminal:                       urxvt
