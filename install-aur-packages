@@ -15,9 +15,9 @@ NC='\033[0m' # No Color
 
 declare -a packages
 packages=(yarn-completion-git leiningen-completions \
-          adr-tools pandoc-bin zeal backblaze-b2 gtk-recordmydesktop \
-          nordvpn-bin \
-          emacs-git cask ruby-ruby_parser)
+          adr-tools pandoc-bin zeal gtk-recordmydesktop \
+          nordvpn-bin backblaze-b2 \
+          cask ruby-ruby_parser)
 
 for pkg in "${packages[@]}"; do
     echo -n "Install $pkg from AUR (y/n)? "

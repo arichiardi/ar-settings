@@ -12,12 +12,14 @@ LIGHT_GREEN='\033[1;32m'
 NC='\033[0m' # No Color
 
 echo -e "${LIGHT_GREEN}Installing packages...${NC}"
-sudo pamac install \
-     rxvt-unicode bash-completion \
+(set -x; sudo pamac install \
+     rxvt-unicode ttf-jetbrains-mono bash-completion \
+     pavucontrol rofi keepassxc \
      qastools scrot cmake arandr the_silver_searcher \
-     xsel docker docker-compose tree byzanz perl-image-exiftool \
-     rlwrap xclip xorg-xbacklight texinfo meld python-pip cryptsetup \
+     yarn nvm leiningen meld \
+     docker docker-compose tree byzanz perl-image-exiftool \
+     rlwrap xsel xclip xorg-xfontsel xorg-xev xorg-xbacklight texinfo python-pip cryptsetup \
      colordiff texlive-latexextra kubectl hub keybase kbfs \
-     keybase-gui tk jq discount
+     keybase-gui tk jq discount)
 
 # not found from apt: global texlive-base-extra console-data
