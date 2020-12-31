@@ -1,0 +1,32 @@
+# Insert your preferred key mappings here.
+
+map e scrollDown
+map i scrollUp
+map E previousTab
+map I nextTab
+map <c-n> scrollPageDown
+map <c-p> scrollPageUp
+
+map n scrollLeft
+map o scrollRight
+map N goBack
+map O goForward
+map zN scrollToLeft
+map zO scrolltoRight
+
+map <c-r> reload
+
+unmap j
+unmap k
+unmap h
+unmap l
+unmap J
+unmap K
+unmap H
+unmap L
+unmap <c-y>
+unmap <c-e>
+unmap d
+unmap u
+unmap zH
+unmap r
