@@ -15,7 +15,7 @@
 [core]
     editor = emacsclient -a '' -nw
     autocrlf = false
-    excludesfile = /home/kapitan/.config/git/ignore
+    excludesfile = ~/.config/git/ignore
 [rerere]
     enabled = true
 [mergetool "meld"]
