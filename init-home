@@ -4,7 +4,7 @@ set -euo pipefail
 
 # For skipping sections, use this trick:
 #
-#   cat >/dev/null <<HUB
+#   cat >/dev/null <<LABEL
 #
 # see the brilliant answer here: https://stackoverflow.com/a/45538151
 
@@ -23,37 +23,41 @@ echo -e "${LIGHT_GREEN}Creating directories...${NC}"
 mkdir -p $HOME/.local/bin
 mkdir -p $HOME/tmp
 
-echo -e "${LIGHT_GREEN}Diffing unencrypted home files...${NC}"
-
 pushd home > /dev/null
+
+echo -e "${LIGHT_GREEN}Diffing unencrypted home files...${NC}"
 for f in $(find . -type f -and -not -name '*.enc'); do
-    local_home_f=$(readlink --no-newline --canonicalize-missing "$HOME/$f")
+    local_f=$(readlink --no-newline --canonicalize-missing "$HOME/$f")
     set +e
-    (set -x; diff --new-file "$local_home_f" "$f" > /dev/null)
+    (set -x; diff --new-file "$local_f" "$f" > /dev/null)
     exit_code=$?
     set -e
 
+    local_d=$(dirname "$local_f")
+    echo -e "${LIGHT_GREEN}Creating $local_d directory...${NC}"
+    mkdir -p "$local_d"
+
     case $exit_code in
-        0) echo -e "${LIGHT_GREEN}File $local_home_f already up-to-date${NC}.";;
-        1) echo -e "${LIGHT_YELLOW}File $local_home_f is outdated or missing, opening diff tool...${NC}"; set +e; meld "$local_home_f" "$f"; set -e;;
-        *) echo -e "${LIGHT_RED}Unidentified $f diff failure, skipping.${NC}";;
+        0) echo -e "${LIGHT_GREEN}File $local_f already up-to-date${NC}.";;
+        1) echo -e "${LIGHT_YELLOW}File $local_f is outdated or missing, opening diff tool...${NC}"; set +e; meld "$local_f" "$f"; set -e;;
+        *) echo -e "${LIGHT_RED}Unidentified $f diff exit code ($exit_code), skipping.${NC}";;
     esac
 done
 
 echo -e "${LIGHT_GREEN}Making $HOME/.local/bin files executable...${NC}"
-find "$HOME/.local/bin" -type f -executable -exec chmod u+x {} ';'
+find "$HOME/.local/bin" -type f -and -not -executable -exec chmod u+x {} ';'
 
 echo -e "${LIGHT_GREEN}Diffing encrypted dot files...${NC}"
-
 for f in $(find . -type f -and -name '*.enc'); do
-    encrypted_f=$(readlink -f "$f")
-    unencrypted_f=$temp_dir/home/${f%.enc}
+    encrypted_f=$(readlink -f --no-newline --canonicalize-missing "$f")
+    temp_f=$(readlink -f --no-newline --canonicalize-missing "$temp_dir/${f%.enc}")
+
     set +e
-    $secret_bin -r -s "$encrypted_f" -d "$unencrypted_f"
+    $secret_bin -r -s "$encrypted_f" -d "$temp_f"
     if [ $? -eq 0 ]; then
-        meld "$HOME/$f" "$unencrypted_f"
+        meld "$HOME/$f" "$temp_f"
     fi
-    shred -u -n 19 "$unencrypted_f"
+    shred -u -n 19 "$temp_f"
     set -e
 done
 
