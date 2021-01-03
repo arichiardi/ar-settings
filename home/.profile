@@ -4,8 +4,15 @@ export GTK2_RC_FILES="$HOME/.gtkrc-2.0"
 # fix "xdg-open fork-bomb" export your preferred browser from here
 export BROWSER=/usr/bin/firefox
 
-# set PATH so it includes user's private bin directories
 PATH=$HOME/.local/bin:$PATH
+
+export MANPATH=$MANPATH:/home/kapitan/.local/share/man
+
+source /usr/share/nvm/init-nvm.sh
+
+export PATH="$HOME/.cask/bin:$PATH"
+
+export PATH="$GOPATH/bin:$PATH"
 
 # gpg-agent - duplicated from .bashrc because we need it in Emacs.
 # https://wiki.archlinux.org/index.php/GnuPG#SSH_agent
