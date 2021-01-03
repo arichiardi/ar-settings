@@ -154,7 +154,6 @@ export MAVEN_JMX="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.
 export CLOJURE_JAR=$HOME/.m2/repository/org/clojure/clojure/1.9.0/clojure-1.9.0.jar
 export CLOJURE_EXT=$CLOJURE_JAR
 export CLOJURE_OPTS="-Xms128M -Xmx512M -server"
-export MANPATH=$MANPATH:/home/kapitan/.local/share/man
 
 # Emacs default editor
 export ALTERNATE_EDITOR=""
@@ -199,26 +198,9 @@ export GTAGSLABEL=universal-ctags
 # Kubernetes
 source <(kubectl completion bash)
 
-# nvm
-source /usr/share/nvm/init-nvm.sh
-
-# sbcl
-export SBCL_HOME="$HOME/.local/lib/sbcl"
-
-# opam configuration
-test -r /home/kapitan/.opam/opam-init/init.sh && . /home/kapitan/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true
-
-export GOPATH="$HOME/go"
-
 # sdkman
 export SDKMAN_DIR="/home/kapitan/.sdkman"
 [[ -s "/home/kapitan/.sdkman/bin/sdkman-init.sh" ]] && source "/home/kapitan/.sdkman/bin/sdkman-init.sh"
-
-# cask
-export PATH="$HOME/.cask/bin:$PATH"
-
-# golang
-export PATH="$GOPATH/bin:$PATH"
 
 # docker
 function docker-network-containers {
