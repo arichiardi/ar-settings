@@ -17,7 +17,7 @@ echo -e "${LIGHT_GREEN}Installing packages...${NC}"
      pavucontrol rofi keepassxc \
      qastools scrot cmake arandr the_silver_searcher \
      yarn nvm leiningen meld \
-     docker docker-compose tree byzanz perl-image-exiftool \
+     docker docker-compose tree dsnutils byzanz perl-image-exiftool \
      rlwrap xsel xclip xorg-xfontsel xorg-xev xorg-xbacklight texinfo python-pip cryptsetup \
      colordiff texlive-latexextra kubectl hub keybase kbfs \
      keybase-gui tk jq discount)
