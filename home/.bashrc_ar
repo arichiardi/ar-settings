@@ -168,21 +168,18 @@ export XMLLINT_INDENT="  "
 export GPGKEY=81052A48
 export GPGKEYID=81052A48
 
-# Private Stuff
 . "$HOME/.bashrc_priv"
 
 # Leiningen
 export LEIN_JVM_OPTS=
-# MOVED TO /etc/bash_completion.d
-# source ~/bin/lein_completion.bash
 
 # Boot
 export BOOT_JVM_OPTIONS="-Xmx8g -client -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -Xverify:none -XX:-OmitStackTraceInFastThrow"
 export BOOT_COLOR=1
 export BOOT_GPG_COMMAND=gpg2
 
-# Docker Remote API
-# DOCKER_OPTS='-H tcp://localhost:4243 -H unix:///var/run/docker.sock'
+# nvm
+source /usr/share/nvm/init-nvm.sh
 
 # AWS completion
 complete -C '/usr/bin/aws_completer' aws

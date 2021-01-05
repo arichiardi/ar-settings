@@ -138,18 +138,5 @@ ex ()
   fi
 }
 
-# Enable gpg-agent if it is not running
-GPG_AGENT_SOCKET=$(gpgconf --list-dirs | grep agent-socket | cut -d ":" -f 2)
-if [ ! -S $GPG_AGENT_SOCKET ]; then
-  gpgconf --launch gpg-agent
-  export GPG_TTY=$(tty)
-fi
-
-# Set SSH to use gpg-agent if it is configured to do so
-GNUPGCONFIG=${GNUPGHOME:-"$HOME/.gnupg/gpg-agent.conf"}
-if grep -q enable-ssh-support "$GNUPGCONFIG"; then
-  export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
-fi
-
 # AR
 . "$HOME/.bashrc_ar"
