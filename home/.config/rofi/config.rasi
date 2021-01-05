@@ -1,0 +1,22 @@
+configuration {
+	modi: "drun,run,combi,ssh";
+	width: 50;
+	lines: 15;
+	columns: 1;
+	font: "JetBrains Mono 11";
+	bw: 1;
+	location: 0;
+	terminal: "urxvt";
+	disable-history: true;
+	case-sensitive: false;
+	sidebar-mode: false;
+	parse-known-hosts: true;
+	combi-modi: "window,file-browser";
+	tokenize: true;
+	line-margin: 2;
+	separator-style: "solid";
+	fullscreen: false;
+	fake-transparency: false;
+	color-normal: "#222d31,#d8d8d8,#222d31,#585858,#d8d8d8";
+	color-window: "#222d31,#1abb9b,#1abb9b";
+}
