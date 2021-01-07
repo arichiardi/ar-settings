@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
 
 # For skipping sections, use this trick:
@@ -8,44 +7,107 @@ set -euo pipefail
 #
 # see the brilliant answer here: https://stackoverflow.com/a/45538151
 
-LIGHT_GREEN='\033[1;32m'
-LIGHT_RED='\033[1;31m'
-NC='\033[0m' # No Color
+light_green='\033[1;32m'
+light_red='\033[1;31m'
+light_yellow='\033[1;33m'
+no_color='\033[0m'
 
-TEMP_DIR=$(mktemp -d -t "ar-settings-install-scripts.XXXXXXXXXX")
+# Helper Functions
+function echo-info  { printf "\r${light_green} %s${no_color}\n" "$*"; }
+function echo-warn  { printf "\r${light_yellow} %s${no_color}\n" "$*"; }
+function echo-skip  { printf "\r${light_yellow} %s${no_color}\n" "$*"; }
+function echo-ok    { printf "\r${light_green} %s${no_color}\n" "$*"; }
+function echo-fail  { printf "\r${light_red} %s${no_color}\n" "$*"; }
 
-echo -e "${LIGHT_GREEN}Installing Clojure CLI...${NC}"
-curl -fsSLoO https://download.clojure.org/install/linux-install-1.10.1.708 > $TEMP_DIR/clojure-linux-install.sh \
-    && chmod +x $TEMP_DIR/clojure-linux-install.sh
-./$TEMP_DIR/clojure-linux-install.sh --prefix=.local
+function installing  { echo-info "Installing $1..."; }
+function installnote { echo-info "   $1"; }
+function skipping    { echo-skip "   already installed; skipping."; }
+function success     { echo-ok   "   success!"; }
 
-echo -e "${LIGHT_GREEN}Installing diff-so-fancy...${NC}"
-curl -fsSLoO https://raw.githubusercontent.com/so-fancy/diff-so-fancy/master/third_party/build_fatpack/diff-so-fancy > $HOME/bin/diff-so-fancy \
-    && chmod +x $HOME/bin/diff-so-fancy
+tmpdir=$(mktemp -d -t "ar-settings-install-scripts.XXXXXXXXXX")
+bindir=$(systemd-path user-binaries)
+target_arch=linux-amd64
 
-echo -e "${LIGHT_GREEN}Installing nvm (Node Version Manager)...${NC}"
-curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh | bash
-NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+function latest_releases {
+  local github_coords="$1"
+  curl -sL "https://api.github.com/repos/$github_coords/releases/latest"
+}
 
-echo -e "${LIGHT_RED}Installing Node.js...${NC}"
-nvm install --lts && nvm use node
+function maybe_install_sdkman {
+  installing "sdkman"
+  if [ -d "$SDKMAN_DIR" ]; then
+    skipping
+  else
+    curl -sfL "https://get.sdkman.io" | bash
+    success
+  fi
+}
 
-echo -e "${LIGHT_GREEN}Installing bash completions...${NC}"
-echo -e "  ${LIGHT_GREEN}docker-compose completions...${NC}"
-curl -o- https://raw.githubusercontent.com/docker/compose/$(docker-compose version --short)/contrib/completion/bash/docker-compose > $TEMP_DIR/docker-compose
-sudo cp -iv --no-preserve=mode,ownership $TEMP_DIR/docker-compose /etc/bash_completion.d/docker-compose
-rm -fv $TEMP_DIR/docker-compose
+function safe_sdk {
+  local args="$@"
+  set +u
+  source $SDKMAN_DIR/bin/sdkman-init.sh
+  eval sdk $args
+  set -u
+}
 
-# https://www.quicklisp.org/beta/#installation
-echo -e "${LIGHT_GREEN}Installing quicklisp...${NC}"
-pushd $TEMP_DIR
-gpg --keyserver pool.sks-keyservers.net --receive-keys "0x307965AB028B5FF7" \
-    && curl -OL https://beta.quicklisp.org/quicklisp.lisp \
-    && curl -OL https://beta.quicklisp.org/quicklisp.lisp.asc \
-    && gpg --verify quicklisp.lisp.asc quicklisp.lisp
-popd
+function safe_nvm {
+  local args="$@"
+  set +u
+  export NVM_DIR="$HOME/.nvm"
+  source "$NVM_DIR/nvm.sh"
+  eval nvm $args
+  set -u
+}
 
-echo -e "${LIGHT_GREEN}Installing eldev...${NC}"
-curl -o- -fsSL https://raw.github.com/doublep/eldev/master/bin/eldev > $HOME/bin/eldev \
-    && chmod a+x $HOME/bin/eldev
+installing "clojure"
+if command -v clojure >/dev/null 2>&1; then
+  skipping
+else
+  installer_name=linux-install-1.10.1.763.sh
+  pushd $tmpdir >/dev/null
+
+  curl -fsSLO https://download.clojure.org/install/$installer_name \
+      && chmod u+x $tmpdir/$installer_name
+  $tmpdir/$installer_name --prefix "$HOME/.local"
+
+  popd >/dev/null
+  success
+fi
+
+# Node
+installing "node"
+if [ -n $NVM_DIR ] && [ -d $NVM_DIR ]; then
+  skipping
+else
+  latest_tag=$(latest_releases creationix/nvm | grep -Po '"tag_name": "\K.*?(?=")')
+  curl -fs -o- "https://raw.githubusercontent.com/creationix/nvm/$latest_tag/install.sh" | bash
+
+  export NVM_DIR="$HOME/.nvm"
+  source "$NVM_DIR/nvm.sh"
+  # Install current and future LTS versions
+  safe_nvm install --lts=*
+
+  # But set current to default and use current
+  safe_nvm alias default lts/*
+  safe_nvm use default
+  success
+fi
+
+installing "bash completions"
+installnote "docker-compose completions"
+if [ -f /etc/bash_completion.d/docker-compose ]; then
+    skipping
+else
+    curl -o- https://raw.githubusercontent.com/docker/compose/$(docker-compose version --short)/contrib/completion/bash/docker-compose > $tmpdir/docker-compose
+    sudo cp --no-preserve=mode,ownership $tmpdir/docker-compose /etc/bash_completion.d/docker-compose
+    success
+fi
+
+if command -v eldev >/dev/null 2>&1; then
+    skipping
+else
+    curl -o- -fsSL https://raw.github.com/doublep/eldev/master/bin/eldev > $bindir/eldev \
+        && chmod u+x $bindir/eldev
+    success
+fi
