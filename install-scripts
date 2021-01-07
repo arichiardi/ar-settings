@@ -14,16 +14,6 @@ NC='\033[0m' # No Color
 
 TEMP_DIR=$(mktemp -d -t "ar-settings-install-scripts.XXXXXXXXXX")
 
-# Cask is in AUR
-# echo -e "${LIGHT_GREEN}Installing cask...${NC}"
-# curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python
-# ln -si $HOME/.cask/bin/cask $HOME/bin/cask
-
-# Leiningen is in AUR
-# echo -e "${LIGHT_GREEN}Installing leiningen...${NC}"
-# curl -o- https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein > $HOME/bin/lein \
-#    && chmod +x $HOME/bin/lein
-
 echo -e "${LIGHT_GREEN}Installing Clojure CLI...${NC}"
 curl -fsSLoO https://download.clojure.org/install/linux-install-1.10.1.708 > $TEMP_DIR/clojure-linux-install.sh \
     && chmod +x $TEMP_DIR/clojure-linux-install.sh
@@ -41,35 +31,11 @@ NVM_DIR="$HOME/.nvm"
 echo -e "${LIGHT_RED}Installing Node.js...${NC}"
 nvm install --lts && nvm use node
 
-echo -e "${LIGHT_RED}Installing bash completions...${NC}"
+echo -e "${LIGHT_GREEN}Installing bash completions...${NC}"
+echo -e "  ${LIGHT_GREEN}docker-compose completions...${NC}"
 curl -o- https://raw.githubusercontent.com/docker/compose/$(docker-compose version --short)/contrib/completion/bash/docker-compose > $TEMP_DIR/docker-compose
 sudo cp -iv --no-preserve=mode,ownership $TEMP_DIR/docker-compose /etc/bash_completion.d/docker-compose
 rm -fv $TEMP_DIR/docker-compose
-
-curl -o- https://raw.githubusercontent.com/technomancy/leiningen/master/bash_completion.bash > $TEMP_DIR/lein-completion.bash
-sudo cp -iv --no-preserve=mode,ownership $TEMP_DIR/lein-completion.bash /etc/bash_completion.d/lein
-rm -fv $TEMP_DIR/lein
-
-curl -o- https://raw.githubusercontent.com/creationix/nvm/master/bash_completion > $TEMP_DIR/nvm-completion.bash
-sudo cp -iv --no-preserve=mode,ownership $TEMP_DIR/nvm-completion.bash /etc/bash_completion.d/nvm
-rm -fv $TEMP_DIR/nvm
-
-npm completion > $TEMP_DIR/npm-completion.bash
-sudo cp -iv --no-preserve=mode,ownership $TEMP_DIR/npm-completion.bash /etc/bash_completion.d/npm
-rm -fv $TEMP_DIR/npm
-
-curl -o- https://raw.githubusercontent.com/github/hub/master/etc/hub.bash_completion.sh > $TEMP_DIR/hub-completion.bash
-sudo cp -iv --no-preserve=mode,ownership $TEMP_DIR/hub-completion.bash /etc/bash_completion.d/hub
-rm -fv $TEMP_DIR/hub
-
-echo -e "${LIGHT_GREEN}Installing hub...${NC}"
-hub_version=2.14.2
-pushd $TEMP_DIR
-curl -OL https://github.com/github/hub/releases/download/v$hub_version/hub-linux-amd64-$hub_version.tgz \
-    && mkdir hub-deflated \
-    && tar -C hub-deflated --strip-components=1 -xvzf hub-linux-amd64-$hub_version.tgz \
-    && prefix="$HOME/.local" ./hub-deflated/install
-popd
 
 # https://www.quicklisp.org/beta/#installation
 echo -e "${LIGHT_GREEN}Installing quicklisp...${NC}"
