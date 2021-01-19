@@ -111,3 +111,32 @@ else
         && chmod u+x $bindir/eldev
     success
 fi
+
+installing "intellij idea community edition"
+if command -v idea.sh >/dev/null 2>&1; then
+  skipping
+else
+  pushd $tmpdir >/dev/null
+
+  curl -fsSL -o- "https://download.jetbrains.com/product?platform=linux&code=IIC&latest" > idea.tar.gz
+  tar -xvzf idea.tar.gz -C $xdg_data_home_dir >/dev/null
+  idea_dir=$(find $xdg_data_home_dir -type d -name 'idea*')
+
+  if [ ! -d "$idea_dir" ]; then
+    echo-fail "Cannot retrieve idea local dir. This is likely a bug."
+  else
+    ln -s "$idea_dir/bin/idea.sh" $bindir/idea.sh
+    mkdir -p $xdg_data_home_dir/applications
+
+    cat << END > $xdg_data_home_dir/applications/idea.desktop
+[Desktop Entry]
+Type=Application
+Terminal=false
+Exec=$idea_dir/bin/idea.sh
+Name=IntelliJ IDEA CE
+Icon=$idea_dir/bin/idea.png
+END
+  fi
+
+  popd
+fi
