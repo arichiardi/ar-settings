@@ -9,13 +9,23 @@ if [ -z $main_id ]; then
     exit 1
 fi
 
+# 23-01-2021 - New variables and overrides cause I want to try HiDPI settings with my 4K.
+framebuffer_dpi=192
+main_resolution=1920x1080
+main_scale=2x2
+main_position=5760x0
+external_id=DP1
+external_resolution=3840x2160
+external_scale=1.5x1.5
+
 main_xrandr=$(xrandr --query | grep -E "$main_id"'-?[0-9]* connected' | sed -e "s/[[:blank:]]primary//")
 main_name=$(echo "$main_xrandr" | awk -F '[ x+]' '/\<connected\>/{print $1}')
-main_width=$(echo "$main_xrandr" | awk -F '[ x+]' '/\<connected\>/{print $3}')
-main_height=$(echo "$main_xrandr" | awk -F '[ x+]' '/\<connected\>/{print $4}')
-main_resolution=$main_width"x"$main_height
 
-external_id=DP1
+if [[ ! "$main_resolution" =~ [0-9]+[xX]{1}[0-9]+ ]]; then
+    main_width=$(echo "$main_xrandr" | awk -F '[ x+]' '/\<connected\>/{print $3}')
+    main_height=$(echo "$main_xrandr" | awk -F '[ x+]' '/\<connected\>/{print $4}')
+    main_resolution=$main_width"x"$main_height
+fi
 
 # detecting external monitors
 set +e
@@ -27,12 +37,11 @@ if [ -z "$external_name" ]; then
     external_name=$(xrandr --query | grep -E "^HDMI-?[0-9]* connected" | sed -e "s/\([A-Z0-9]\+\) connected.*/\1/")
     set -e
 fi
+
 if [ -z "$external_name" ]; then
     echo "Failed: cannot find external monitors."
     exit 1
 fi
-
-external_resolution=
 
 # grepping the list of resolutions for the highest resolution
 if [[ ! "$external_resolution" =~ [0-9]+[xX]{1}[0-9]+ ]]; then
@@ -54,8 +63,8 @@ if [[ ! "$external_resolution" =~ ^[0-9]+[xX]{1}[0-9]+ ]]; then
     unset external_height
 fi
 
-# has to be specified
-if [[ ! "$external_resolution" =~ ^[0-9]+[xX]{1}[0-9]+$ ]]; then
+# has to be width x height if specified
+if [[ -n "$external_resolution" && ! "$external_resolution" =~ ^[0-9]+[xX]{1}[0-9]+$ ]]; then
    echo "Failed: resolution has to be \"width\"x\"height\" (was $external_resolution)".
    exit 1
 fi
@@ -63,18 +72,20 @@ fi
 external_width=$(echo "$external_resolution" | awk -F 'x' '{print $1}')
 external_height=$(echo "$external_resolution" | awk -F 'x' '{print $2}')
 
-external_position="0x0"
-main_position=$external_width"x0"
+external_position=0x0
+if [[ -z $main_position ]]; then
+    main_position="$external_width"x0
+fi
 
-# The blank space, which is part of the IFS shell variable, is used by default
-# in arrays assignment. external_name will contain a space separated list that we
-# convert to array.
+# The blank space, which is part of the IFS shell variable, is used by default in arrays
+# assignment. external_name will contain a space separated list that we convert to array.
 declare -a external_array
 external_array=($external_name)
 
-cmd="xrandr --output ${external_array[0]} --mode $external_resolution --pos $external_position --rotate normal \
- --output $main_name --primary --mode $main_resolution --pos $main_position --rotate normal \
- --output VIRTUAL1 --off"
+cmd="xrandr --dpi $framebuffer_dpi \
+--output $main_name --mode $main_resolution --scale $main_scale --pos $main_position --rotate normal \
+--output ${external_array[0]} --primary --mode $external_resolution --scale $external_scale --pos $external_position --rotate normal \
+--output VIRTUAL1 --off"
 
 set +e
 eval $cmd
