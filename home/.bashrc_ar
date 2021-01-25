@@ -157,9 +157,9 @@ export CLOJURE_OPTS="-Xms128M -Xmx512M -server"
 
 # Emacs default editor
 export ALTERNATE_EDITOR=""
-export EDITOR="$HOME/bin/emacsclient-daemon.sh -nw"
-export VISUAL="$HOME/bin/emacsclient-daemon.sh -c"
-export EA_EDITOR="$HOME/bin/emacsclient-daemon.sh -c"
+export EDITOR="emacsclient-daemon.sh -nw"
+export VISUAL="emacsclient-daemon.sh -c"
+export EA_EDITOR="emacsclient-daemon.sh -c"
 
 # Misc
 export XMLLINT_INDENT="  "
