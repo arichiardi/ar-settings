@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+light_green='\033[1;32m'
+light_red='\033[1;31m'
+light_yellow='\033[1;33m'
+no_color='\033[0m'
+
+# Helper Functions
+function echo-info  { printf "\r${light_green} %s${no_color}\n" "$*"; }
+function echo-warn  { printf "\r${light_yellow} %s${no_color}\n" "$*"; }
+function echo-skip  { printf "\r${light_yellow} %s${no_color}\n" "$*"; }
+function echo-ok    { printf "\r${light_green} %s${no_color}\n" "$*"; }
+function echo-fail  { printf "\r${light_red} %s${no_color}\n" "$*"; }
+
+function installing  { echo-info "Installing $1..."; }
+function installnote { echo-info "   $1"; }
+function skipping    { echo-skip "   already installed; skipping."; }
+function success     { echo-ok   "   success!"; }
+
+function latest_releases {
+  local github_coords="$1"
+  curl -sL "https://api.github.com/repos/$github_coords/releases/latest"
+}
+
+temp_dir=$(mktemp -d -t "ar-init-tarsnap.XXXXXXXXXX")
+rootbindir=/usr/local/bin
+secret_bin=$(pwd)/home/.local/bin/secret
+secrets_dir=$(pwd)/secrets
+tarsnap_dir=/var/lib/tarsnap
+
+installing "acts"
+if command -v acts >/dev/null 2>&1; then
+  skipping
+else
+  github_coordinates=alexjurkiewicz/acts
+  latest_tarball=$(latest_releases $github_coordinates | grep -Po '"tarball_url": "\K.*?(?=")')
+
+  pushd $tmpdir >/dev/null
+  curl -fsSL -o- "$latest_tarball" > acts.tar.gz
+  tar -xvzf acts.tar.gz >/dev/null
+
+  acts_binary="$(find . -type f -name acts)"
+  chmod u+x $acts_binary
+  sudo mv $acts_binary $rootbindir
+  popd >/dev/null
+  success
+fi
+
+installing "tarsnap"
+if command -v tarsnap >/dev/null 2>&1; then
+    skipping
+else
+    sudo pamac install tarsnap
+    sudo mkdir -p $tarsnap_dir/cache
+    sudo mkdir -p /etc/tarsnap
+    success
+fi
+
+for f in $(find "$secrets_dir" -type f -and -name 'tarsnap*.enc'); do
+    encrypted_f=$(readlink -f "$f")
+    filename="$(basename "$f")"
+
+    installing "tarsnap key $filename"
+    temp_f="$temp_dir/${filename%.enc}"
+    root_f="/root/${filename%.enc}"
+
+    if [ -f $root_f ]; then
+        skipping
+    else
+        $secret_bin -r -s "$encrypted_f" -d "$temp_f"
+        sudo mv -iv "$temp_f" "$root_f"
+        sudo chmod 600 "$root_f"
+        success
+    fi
+done
+
+installing "tarsnap configuration"
+tarsnap_conf_path=/etc/tarsnap/tarsnap.conf
+
+if [ -f $tarsnap_conf_path ]; then
+    skipping
+else
+    temp_file="$temp_dir/tarsnap.conf"
+    $secret_bin -r -s etc/tarsnap/tarsnap.conf.enc -d $temp_file
+    sudo mv -i $temp_file $tarsnap_conf_path
+    shred -u -n 19 $temp_file
+    success
+fi
+
+installing "acts configuration"
+acts_conf_path=/etc/acts.conf
+
+if [ -f $acts_conf_path ]; then
+    skipping
+else
+    sudo cp -i etc/acts.conf $acts_conf_path
+    success
+fi
+
+installing "root crontab"
+sudo crontab -u root root/crontab.txt
+success

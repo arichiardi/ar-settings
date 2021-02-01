@@ -26,6 +26,7 @@ function success     { echo-ok   "   success!"; }
 
 tmpdir=$(mktemp -d -t "ar-settings-install-scripts.XXXXXXXXXX")
 bindir=$(systemd-path user-binaries)
+
 target_arch=linux-amd64
 
 function latest_releases {
@@ -80,8 +81,9 @@ installing "node"
 if [ -n $NVM_DIR ] && [ -d $NVM_DIR ]; then
   skipping
 else
-  latest_tag=$(latest_releases creationix/nvm | grep -Po '"tag_name": "\K.*?(?=")')
-  curl -fs -o- "https://raw.githubusercontent.com/creationix/nvm/$latest_tag/install.sh" | bash
+  github_coordinates=creationix/nvm
+  latest_tag=$(latest_releases $github_coordinates | grep -Po '"tag_name": "\K.*?(?=")')
+  curl -fs -o- "https://raw.githubusercontent.com/$github_coordinates/$latest_tag/install.sh" | bash
 
   export NVM_DIR="$HOME/.nvm"
   source "$NVM_DIR/nvm.sh"
