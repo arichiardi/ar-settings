@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+tmp_dir="${TMPDIR:=/tmp}/download-passwd-s3fs-$(date --iso-8601=s)"
+mkdir -p $tmp_dir || exit 66
+
+tmp_file="$tmp_dir/passwd-s3fs.enc"
+
+url="https://f000.backblazeb2.com/file/secrets-f3ba7cb4/passwd-s3fs.enc"
+
+curl -fsSL -o- $url > "$tmp_file"
+
+# /root is writable within Clonezilla Live
+openssl enc -d -aes-256-cbc -pbkdf2 -in "$tmp_file" -out /root/.passwd-s3fs
