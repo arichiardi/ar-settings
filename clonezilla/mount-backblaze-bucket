@@ -2,10 +2,10 @@
 
 set -euo pipefail
 
-url=s3.us-west-000.backblazeb2.com
+url=https://s3.us-west-000.backblazeb2.com
 bucket_name=clones-wpn8au1e
 mount_point=/home/partimag
 
 set +x
-s3fs "$bucket_name" -o url="$url" -o parallel_count=30 -o multireq_max=30
+s3fs "$bucket_name" -o url="$url" -o parallel_count=30 -o multireq_max=30 "$mount_point"
 set -x
