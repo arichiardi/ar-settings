@@ -57,7 +57,7 @@ bindsym XF86MonBrightnessUp exec "xbacklight -inc 10; notify-send 'brightness up
 bindsym XF86MonBrightnessDown exec "xbacklight -dec 10; notify-send 'brightness down'"
 
 # Start Applications
-bindsym $mod+Ctrl+b exec terminal -e 'bmenu'
+# bindsym $mod+Ctrl+b exec terminal -e 'bmenu'
 # bindsym $mod+F2 exec palemoon
 # bindsym $mod+F3 exec pcmanfm
 # bindsym $mod+F3 exec ranger
@@ -130,11 +130,11 @@ bindsym $mod+a focus parent
 # bindsym $mod+Shift+a focus child
 
 # move the currently focused window to the scratchpad
-bindsym $mod+Shift+minus move scratchpad
+bindsym $mod+Shift+backslash move scratchpad
 
 # Show the next scratchpad window or hide the focused scratchpad window.
 # If there are multiple scratchpad windows, this command cycles through them.
-bindsym $mod+minus scratchpad show
+bindsym $mod+backslash scratchpad show
 
 #navigate workspaces next / previous
 bindsym $mod+Ctrl+Right workspace next
@@ -146,7 +146,7 @@ bindsym $mod+Ctrl+Left workspace prev
 #                 set $ws2 2:
 set $ws1 1
 set $ws2 2
-set $ws3 3
+set $ws3 3:♥
 set $ws4 4
 set $ws5 5
 set $ws6 6
@@ -258,8 +258,8 @@ mode "$mode_system" {
 }
 
 # Resize window (you can also use the mouse for that)
-bindsym $mod+Mod1+r mode "resize"
-mode "resize" {
+set $mode_resize use arrows to resize (Esc to exit)
+mode "$mode_resize" {
         # These bindings trigger as soon as you enter the resize mode
         # Pressing left will shrink the window’s width.
         # Pressing right will grow the window’s width.
@@ -280,6 +280,7 @@ mode "resize" {
         bindsym Return mode "default"
         bindsym Escape mode "default"
 }
+bindsym $mod+Mod1+r mode "$mode_resize"
 
 # Lock screen
 bindsym Mod4+Mod1+l exec --no-startup-id blurlock
@@ -336,13 +337,13 @@ bar {
 	status_command i3status
 	position bottom
 
-## please set your primary output first. Example: 'xrandr --output eDP1 --primary'
-#	tray_output primary
-#	tray_output eDP1
+    # please set your primary output first. Example: 'xrandr --output eDP1 --primary'
+	tray_output primary
+	tray_output e-DP1
 
 	bindsym button4 nop
 	bindsym button5 nop
-#   font xft:DejaVu Sans Mono 9
+    # font xft:DejaVu Sans Mono 9
 	strip_workspace_numbers yes
 
     colors {
@@ -350,7 +351,7 @@ bar {
         statusline #F9FAF9
         separator  #454947
 
-#                      border  backgr. text
+        #                  border  backgr. text
         focused_workspace  #F9FAF9 #16a085 #292F34
         active_workspace   #595B5B #353836 #FDF6E3
         inactive_workspace #595B5B #222D31 #EEE8D5
@@ -430,15 +431,13 @@ mode "$mode_gaps_outer" {
 }
 
 # Display management
-set_from_resource $main-display-output i3wm.mainDisplayOutput eDP1
+set_from_resource $main-display-output i3wm.mainDisplayOutput e-DP1
 
-set $mode_display HDMI display (a)uto, (m)ain only, (r)ight of main, (l)eft of main, (t)wo right of main
+set $mode_display HDMI display (a)uto, (m)ain only, (r)ight of main, (l)eft of main
 mode "$mode_display" {
   bindsym a exec --no-startup-id "xrandr --auto; sleep 1; nitrogen --restore"
-  bindsym m exec --no-startup-id "main-only.sh $main-display-output; sleep 1; nitrogen --restore"
   bindsym r exec --no-startup-id "hdmi1-right-of-main.sh $main-display-output; sleep 1; nitrogen --restore"
   bindsym l exec --no-startup-id "hdmi1-left-of-main.sh $main-display-output; sleep 1; nitrogen --restore"
-  bindsym t exec --no-startup-id "hdmis-right-of-main.sh $main-display-output; sleep 1; nitrogen --restore"
 
   # back to normal: Enter or Escape
   bindsym Return mode "default"
@@ -451,7 +450,7 @@ bindsym $mod+Mod1+d mode "$mode_display"
 # Bindings
 bindsym $mod+Mod1+e exec "emacsclient-daemon.sh -c"
 bindsym $mod+Mod1+h exec "pcmanfm ~"
-bindsym $mod+Mod1+v exec "pcmanfm /tmp/vault"
+bindsym $mod+Mod1+v exec "pcmanfm /var/lib/vault/mnt/"
 bindsym $mod+Mod1+p exec "keepassxc"
 bindsym $mod+F4 exec "rhythmbox-client --play-pause"
 bindsym $mod+F5 exec "rhythmbox-client --next"
@@ -470,4 +469,4 @@ bindsym XF86AudioMicMute exec mute-mic
 exec --no-startup-id i3-battery-popup -n -m 'Battery level is getting low' -i /usr/share/icons/Vibrancy-Colors/status/scalable/battery-low-symbolic.svg
 
 # Display
-exec --no-startup-id "hdmis-right-of-main.sh $main-display-output; sleep 1; nitrogen --restore"
+exec --no-startup-id "hdmi1-left-of-main.sh $main-display-output; sleep 1; nitrogen --restore"
