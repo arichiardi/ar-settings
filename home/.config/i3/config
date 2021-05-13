@@ -470,3 +470,30 @@ exec --no-startup-id i3-battery-popup -n -m 'Battery level is getting low' -i /u
 
 # Display
 exec --no-startup-id "hdmi1-left-of-main.sh $main-display-output; sleep 1; nitrogen --restore"
+
+# Cohesic
+assign [class="^URxvt$" title="^cohesic-app"] $ws3
+assign [class="^Chromium$" window_role="browser" title="^cardioDI"] $ws3
+
+assign [class="^URxvt$" title="^cohesic-sql"] $ws10
+assign [class="^URxvt$" title="^cohesic-api"] $ws10
+assign [class="^URxvt$" title="^cohesic-web"] $ws10
+assign [class="^URxvt$" title="^cohesic-report"] $ws10
+assign [class="^URxvt$" title="^cohesic-doc"] $ws10
+assign [class="^URxvt$" title="^cohesic-sql-reset"] $ws10
+
+set $mode_cardiodi Start (s)ql, (l)egacy api, (w)eb, (a)ppserver, (r)eport, (d)ocumentation, (Shift+R)eset database
+mode "$mode_cardiodi" {
+        bindsym a exec --no-startup-id "urxvt -ls -hold -title cohesic-app -cd $HOME/git/cohesic/acuity -e sh -c 'bash -i $(pwd)/scripts/start-services.sh appserver'"
+        bindsym s exec --no-startup-id "urxvt -ls -hold -title cohesic-sql -cd $HOME/git/cohesic/acuity -e sh -c 'bash -i $(pwd)/scripts/start-services.sh sql'"
+        bindsym l exec --no-startup-id "urxvt -ls -hold -title cohesic-api -cd $HOME/git/cohesic/acuity -e sh -c 'bash -i $(pwd)/scripts/start-services.sh api'"
+        bindsym w exec --no-startup-id "urxvt -ls -hold -title cohesic-web -cd $HOME/git/cohesic/acuity -e sh -c 'bash -i $(pwd)/scripts/start-services.sh web'"
+        bindsym r exec --no-startup-id "urxvt -ls -hold -title cohesic-report -cd $HOME/git/cohesic/acuity -e sh -c 'bash -i $(pwd)/scripts/start-services.sh report'"
+        bindsym d exec --no-startup-id "urxvt -ls -hold -title cohesic-doc -cd $HOME/git/docs-internal-site -e bash -i -c 'env PLAYBOOK_FILENAME=local-antora-playbook.yml make serve'"
+        bindsym Shift+r exec --no-startup-id "urxvt -ls -hold -title cohesic-sql-reset -cd $HOME/git/cohesic/acuity -e sh -c 'bash -i $(pwd)/scripts/start-services.sh sql --reset-db'"
+
+        # exit mode: Enter or Escape
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+}
+bindsym $mod+Mod1+i mode "$mode_cardiodi"
