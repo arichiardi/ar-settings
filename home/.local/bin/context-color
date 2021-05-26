@@ -1,0 +1,260 @@
+#!/bin/sh
+#
+# context-color
+# Copyright (C) 2018, 2019 Guillaume Gelin
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+readonly PROGNAME=$(basename "$0")
+readonly DEFAULT_CONTEXT="whoami; hostname"
+readonly DEFAULT_EXCLUDES="0,7,15"
+readonly DEFAULT_METHOD="sum"
+
+__context_color_usage() {
+    cat <<- EOF
+usage: $PROGNAME [OPTIONS]
+
+Print a color sequence based on a command output's hash.
+
+COMMON OPTIONS:
+    --help, -h          Print this help.
+    --background, -b    Use a background sequence rather than foreground.
+    --id, -i            Print the color id rather than the color sequence.
+    --prompt, -p        Declare the sequence as non-printable for prompts.
+
+    --context <command>, -c <command>
+                        Define the context command on which result the color
+                        will be generated.
+                        The default context is "$DEFAULT_CONTEXT".
+
+    --exclude <colors>, -e <colors>
+                        Comma separated list of color ids not to be used.
+                        Multiple --exclude/-e arguments can be specified.
+                        The default excluded colors are: "$DEFAULT_EXCLUDES"
+
+    --method <method>, -m <method>
+                        Choose which hashing method to use. "sum" will tend to
+                        give adjacent colors for adjacent context outputs.
+                        "md5sum" will give more randomization on colors.
+                        The default method is: "$DEFAULT_METHOD"
+
+DEBUG OPTIONS:
+    --debug, -d         Output the sequence as a human-readable string and more
+                        useful information.
+    --force <color>, -f <color>
+                        Ignore the context and force a color id instead.
+EOF
+}
+
+__context_color_debug() {
+    sequence="$(__context_color_sequence)"
+    cat <<- EOF
+Setup:
+    Background mode: ${CC_BACKGROUND}
+    Id mode: ${CC_ID}
+    Prompt mode: ${CC_PROMPT}
+    Context command: ${CC_CONTEXT}
+    Excluded color ids: ${CC_EXCLUDES}
+    Method: ${CC_METHOD}
+    Forced color id: ${CC_FORCE_COLOR}
+
+Colors:
+    Terminfo: $(__context_color_terminfo_count)
+    Excluded: $(__context_color_excludes_count)
+    Included: $(__context_color_count)
+
+Output:
+    Context hash: $(__context_color_hash)
+    Color id: $(__context_color_id)
+    Sequence: ${sequence}$(echo "$sequence" | cat -v)$(tput sgr0)
+EOF
+}
+
+__context_color_terminfo_count() {
+    hexcount=$(infocmp -1 | sed -n -e 's/^\t*colors#\([0-9]x\?[0-9]*\),.*/\1/p')
+    printf "%d" "$hexcount"
+}
+
+__context_color_excludes_count() {
+    echo "$CC_EXCLUDES" | tr "," '\n' | wc -l
+}
+
+__context_color_count(){
+    echo $(( $(__context_color_terminfo_count) - $(__context_color_excludes_count) ))
+}
+
+__context_color_hash() {
+    if [ "$CC_METHOD" = "md5sum" ]
+    then
+        hash=$(eval "$CC_CONTEXT" | md5sum | head -c 6 | tr '[:lower:]' '[:upper:]')
+        printf "%d\n" "0x$hash"
+    else
+        hash=$(eval "$CC_CONTEXT" | sum | cut -d' ' -f1)
+        printf "%.0f\n" "$hash"
+    fi
+}
+
+__context_color_id() {
+    if [ -n "$CC_FORCE_COLOR" ]
+    then
+        id="$CC_FORCE_COLOR"
+    else
+        id=$(( $(__context_color_hash) % ($(__context_color_count) - 1) ))
+    fi
+
+    for excluded_id in $(echo "$CC_EXCLUDES" | tr ", " '\n')
+    do
+        if [ "$id" -ge "$excluded_id" ]
+        then
+            id=$((id + 1))
+        fi
+    done
+    echo "$id"
+}
+
+__context_color_sequence() {
+    if [ -n "$CC_BACKGROUND" ]
+    then
+        capname="setab"
+    else
+        capname="setaf"
+    fi
+
+    sequence="$(tput $capname "$(__context_color_id)")"
+
+    if [ -n "$CC_PROMPT" ]
+    then
+        sequence="\\[${sequence}\\]"
+    fi
+    printf "%s" "$sequence"
+}
+
+context_color() {
+    for arg
+    do
+        case "$arg" in
+            --help)
+                args="${args}-h "
+                ;;
+            --background)
+                args="${args}-b "
+                ;;
+            --id)
+                args="${args}-i "
+                ;;
+            --prompt)
+                args="${args}-p "
+                ;;
+            --context)
+                args="${args}-c "
+                ;;
+            --debug)
+                args="${args}-d "
+                ;;
+            --force)
+                args="${args}-f "
+                ;;
+            --exclude)
+                args="${args}-e "
+                ;;
+            --method)
+                args="${args}-m "
+                ;;
+            *)
+                args="$args \"$arg\" "
+                ;;
+        esac
+    done
+
+    eval set -- "$args"
+
+    while getopts "hbipc:e:m:df:" OPTION
+    do
+         case $OPTION in
+         h)
+             __context_color_usage
+             exit 0
+             ;;
+         b)
+             readonly CC_BACKGROUND=1
+             ;;
+         i)
+             readonly CC_ID=1
+             ;;
+         p)
+             readonly CC_PROMPT=1
+             ;;
+         c)
+             CC_CONTEXT="$OPTARG"
+             ;;
+         e)
+             for arg in $(echo "$OPTARG" | tr "," '\n')
+             do
+                 if ! { [ "$arg" -le "$(__context_color_terminfo_count)" ] &&
+                            [ "$arg" -ge "0" ]; } 2> /dev/null
+                 then
+                     >&2 echo "Invalid color id: $arg"
+                     return 1
+                 fi
+
+                 if [ -z "$CC_EXCLUDES" ]
+                 then
+                     CC_EXCLUDES="$arg"
+                 elif ! (echo "$CC_EXCLUDES" | tr ", " '\n' | grep -qw "$arg")
+                 then
+                     CC_EXCLUDES="$CC_EXCLUDES, $arg"
+                 fi
+             done
+             ;;
+         m)
+             CC_METHOD="$OPTARG"
+             ;;
+         d)
+             readonly CC_DEBUG=1
+             ;;
+         f)
+             readonly CC_FORCE_COLOR="$OPTARG"
+             ;;
+         *)
+             __context_color_usage
+             exit 1
+         esac
+    done
+
+    if [ -z "$CC_CONTEXT" ]
+    then
+        CC_CONTEXT="$DEFAULT_CONTEXT"
+    fi
+    if [ -z "$CC_EXCLUDES" ]
+    then
+        CC_EXCLUDES="$DEFAULT_EXCLUDES"
+    fi
+    if [ -z "$CC_METHOD" ]
+    then
+        CC_METHOD="$DEFAULT_METHOD"
+    fi
+
+    if [ -n "$CC_DEBUG" ]
+    then
+        __context_color_debug
+    elif [ -n "$CC_ID" ]
+    then
+        __context_color_id
+    else
+        __context_color_sequence
+    fi
+    return 0
+}
+
+context_color "$@"

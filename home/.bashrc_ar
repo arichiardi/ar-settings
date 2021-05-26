@@ -1,4 +1,5 @@
-# Git Prompt
+# Custom .bashrc on top of the distro one
+
 source "/usr/share/git/completion/git-prompt.sh"
 
 GIT_PS1_SHOWUPSTREAM="verbose"
@@ -46,53 +47,45 @@ use_color=$(detect_color_support)
 NC=`tput sgr0`
 BOLD=`tput bold`
 BLUE=`tput setaf 4`
-GRAY_BACKGROUND=`tput setab 7`
 
-# we mark with a different color if we are running from a
-REMOTE_COLOR=
-if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
-    if [ "$use_color" == true ]; then
-        REMOTE_COLOR="$GRAY_BACKGROUND"
-    fi
+CC_EXCLUDED="0,7,15,17"
+PS1_COLORED_AT='@'
+PS1_COLORED_HOST='\h'
+
+if [[ "$use_color" == "true" ]] && [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
+    PS1_COLORED_HOST='$(context-color --background --exclude $CC_EXCLUDED --context "hostname")\h\[$NC\]'
+else
+    PS1_COLORED_AT='$(context-color --exclude $CC_EXCLUDED)@\[$NC\]'
 fi
 
 PROMPT_COMMAND=
 if ${use_color} ; then
    GIT_PS1_SHOWCOLORHINTS=1
-   PROMPT_COMMAND='__git_ps1 "$REMOTE_COLOR${debian_chroot:+($debian_chroot)}\[$BOLD\]\u@\h\[$NC\] \[$BLUE\]\w\[$NC\]" "\\$ "'
+   PROMPT_COMMAND='__git_ps1 "${debian_chroot:+($debian_chroot)}\[$BOLD\]\u$PS1_COLORED_AT$PS1_COLORED_HOST \[$BLUE\]\w\[$NC\]" "\\$ "'
 else
-   PROMPT_COMMAND='__git_ps1 "$REMOTE_COLOR${debian_chroot:+($debian_chroot)}\u@\h \w" "\\$ "'
-fi
-
-PS1_TAIL='$(__git_ps1 " (%s)")\$ '
-
-if ${use_color} ; then
-    PS1='$REMOTE_COLOR${debian_chroot:+($debian_chroot)}\[$BOLD\]\u@\h\[$NC\]:\[$BLUE\]\w\[$NC\]'$PS1_TAIL
-else
-    PS1='$REMOTE_COLOR${debian_chroot:+($debian_chroot)}\u@\h:\w'$PS1_TAIL
+   PROMPT_COMMAND='__git_ps1 "${debian_chroot:+($debian_chroot)}\u@\h \w" "\\$ "'
 fi
 
 # From https://superuser.com/questions/509950/why-are-unicode-characters-not-rendering-correctly
-LANG=en_US.UTF-8
-LC_CTYPE="en_US.UTF-8"
-LC_NUMERIC="en_US.UTF-8"
-LC_TIME="en_US.UTF-8"
-LC_COLLATE="en_US.UTF-8"
-LC_MONETARY="en_US.UTF-8"
-LC_MESSAGES="en_US.UTF-8"
-LC_PAPER="en_US.UTF-8"
-LC_NAME="en_US.UTF-8"
-LC_ADDRESS="en_US.UTF-8"
-LC_TELEPHONE="en_US.UTF-8"
-LC_MEASUREMENT="en_US.UTF-8"
-LC_IDENTIFICATION="en_US.UTF-8"
-LC_ALL=en_US.UTF-8
+LANG=en_CA.UTF-8
+LC_CTYPE="en_CA.UTF-8"
+LC_NUMERIC="en_CA.UTF-8"
+LC_TIME="en_CA.UTF-8"
+LC_COLLATE="en_CA.UTF-8"
+LC_MONETARY="en_CA.UTF-8"
+LC_MESSAGES="en_CA.UTF-8"
+LC_PAPER="en_CA.UTF-8"
+LC_NAME="en_CA.UTF-8"
+LC_ADDRESS="en_CA.UTF-8"
+LC_TELEPHONE="en_CA.UTF-8"
+LC_MEASUREMENT="en_CA.UTF-8"
+LC_IDENTIFICATION="en_CA.UTF-8"
+LC_ALL=en_CA.UTF-8
 
 # Alias definitions.
 # You may want to put all your additions into a separate file like
 # ~/.bash_aliases, instead of adding them here directly.
 # See /usr/share/doc/bash-doc/examples in the bash-doc package.
-
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
@@ -178,12 +171,6 @@ export BOOT_JVM_OPTIONS="-Xmx8g -client -XX:+TieredCompilation -XX:TieredStopAtL
 export BOOT_COLOR=1
 export BOOT_GPG_COMMAND=gpg2
 
-# nvm
-source /usr/share/nvm/init-nvm.sh
-
-# AWS completion
-complete -C '/usr/bin/aws_completer' aws
-
 export GIT_HOME="$HOME/git"
 
 # Custom load config
@@ -191,13 +178,6 @@ export LD_LIBRARY_PATH="$HOME/.local/lib"
 
 # Gtags & ctags
 export GTAGSLABEL=universal-ctags
-
-# Kubernetes
-source <(kubectl completion bash)
-
-# sdkman
-export SDKMAN_DIR="/home/kapitan/.sdkman"
-[[ -s "/home/kapitan/.sdkman/bin/sdkman-init.sh" ]] && source "/home/kapitan/.sdkman/bin/sdkman-init.sh"
 
 # docker
 function docker-network-containers {
