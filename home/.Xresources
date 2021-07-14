@@ -1,5 +1,6 @@
 !! see .i3/config
 ! i3wm.primaryDisplayId: the xrandr id will go here
+! i3wm.secondaryDisplayId: the xrandr id will go here
 
 !! Emacs - https://www.gnu.org/software/emacs/manual/html_node/emacs/X-Resources.html
 Emacs.menuBar:     0
