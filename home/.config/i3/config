@@ -145,7 +145,7 @@ bindsym $mod+Ctrl+Left workspace prev
 # something like: set $ws1 1:mail
 #                 set $ws2 2:
 set $ws1 1
-set $ws2 2
+set $ws2 2:✉
 set $ws3 3:♥
 set $ws4 4
 set $ws5 5
@@ -193,7 +193,7 @@ bindsym $mod+Ctrl+0 move container to workspace $ws10; workspace $ws10
 
 
 # Open applications on specific workspaces
-# assign [class="Thunderbird"] $ws1
+assign [class="Thunderbird"] $ws2
 # assign [class="Pale moon"] $ws2
 # assign [class="Pcmanfm"] $ws3
 # assign [class="Skype"] $ws5
@@ -293,12 +293,13 @@ exec --no-startup-id nm-applet
 exec --no-startup-id xfce4-power-manager
 exec --no-startup-id pamac-tray
 # exec --no-startup-id clipit
-# exec --no-startup-id blueman-applet
+exec --no-startup-id blueman-applet
 # exec_always --no-startup-id sbxkb
 exec --no-startup-id start_conky_kap
 exec --no-startup-id xautolock -time 10 -locker blurlock
 exec_always --no-startup-id ff-theme-util
 exec_always --no-startup-id fix_xcursor
+
 
 # Color palette used for the terminal ( ~/.Xresources file )
 # Colors are gathered based on the documentation:
@@ -431,13 +432,13 @@ mode "$mode_gaps_outer" {
 }
 
 # Display management
-set_from_resource $main-display-output i3wm.mainDisplayOutput e-DP1
+set_from_resource $primary-display-id i3wm.primaryDisplayId e-DP1
 
 set $mode_display HDMI display (a)uto, (m)ain only, (r)ight of main, (l)eft of main
 mode "$mode_display" {
   bindsym a exec --no-startup-id "xrandr --auto; sleep 1; nitrogen --restore"
-  bindsym r exec --no-startup-id "hdmi1-right-of-main.sh $main-display-output; sleep 1; nitrogen --restore"
-  bindsym l exec --no-startup-id "hdmi1-left-of-main.sh $main-display-output; sleep 1; nitrogen --restore"
+  bindsym r exec --no-startup-id "primary-right-of-secondary.sh $primary-display-id; sleep 1; nitrogen --restore"
+  bindsym l exec --no-startup-id "primary-left-of-secondary.sh $primary-display-id; sleep 1; nitrogen --restore"
 
   # back to normal: Enter or Escape
   bindsym Return mode "default"
@@ -469,7 +470,7 @@ bindsym XF86AudioMicMute exec mute-mic
 exec --no-startup-id i3-battery-popup -n -m 'Battery level is getting low' -i /usr/share/icons/Vibrancy-Colors/status/scalable/battery-low-symbolic.svg
 
 # Display
-exec --no-startup-id "hdmi1-left-of-main.sh $main-display-output; sleep 1; nitrogen --restore"
+exec --no-startup-id "primary-right-of-secondary.sh $primary-display-id; sleep 1; nitrogen --restore"
 
 # Cohesic
 assign [class="^URxvt$" title="^cohesic-app"] $ws3
