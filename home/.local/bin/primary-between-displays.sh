@@ -1,12 +1,12 @@
 #!/bin/bash
 
-set -xeuo pipefail
+set -euo pipefail
 scriptdir="$(cd "$(dirname "$0")"; pwd -P)"
 
 # Start
 do_usage() {
     echo
-    echo "TODO."
+    echo "Positions the primary monitor between left and right."
     echo
     echo "Usage:"
     echo " -p|--primary <xrandr id> -l|left <xrandr id> -r|--right <xrandr id>"
@@ -59,7 +59,6 @@ for id in $(xrandr --query | awk -F '[ x+]' '/\<connected\>/{print $1}' | xargs)
     connected_ids+=( $id )
 done
 
-echo "${connected_ids[@]}"
 right_connected=no
 left_connected=no
 for id in "${connected_ids[@]}"
