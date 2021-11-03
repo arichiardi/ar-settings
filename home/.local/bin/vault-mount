@@ -18,19 +18,6 @@ if [ -z "$mount_point" ]; then
     exit $error_code
 fi
 
-echo -n "Verifying digest for $loop_file..."
-pushd $(dirname $loop_file) > /dev/null
-md5sum --quiet --strict --check "$loop_file.md5"
-popd > /dev/null
-
-if [ "$?" -eq 0 ]; then
-    echo "Completed."
-else
-    error_code=66
-    echo "Failed (error: $error_code)."
-    exit $error_code
-fi
-
 dev_loop=""
 existing_loop=$(losetup -j "$loop_file")
 
