@@ -71,10 +71,6 @@ if [ "$?" = "0" ]; then
     sudo losetup -d $dev_loop
 
     if [ "$?" = "0" ]; then
-        echo -n "Generating $vault_file digest..."
-        pushd $(dirname $vault_file) > /dev/null
-        md5sum $(basename $vault_file) > $vault_file.md5
-        popd > /dev/null
         echo "Completed."
     else
         echo "Error: losetup -d exited with $?"
