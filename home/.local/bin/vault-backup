@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+vault_dir=${1:-}
+
+if [ -z "$vault_dir" ]; then
+    error_code=64
+    echo "Please pass the vault dir as first parameter (error: $error_code)"
+    exit $error_code
+fi
+
+dest_bucket=secrets-f3ba7cb4
+
+vault_dir=${vault_dir%/}
+vault_path="$vault_dir/vault.enc"
+vault_sha1=$(sha1sum --binary $vault_path | cut -d' ' -f1)
+
+backblaze-b2 upload-file \
+             --info large_file_sha1=$vault_sha1 \
+             --sha1 $vault_sha1 \
+             --noProgress \
+             "$dest_bucket" \
+             "$vault_path" \
+             "$(basename "$vault_path")"
