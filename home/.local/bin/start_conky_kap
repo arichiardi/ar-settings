@@ -1,6 +1,6 @@
 #!/bin/bash
 
-conky -c /home/kapitan/.config/conky/conky1.10_shortcuts_kap &&
+conky -c $HOME/.config/conky/conky1.10_shortcuts_kap &&
 conky -c /usr/share/conky/conky_maia &&
 
 exit 0
