@@ -1,6 +1,9 @@
 #!/bin/bash
 
 conky -c $HOME/.config/conky/conky1.10_shortcuts_kap &&
-conky -c /usr/share/conky/conky_maia &&
+conky -c $HOME/.config/conky/conky1.10_maia_kap
+
+# Manjaro conky-i3 theming
+# conky -c /usr/share/conky/conky_maia
 
 exit 0
