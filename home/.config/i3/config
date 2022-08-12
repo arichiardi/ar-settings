@@ -198,6 +198,7 @@ bindsym $mod+Ctrl+0 move container to workspace $ws10; workspace $ws10
 
 # Open applications on specific workspaces
 assign [class="Thunderbird"] $ws2
+# assign [class="(?i)Microsoft Teams"] $ws2
 # assign [class="Pale moon"] $ws2
 # assign [class="Pcmanfm"] $ws3
 # assign [class="Skype"] $ws5
@@ -303,7 +304,7 @@ exec --no-startup-id start_conky_kap
 exec --no-startup-id xautolock -time 10 -locker blurlock
 exec_always --no-startup-id ff-theme-util
 exec_always --no-startup-id fix_xcursor
-
+exec_always --no-startup-id keepassxc
 
 # Color palette used for the terminal ( ~/.Xresources file )
 # Colors are gathered based on the documentation:
@@ -454,6 +455,7 @@ bindsym $mod+Mod1+e exec "emacsclient-daemon.sh -c"
 bindsym $mod+Mod1+h exec "pcmanfm ~"
 bindsym $mod+Mod1+v exec "pcmanfm /var/lib/vault/mnt/"
 bindsym $mod+Mod1+p exec "keepassxc"
+bindsym $mod+Mod1+k exec "xmodmap ~/.Xmodmap"
 bindsym $mod+F4 exec "rhythmbox-client --play-pause"
 bindsym $mod+F5 exec "rhythmbox-client --next"
 bindsym $mod+F6 exec "rhythmbox-client --previous"
@@ -471,28 +473,33 @@ bindsym XF86AudioMicMute exec mute-mic
 exec --no-startup-id i3-battery-popup -n -m 'Battery level is getting low' -i /usr/share/icons/Vibrancy-Colors/status/scalable/battery-low-symbolic.svg
 
 # Display
-exec --no-startup-id "primary-right-of-secondary.sh $primary-display-id $secondary-display-id; sleep 0.5; nitrogen --restore"
+exec --no-startup-id "primary-between-displays.sh --primary $primary-display-id --left $secondary-display-id --right eDP-1; sleep 0.5; nitrogen --restore"
 
 # Cohesic
-assign [class="^URxvt$" title="^cohesic-app"] $ws3
+assign [class="^URxvt$" title="^cohesic-appserver"] $ws3
 assign [class="^Chromium$" window_role="browser" title="^cardioDI"] $ws3
 
 assign [class="^URxvt$" title="^cohesic-sql"] $ws10
 assign [class="^URxvt$" title="^cohesic-api"] $ws10
 assign [class="^URxvt$" title="^cohesic-web"] $ws10
 assign [class="^URxvt$" title="^cohesic-report"] $ws10
+assign [class="^URxvt$" title="^cohesic-storybook"] $ws10
 assign [class="^URxvt$" title="^cohesic-doc"] $ws10
 assign [class="^URxvt$" title="^cohesic-sql-reset"] $ws10
+assign [class="^URxvt$" title="^cohesic-openapi"] $ws10
+assign [class="^URxvt$" title="^cohesic-sql-state"] $ws10
 
-set $mode_cardiodi Start (s)ql, (l)egacy api, (w)eb, (a)ppserver, (r)eport, (d)ocumentation, (Shift+R)eset database
+set $mode_cardiodi Start (e)2e Appserver, (l)egacy api, (w)eb, story(b)ook, (r)eport, (o)penapi, (d)ocumentation, (s)tate service, (Shift+R)eset database
 mode "$mode_cardiodi" {
-        bindsym a exec --no-startup-id "urxvt -ls -hold -title cohesic-app -cd $HOME/git/cohesic/acuity -e sh -c 'bash -i $(pwd)/scripts/start-services.sh appserver'"
-        bindsym s exec --no-startup-id "urxvt -ls -hold -title cohesic-sql -cd $HOME/git/cohesic/acuity -e sh -c 'bash -i $(pwd)/scripts/start-services.sh sql'"
+        bindsym e exec --no-startup-id "urxvt -ls -hold -title cohesic-appserver -cd $HOME/git/cohesic/acuity/appserver -e sh -c 'bash -i bin/serve-e2e'"
         bindsym l exec --no-startup-id "urxvt -ls -hold -title cohesic-api -cd $HOME/git/cohesic/acuity -e sh -c 'bash -i $(pwd)/scripts/start-services.sh api'"
-        bindsym w exec --no-startup-id "urxvt -ls -hold -title cohesic-web -cd $HOME/git/cohesic/acuity -e sh -c 'bash -i $(pwd)/scripts/start-services.sh web'"
+        bindsym w exec --no-startup-id "urxvt -ls -hold -title cohesic-web -cd $HOME/git/cohesic/acuity -e sh -c 'bash -i cdt start client'"
+        bindsym b exec --no-startup-id "urxvt -ls -hold -title cohesic-storybook -cd $HOME/git/cohesic/acuity -e sh -c 'bash -i $(pwd)/scripts/start-services.sh storybook --cardiodi'"
         bindsym r exec --no-startup-id "urxvt -ls -hold -title cohesic-report -cd $HOME/git/cohesic/acuity -e sh -c 'bash -i $(pwd)/scripts/start-services.sh report'"
-        bindsym d exec --no-startup-id "urxvt -ls -hold -title cohesic-doc -cd $HOME/git/docs-internal-site -e bash -i -c 'env PLAYBOOK_FILENAME=local-antora-playbook.yml make serve'"
-        bindsym Shift+r exec --no-startup-id "urxvt -ls -hold -title cohesic-sql-reset -cd $HOME/git/cohesic/acuity -e sh -c 'bash -i $(pwd)/scripts/start-services.sh sql --reset-db'"
+        bindsym o exec --no-startup-id "urxvt -ls -hold -title cohesic-openapi -cd $HOME/git/cohesic/acuity -e sh -c 'bash -i $(pwd)/scripts/start-services.sh openapi'"
+        bindsym d exec --no-startup-id "urxvt -ls -hold -title cohesic-doc -cd $HOME/git/cohesic-internal-site -e bash -i -c 'make serve-local'"
+        bindsym s exec --no-startup-id "urxvt -ls -hold -title cohesic-sql-state -cd $HOME/git/cohesic/acuity -e sh -c 'bash -i cdt start state-service'"
+        bindsym Shift+r exec --no-startup-id "urxvt -ls -hold -title cohesic-sql-reset -cd $HOME/git/cohesic/acuity -e sh -c 'bash -i cdt db reset'"
 
         # exit mode: Enter or Escape
         bindsym Return mode "default"
