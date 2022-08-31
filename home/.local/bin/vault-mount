@@ -21,6 +21,7 @@ fi
 dev_loop=""
 existing_loop=$(losetup -j "$loop_file")
 
+
 if [ -z "$existing_loop" ] ; then
     tmp_loop_dev=$(sudo losetup -f)
     if [ "$?" = 0 ]; then
@@ -37,35 +38,46 @@ else
     echo "The file $loop_file is already mounted on $dev_loop";
 fi
 
-if [ -n "$dev_loop" ]; then
-    luks_status=$(sudo cryptsetup status vault)
-    if [ "$?" -eq 0 -o "$?" -eq 4 ]; then
-        matches_count=$(echo "$luks_status" | grep -c 'read/write')
-        if [ "$matches_count" -lt 1 ]; then
 
-            sudo cryptsetup luksOpen $dev_loop vault
+is_opened=false
+if $(sudo cryptsetup isLuks $dev_loop); then
+    luks_uuid=$(sudo cryptsetup luksUUID $dev_loop | tr -d -)
+    if test -b /dev/disk/by-id/dm-uuid-*$luks_uuid*; then
+        is_opened=true
+    fi
+fi
 
-            if [ "$?" -eq 0 ]; then
-                mkdir -p $mount_point
-                sudo mount /dev/mapper/vault $mount_point
+if [ "$is_opened" = "false" ]; then
+    if [ -n "$dev_loop" ]; then
+        luks_status=$(sudo cryptsetup status vault)
+        if [ "$?" -eq 0 -o "$?" -eq 4 ]; then
+            matches_count=$(echo "$luks_status" | grep -c 'read/write')
+            if [ "$matches_count" -lt 1 ]; then
+
+                sudo cryptsetup luksOpen $dev_loop vault
 
                 if [ "$?" -eq 0 ]; then
-                    echo "Vault mounted on $mount_point"
-                else
-                    echo "Error: mount exited with $?"
-                fi
+                    mkdir -p $mount_point
+                    sudo mount /dev/mapper/vault $mount_point
 
+                    if [ "$?" -eq 0 ]; then
+                        echo "Vault mounted on $mount_point"
+                    else
+                        echo "Error: mount exited with $?"
+                    fi
+
+                else
+                    echo "Error: cryptsetup exited with $?"
+                fi
             else
-                echo "Error: cryptsetup exited with $?"
+                echo "$luks_status"
             fi
         else
-            echo "$luks_status"
+            echo "Error: cannot retrieve vault status"
         fi
     else
-        echo "Error: cannot retrieve vault status"
+        echo "Error: cannot detect the mounted loop device"
     fi
-else
-    echo "Error: cannot detect the mounted loop device"
 fi
 
 exit $?
