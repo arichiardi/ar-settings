@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# Start
+do_usage() {
+    echo
+    echo "Backup/Restore the vault to Backblaze."
+    echo
+    echo "The file will be copied as vault.enc in the input vault directory."
+    echo
+    echo "Usage:"
+    echo "vault-b2 -r|--restore -v|--vault-dir <path-to-vault>"
+    echo "or"
+    echo "vault-b2 -b|--backup -v|--vault-dir <path-to-vault>"
+    exit 1
+}
+
+do_error() {
+  echo "Error: $1"
+  echo -n "---"
+  do_usage
+}
+
+set +e
+temp=`getopt -o v:n:br --long help,vault-dir:,bucket-name:,backup,restore -n 'vault-b2' -- "$@"`
+set -e
+eval set -- "$temp"
+
+vault_dir=
+bucket_name=
+action=
+
+while true ; do
+    case "$1" in
+        -n|--bucket-name) bucket_name="$2" ; shift 2 ;;
+        -v|--vault-dir) vault_dir="$2" ; shift 2 ;;
+        -b|--backup) action="backup" ; shift ;;
+        -r|--restore) action="restore" ; shift ;;
+        -h|--help) shift ; do_usage ; break ;;
+        --) shift ; break ;;
+        *) do_usage ; exit 1 ;;
+    esac
+done
+
+if [ -z "$vault_dir" ]; then
+    error_code=64
+    do_error "cannot work without the local vault directory (error: $error_code)."
+    exit $error_code
+fi
+
+if [ -z "$bucket_name" ]; then
+    error_code=65
+    do_error "cannot work without the name of the Backblaze bucket (error: $error_code)."
+    exit $error_code
+fi
+
+if [ "$action" != "backup" ] && [ "$action" != "restore" ]; then
+    error_code=66
+    do_error "select either --backup or --restore (error: $error_code)."
+    exit $error_code
+fi
+
+vault_file_name=vault.enc
+vault_local_dir="${vault_dir%/}"
+vault_local_path="$vault_local_dir/$vault_file_name"
+
+if [ "$action" == "backup" ]; then
+    vault_sha1=$(sha1sum --binary $vault_local_path | cut -d' ' -f1)
+    backblaze-b2 upload-file \
+                 --info large_file_sha1=$vault_sha1 \
+                 --sha1 $vault_sha1 \
+                 $bucket_name \
+                 $vault_local_path \
+                 $vault_file_name
+elif [ "$action" == "restore" ]; then
+    if [ ! -f "$vault_local_path" ]; then
+        backblaze-b2 download-file-by-name \
+                     $bucket_name \
+                     $vault_file_name \
+                     $vault_local_path
+    else
+        error_code=66
+        do_error "a $vault_local_path already exists locally, aborting (error: $error_code)."
+        exit $error_code
+    fi
+else
+    do_error "This is a bug."
+    exit 1
+fi
