@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+b2_bin=b2-wrapper
+
 # Start
 do_usage() {
     echo
@@ -67,18 +69,18 @@ vault_local_path="$vault_local_dir/$vault_file_name"
 
 if [ "$action" == "backup" ]; then
     vault_sha1=$(sha1sum --binary $vault_local_path | cut -d' ' -f1)
-    backblaze-b2 upload-file \
-                 --info large_file_sha1=$vault_sha1 \
-                 --sha1 $vault_sha1 \
-                 $bucket_name \
-                 $vault_local_path \
-                 $vault_file_name
+    $b2_bin upload-file \
+            --info large_file_sha1=$vault_sha1 \
+            --sha1 $vault_sha1 \
+            $bucket_name \
+            $vault_local_path \
+            $vault_file_name
 elif [ "$action" == "restore" ]; then
     if [ ! -f "$vault_local_path" ]; then
-        backblaze-b2 download-file-by-name \
-                     $bucket_name \
-                     $vault_file_name \
-                     $vault_local_path
+        $b2_bin download-file-by-name \
+                $bucket_name \
+                $vault_file_name \
+                $vault_local_path
     else
         error_code=66
         do_error "a $vault_local_path already exists locally, aborting (error: $error_code)."
