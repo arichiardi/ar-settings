@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -x
+b2_bin=backblaze-b2
+
+cleanup() {
+  local account_file_path=$($b2_bin get-account-info | jq -r .accountFilePath)
+  rm -f $account_file_path
+}
+
+trap cleanup EXIT HUP INT QUIT TERM STOP
+
+$b2_bin "$@"
