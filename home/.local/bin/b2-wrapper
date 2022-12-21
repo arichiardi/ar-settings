@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -x
+
 b2_bin=backblaze-b2
 
 cleanup() {
