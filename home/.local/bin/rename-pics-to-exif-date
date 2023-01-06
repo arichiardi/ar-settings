@@ -1,0 +1,65 @@
+#!/bin/bash
+
+set -euo pipefail
+
+declare -a file_names
+
+function extract_tag_date () {
+    local tag_value="$1"
+    echo -ne $tag_value | cut -d : -f 2,3,4 | cut -d ' ' -f 2 | sed 's/[\:]/\-/g'
+}
+
+function rename_file_with_date () {
+    local date="$1"
+    local file_path="$2"
+    local file_extension="$(echo ${file_path##*.} | awk '{print tolower($0)}')"
+    local new_path="${date//[[:punct:]]/_}.$file_extension"
+
+    echo "  Renamed: $new_path"
+
+    mv "$file_path" "$new_path"
+}
+
+while IFS= read -r -d '' file_name; do
+  file_names+=( "$file_name" )
+done < <(find -maxdepth 1 -regextype posix-extended -iregex '.*\.(jpg|png|tiff)' -print0)
+
+for f in "${file_names[@]}"; do
+    if [ -n "$f" ]; then
+        echo "File: $f"
+        tag_value=$(exiftool -DateTimeOriginal "$f")
+        if [ -n "$tag_value" ]; then
+            tag_date=$(extract_tag_date "$tag_value")
+            if [ -n "$tag_date" ]; then
+                echo "  DateTimeOriginal: $tag_date"
+                rename_file_with_date "$tag_date" "$f"
+            else
+                echo "  DateTimeOriginal: <empty>"
+            fi
+        else
+            tag_value=$(exiftool -CreateDate "$f")
+            if [ -n "$tag_value" ]; then
+                tag_date=$(extract_tag_date "$tag_value")
+                if [ -n "$tag_date" ]; then
+                    echo "  CreateDate: $tag_date"
+                    rename_file_with_date "$tag_date" "$f"
+                else
+                    echo "  CreateDate: <empty>"
+                fi
+            else
+                tag_value=$(exiftool -FileModifyDate "$f")
+                if [ -n "$tag_value" ]; then
+                    tag_date=$(extract_tag_date "$tag_value")
+                    if [ -n "$tag_date" ]; then
+                        echo "  FileModifyDate: $tag_date"
+                        rename_file_with_date "$tag_date" "$f"
+                    else
+                        echo "  FileModifyDate: <empty>"
+                    fi
+                else
+                    echo "  Skipping";
+                fi
+            fi
+        fi
+    fi
+done
