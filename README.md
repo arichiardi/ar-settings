@@ -30,8 +30,4 @@ $ cat > ~/.emacs-live.el
 
 ### Secrets
 
-The secret dotfiles are stored in an encrypted [Keybase](https://keybase.io/) repository:
-
-``` shell
-git clone keybase://private/arichiardi/ar-secret-settings
-```
+You should not know where we store the secrets but it is this repo, as encrypted files.
