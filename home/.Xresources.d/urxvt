@@ -1,10 +1,13 @@
 ! Setting the terminal to xterm solves the emacsclient bug
 ! URxvt*termName: xterm-256color
-URxvt*geometry: 95x24
+! Bug in urxvt workaround
+! https://forums.freebsd.org/threads/changed-behavior-in-rxvt-unicode-between-9-30-and-9-31.87711/
+URxvt*geometry: 95x1042
 URxvt*scrollBar: false
 URxvt*saveLines: 16384
-URxvt*font: xft:JetBrains Mono:style=g:antialias=true:hinting=true:size=11
-URxvt*boldFont: xft:JetBrains Mono:style=g:bold:antialias=true:hinting=true:size=11
+URxvt*font: xft:JetBrains Mono:style=g:antialias=true:size=11
+URxvt*boldFont: xft:JetBrains Mono:style=g:bold:antialias=true:size=11
+URxvt*letterSpace: -1
 URxvt*lineSpace: -1
 URxvt*reverseVideo: off
 URxvt*fading: 25
@@ -31,13 +34,16 @@ URxvt*keysym.Mod4-t: \033[32;74~
 URxvt.iso14755: false
 URxvt.iso14755_52: false
 ! https://superuser.com/questions/1415969/how-to-disable-urxvt-autoscroll-on-output
-! https://wiki.archlinux.org/index.php/Rxvt-unicode$
+! https://wiki.archlinux.org/index.php/Rxvt-unicode
 ! do not scroll with output
 URxvt*scrollTtyOutput: false
-! scroll in relation to buffer (with mouse scroll or Shift+Page Up)$
+! scroll in relation to buffer (with mouse scroll or Shift+Page Up)
 URxvt*scrollWithBuffer: true
-! scroll back to the bottom on keypress$
+! scroll back to the bottom on keypress
 URxvt*scrollTtyKeypress: true
+! https://wiki.archlinux.org/title/rxvt-unicode
+URxvt.secondaryScreen: 1
+URxvt.secondaryScroll: 0
 ! extensions
 URxvt*perl-lib: /usr/lib/urxvt/perl/
 URxvt*perl-ext-common: default,selection,matcher,searchable-scrollback,font-size,keyboard-select
