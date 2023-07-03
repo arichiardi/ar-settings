@@ -7,25 +7,10 @@ set -euo pipefail
 #
 # see the brilliant answer here: https://stackoverflow.com/a/45538151
 
-light_green='\033[1;32m'
-light_red='\033[1;31m'
-light_yellow='\033[1;33m'
-no_color='\033[0m'
-
-# Helper Functions
-function echo-info  { printf "\r${light_green} %s${no_color}\n" "$*"; }
-function echo-warn  { printf "\r${light_yellow} %s${no_color}\n" "$*"; }
-function echo-skip  { printf "\r${light_yellow} %s${no_color}\n" "$*"; }
-function echo-ok    { printf "\r${light_green} %s${no_color}\n" "$*"; }
-function echo-fail  { printf "\r${light_red} %s${no_color}\n" "$*"; }
-
-function installing  { echo-info "Installing $1..."; }
-function installnote { echo-info "   $1"; }
-function skipping    { echo-skip "   already installed; skipping."; }
-function success     { echo-ok   "   success!"; }
-
 tmpdir=$(mktemp -d -t "ar-settings-install-scripts.XXXXXXXXXX")
 bindir=$(systemd-path user-binaries)
+
+source ./helpers
 
 target_arch=linux-amd64
 

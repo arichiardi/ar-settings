@@ -8,25 +8,23 @@ set -euo pipefail
 #
 # see the brilliant answer here: https://stackoverflow.com/a/45538151
 
-LIGHT_GREEN='\033[1;32m'
-NC='\033[0m' # No Color
+source ./helpers
 
 # ruby-ruby_parser is needed for cucumber.el/feature-mode
 
 declare -a packages
-packages=(yarn-completion-git leiningen-completions \
-          adr-tools pandoc-bin zeal gtk-recordmydesktop \
-          nordvpn-bin backblaze-b2 \
-          cask ruby-ruby_parser)
+packages=(pandoc-bin zeal gtk-recordmydesktop \
+          nordvpn-bin backblaze-b2 yarn-completion-git \
+          cask ruby-ruby_parser adr-tools)
 
 for pkg in "${packages[@]}"; do
     echo -n "Install $pkg from AUR (y/n)? "
     stty raw -echo ; answer=$(head -c 1) ; stty sane
 
     if echo "$answer" | grep -iq "^y" ;then
-        echo -e "\n${LIGHT_GREEN}Installing $pkg...${NC}"
+        echo-info "\nInstalling $pkg..."
         pamac build "$pkg"
     else
-        echo -e "Skipping."
+        echo-skip "Skipping."
     fi
 done

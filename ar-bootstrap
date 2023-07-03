@@ -38,6 +38,5 @@ export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
 gpgconf --reload gpg-agent
 
 echo -e "${LIGHT_GREEN}Clone ar-settings into $HOME/git${NC}"
-
 mkdir -p $HOME/git
-git clone git@github.com:arichiardi/ar-settings.git $HOME/git/ar-settings && cd $HOME/git/ar-settings
+git clone git@github.com:arichiardi/ar-settings.git $HOME/git/ar-settings

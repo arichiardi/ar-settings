@@ -8,24 +8,22 @@ set -euo pipefail
 #
 # see the brilliant answer here: https://stackoverflow.com/a/45538151
 
-LIGHT_YELLOW='\033[1;93m'
-LIGHT_GREEN='\033[1;92m'
-LIGHT_RED='\033[1;91m'
-NC='\033[0m' # No Color
-
 secret_bin=$(pwd)/home/.local/bin/secret
 temp_dir=$(mktemp -d -t "ar-init-home.XXXXXXXXXX")
 
-echo -e "${LIGHT_GREEN}Installing dependencies...${NC}"
-sudo pamac install meld
+source ./helpers
 
-echo -e "${LIGHT_GREEN}Creating directories...${NC}"
+echo-info "Installing diffing tools..."
+pkg_install vim
+
+echo-info "Creating directories..."
 mkdir -p $HOME/.local/bin
 mkdir -p $HOME/tmp
+mkdir -p $HOME/git
 
-pushd home > /dev/null
+pushd ./home > /dev/null
 
-echo -e "${LIGHT_GREEN}Diffing unencrypted home files...${NC}"
+echo-info "Diffing unencrypted home files..."
 for f in $(find . -type f -and -not -name '*.enc'); do
     local_f=$(readlink --no-newline --canonicalize-missing "$HOME/$f")
     set +e
@@ -34,20 +32,20 @@ for f in $(find . -type f -and -not -name '*.enc'); do
     set -e
 
     local_d=$(dirname "$local_f")
-    echo -e "${LIGHT_GREEN}Creating $local_d directory...${NC}"
+    echo-info "Creating $local_d directory..."
     mkdir -p "$local_d"
 
     case $exit_code in
-        0) echo -e "${LIGHT_GREEN}File $local_f already up-to-date${NC}.";;
-        1) echo -e "${LIGHT_YELLOW}File $local_f is outdated or missing, opening diff tool...${NC}"; set +e; meld "$local_f" "$f"; set -e;;
-        *) echo -e "${LIGHT_RED}Unidentified $f diff exit code ($exit_code), skipping.${NC}";;
+        0) echo-info "File $local_f already up-to-date.";;
+        1) echo-warn "File $local_f is outdated or missing, opening diff tool..."; set +e; vimdiff "$local_f" "$f"; set -e;;
+        *) echo-fail "Unidentified $f diff exit code ($exit_code), skipping.";;
     esac
 done
 
-echo -e "${LIGHT_GREEN}Making $HOME/.local/bin files executable...${NC}"
+echo-info "Making $HOME/.local/bin files executable..."
 find "$HOME/.local/bin" -type f -and -not -executable -exec chmod u+x {} ';'
 
-echo -e "${LIGHT_GREEN}Diffing encrypted dot files...${NC}"
+echo-info "Diffing encrypted dot files..."
 for f in $(find . -type f -and -name '*.enc'); do
     encrypted_f=$(readlink -f --no-newline --canonicalize-missing "$f")
     temp_f=$(readlink -f --no-newline --canonicalize-missing "$temp_dir/${f%.enc}")
@@ -55,10 +53,10 @@ for f in $(find . -type f -and -name '*.enc'); do
     set +e
     $secret_bin -r -s "$encrypted_f" -d "$temp_f"
     if [ $? -eq 0 ]; then
-        meld "$HOME/$f" "$temp_f"
+        vimdiff "$HOME/$f" "$temp_f"
     fi
     shred -u -n 19 "$temp_f"
     set -e
 done
 
-popd
+popd > /dev/null

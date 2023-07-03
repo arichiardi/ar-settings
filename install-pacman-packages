@@ -8,10 +8,9 @@ set -euo pipefail
 #
 # see the brilliant answer here: https://stackoverflow.com/a/45538151
 
-LIGHT_GREEN='\033[1;32m'
-NC='\033[0m' # No Color
+source ./helpers
 
-echo -e "${LIGHT_GREEN}Installing packages...${NC}"
+echo-info "Installing packages..."
 (set -x; sudo pamac install \
      rxvt-unicode ttf-jetbrains-mono bash-completion \
      zip unzip tree dsnutils pavucontrol rofi \
