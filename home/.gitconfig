@@ -16,13 +16,15 @@
     editor = emacsclient -a '' -nw
     autocrlf = false
     excludesfile = ~/.config/git/ignore
+[init]
+  defaultBranch = main
 [rerere]
     enabled = true
 [mergetool "meld"]
-    cmd = $HOME/bin/meld-merge-script \"$LOCAL\" \"$REMOTE\" \"$MERGED\" \"$BASE\"
+    cmd = $HOME/.local/bin/meld-merge-script \"$LOCAL\" \"$REMOTE\" \"$MERGED\" \"$BASE\"
     trustExitCode = true
 [mergetool "ediff"]
-    cmd = $HOME/bin/ediff-merge-script \"$LOCAL\" \"$REMOTE\" \"$MERGED\" \"$BASE\"
+    cmd = $HOME/.local/bin/ediff-merge-script \"$LOCAL\" \"$REMOTE\" \"$MERGED\" \"$BASE\"
     trustExitCode = true
 [merge]
     conflictstyle = diff3
@@ -49,6 +51,7 @@
     ba = "branch -v -a"
     c = "commit -S"
     p = "pull"
+    pfl = "push --force-if-includes --force-with-lease"
     f = "fetch -v"
     fp = "!f() { git fetch -v && git pull; }; f"
     fa = "fetch -v --all"
@@ -76,8 +79,9 @@
     ra = "rebase --abort"
     rmc = "rm --cached"
     ss = status --short -uno
-    ln = log --graph --decorate --pretty=oneline --abbrev-commit
-    lna = log --graph --decorate --pretty=format:"%h%x09%an%x09%ad%x09%s" --abbrev-commit
+    ln = log --graph --format=format:'%C(blue)%h%C(reset) - %C(green)(%ar)%C(reset) %C(white)%s%C(reset) %C(white)— %an%C(reset)%C(yellow)%d%C(reset)' --abbrev-commit --date=relative
+    lna = log --graph --format=format:'%C(blue)%h%C(reset) - %C(green)(%ar)%C(reset) %C(white)%s%C(reset) %C(white)— %an%C(reset)%C(yellow)%d%C(reset)' --abbrev-commit --date=relative --all
+    lnas = log --graph --format=format:'%C(blue)%h%C(reset) - %C(green)(%ar)%C(reset) %C(white)%s%C(reset) %C(white)— %an%C(reset)%C(yellow)%d%C(reset)' --abbrev-commit --date=relative --all --stat
     patch = !git --no-pager diff --no-color
     fixup = !sh -c 'REV=$(git rev-parse $1) && git commit --fixup $@ && git rebase -i --autosquash $REV^' -
     fixprev = "!f() { SHA=$(git rev-parse HEAD) && REV=$(git rev-parse $SHA) && git commit --fixup $SHA && git rebase -i --autosquash $REV^; }; f -"
@@ -101,8 +105,6 @@
     ski = "stash save --keep-index"
 [protocol "keybase"]
     allow = always
-[hub]
-    host = github.elasticpath.net
 [credential]
     # Compile the git-credential-netrc helper from the git repo
     # https://andrearichiardi.com/blog/posts/git-credential-netrc.html
