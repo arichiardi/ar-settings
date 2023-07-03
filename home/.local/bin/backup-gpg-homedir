@@ -5,7 +5,7 @@ script_name=$(basename "$0")
 do_usage() {
     echo -n
     echo "Usage:"
-    echo "$script_name [-s|--secret] -p|--prefix *desination prefix* -d|--dest *destination folder*"
+    echo "$script_name [-s|--secret] [-l|--label *file label*]  -d|--dest *destination folder*"
     exit 1
 }
 
