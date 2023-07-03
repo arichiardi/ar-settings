@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# For skipping sections, use this trick:
+#
+#   cat >/dev/null <<HUB
+#
+# see the brilliant answer here: https://stackoverflow.com/a/45538151
+
+tmpdir=$(mktemp -d -t "ar-settings-install-scripts.XXXXXXXXXX")
+bindir=$(systemd-path user-binaries)
+
+source ./helpers
+
+target_arch=linux-amd64
+
+function latest_releases {
+  local github_coords="$1"
+  curl -sL "https://api.github.com/repos/$github_coords/releases/latest"
+}
+
+function maybe_install_sdkman {
+  installing "sdkman"
+  if [ -d "$SDKMAN_DIR" ]; then
+    skipping
+  else
+    curl -sfL "https://get.sdkman.io" | bash
+    success
+  fi
+}
+
+function safe_sdk {
+  local args="$@"
+  set +u
+  source $SDKMAN_DIR/bin/sdkman-init.sh
+  eval sdk $args
+  set -u
+}
+
+function safe_nvm {
+  local args="$@"
+  set +u
+  export NVM_DIR="$HOME/.nvm"
+  source "$NVM_DIR/nvm.sh"
+  eval nvm $args
+  set -u
+}
+
+installing "clojure"
+if command -v clojure >/dev/null 2>&1; then
+  skipping
+else
+  installer_name=linux-install-1.10.1.763.sh
+  pushd $tmpdir >/dev/null
+
+  curl -fsSLO https://download.clojure.org/install/$installer_name \
+      && chmod u+x $tmpdir/$installer_name
+  $tmpdir/$installer_name --prefix "$HOME/.local"
+
+  popd >/dev/null
+  success
+fi
+
+# Node
+installing "node"
+if [ -n $NVM_DIR ] && [ -d $NVM_DIR ]; then
+  skipping
+else
+  github_coordinates=creationix/nvm
+  latest_tag=$(latest_releases $github_coordinates | grep -Po '"tag_name": "\K.*?(?=")')
+  curl -fs -o- "https://raw.githubusercontent.com/$github_coordinates/$latest_tag/install.sh" | bash
+
+  export NVM_DIR="$HOME/.nvm"
+  source "$NVM_DIR/nvm.sh"
+  # Install current and future LTS versions
+  safe_nvm install --lts=*
+
+  # But set current to default and use current
+  safe_nvm alias default lts/*
+  safe_nvm use default
+  success
+fi
+
+installing "bash completions"
+installnote "docker-compose completions"
+if [ -f /etc/bash_completion.d/docker-compose ]; then
+    skipping
+else
+    curl -o- https://raw.githubusercontent.com/docker/compose/$(docker-compose version --short)/contrib/completion/bash/docker-compose > $tmpdir/docker-compose
+    sudo cp --no-preserve=mode,ownership $tmpdir/docker-compose /etc/bash_completion.d/docker-compose
+    success
+fi
+
+if command -v eldev >/dev/null 2>&1; then
+    skipping
+else
+    curl -o- -fsSL https://raw.github.com/doublep/eldev/master/bin/eldev > $bindir/eldev \
+        && chmod u+x $bindir/eldev
+    success
+fi
+
+installing "intellij idea community edition"
+if command -v idea.sh >/dev/null 2>&1; then
+  skipping
+else
+  pushd $tmpdir >/dev/null
+
+  curl -fsSL -o- "https://download.jetbrains.com/product?platform=linux&code=IIC&latest" > idea.tar.gz
+  tar -xvzf idea.tar.gz -C $xdg_data_home_dir >/dev/null
+  idea_dir=$(find $xdg_data_home_dir -type d -name 'idea*')
+
+  if [ ! -d "$idea_dir" ]; then
+    echo-fail "Cannot retrieve idea local dir. This is likely a bug."
+  else
+    ln -s "$idea_dir/bin/idea.sh" $bindir/idea.sh
+    mkdir -p $xdg_data_home_dir/applications
+
+    cat << END > $xdg_data_home_dir/applications/idea.desktop
+[Desktop Entry]
+Type=Application
+Terminal=false
+Exec=$idea_dir/bin/idea.sh
+Name=IntelliJ IDEA CE
+Icon=$idea_dir/bin/idea.png
+END
+  fi
+
+  popd
+fi
