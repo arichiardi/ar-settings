@@ -1,0 +1,6 @@
+# Convenience for allowing wheel to run cryptsetup
+# against our vault. 
+cokap ALL=(root) NOPASSWD: /sbin/cryptsetup ^open --type luks1 .*/vault.enc vault$
+cokap ALL=(root) NOPASSWD: /sbin/cryptsetup close vault 
+cokap ALL=(root) NOPASSWD: /sbin/cryptsetup status vault
+cokap ALL=(root) NOPASSWD: /sbin/cryptsetup isLuks

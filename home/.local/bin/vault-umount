@@ -56,27 +56,7 @@ for f in $files; do
 done
 IFS=$ifs_backup
 
-# echo "Unmounting vault from $mount_point..."
 sudo umount $mount_point
 
-echo "Encrypting vault..."
-sudo cryptsetup luksClose vault
-
-if [ "$?" = "0" ]; then
-    vault_losetup=$(sudo losetup -a | grep vault)
-    vault_file=$(echo "$vault_losetup" | grep -o '(.*)' | cut -d \( -f 2 | cut -d \) -f 1)
-    dev_loop=$(echo "$vault_losetup" | awk -F ':' '{ print($1) }')
-
-    echo "Umounting $dev_loop..."
-    sudo losetup -d $dev_loop
-
-    if [ "$?" = "0" ]; then
-        echo "Completed."
-    else
-        echo "Error: losetup -d exited with $?"
-    fi
-else
-    echo "Error: cryptsetup exited with $?"
-fi
-
-exit $?
+echo "Closing (encrypting) vault..."
+sudo cryptsetup close vault
