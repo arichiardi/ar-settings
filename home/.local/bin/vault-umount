@@ -58,5 +58,6 @@ IFS=$ifs_backup
 
 sudo umount $mount_point
 
-echo "Closing (encrypting) vault..."
+echo
+echo -n "Closing (encrypting)..."
 sudo cryptsetup close vault
