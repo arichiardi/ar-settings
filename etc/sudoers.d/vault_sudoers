@@ -4,3 +4,4 @@ cokap ALL=(root) NOPASSWD: /sbin/cryptsetup ^open --type luks1 .*/vault.enc vaul
 cokap ALL=(root) NOPASSWD: /sbin/cryptsetup close vault 
 cokap ALL=(root) NOPASSWD: /sbin/cryptsetup status vault
 cokap ALL=(root) NOPASSWD: /sbin/cryptsetup isLuks
+cokap ALL=(root) NOPASSWD: /usr/bin/mount /dev/mapper/vault /var/lib/vault/mnt
