@@ -16,7 +16,7 @@ function installnote { echo-info "   $1"; }
 function skipping    { echo-skip "   already installed; skipping."; }
 function success     { echo-ok   "   success!"; }
 
-pkg_install () {
+function pkg_install () {
     local distro;
     local cmd;
     local usesudo
@@ -38,5 +38,83 @@ pkg_install () {
         $usesudo $cmd $@
     else
         echo $cmd
+    fi
+}
+
+function sync_dir_to_b2 () {
+    # $1 B2_APPLICATION_KEY_ID
+    # $2 B2_APPLICATION_KEY
+    # $3 Backblaze bucket name
+    # $4 Dir path
+    env \
+      B2_APPLICATION_KEY_ID="$1" \
+      B2_APPLICATION_KEY="$2" \
+      b2-wrapper sync \
+      --threads 3 \
+      --replaceNewer \
+      --keepDays 365 \
+      --excludeRegex "(.*\/\..*)|(.*\.DS_Store)|(.*\.Spotlight-V100)|(.*\.Trash.*)|(.*\/wip)|(.*\/WIP)" \
+      --excludeAllSymlinks \
+      "$4" "b2://$3"
+}
+
+function sync_b2_secrets_to_target () {
+    # $1 B2_APPLICATION_KEY_ID
+    # $2 B2_APPLICATION_KEY
+    # $3 the target dir
+    local target_dir=$3
+
+    env B2_APPLICATION_KEY_ID="$1" B2_APPLICATION_KEY="$2" \
+        b2-wrapper sync \
+        --replaceNewer \
+        --excludeRegex "(.*bin\/.*)|(vault\.enc)" \
+        --excludeAllSymlinks \
+        "b2://secrets-f3ba7cb4" "$target_dir"
+}
+
+function merge_keepass_dbs () {
+    # $1 the destination dir (these files will be updated)
+    # $2 the source dir where secrets are taken from
+    local dest_dir=$1
+    local source_dir=$2
+
+    declare -a dest_paths
+    while IFS= read -r -d '' file_name; do
+        dest_paths+=( "$file_name" )
+    done < <(find $dest_dir -maxdepth 1 \
+                  -regextype posix-extended \
+                  -iregex '.*\.kdbx' \
+                  -print0)
+
+    for dest_path in "${dest_paths[@]}"; do
+        dest_name=$(basename "$dest_path")
+        source_path=$source_dir/$dest_name
+
+        if [ -f "$dest_path" ] && [ -f "$source_path" ]; then
+            if [ "$(sha256sum $dest_path)" != "$(sha256sum $source_path)" ]; then
+                keepassxc-cli merge --same-credentials "$dest_path" "$source_path"
+            else
+                echo-info "Database $dest_path had not been changed, skipping..."
+            fi
+        else
+            echo-warn "Either destination ($dest_path) or source ($source_path) did not exist, skipping..."
+        fi
+    done
+}
+
+function merge_b2_secrets () {
+    # $1 B2_APPLICATION_KEY_ID
+    # $2 B2_APPLICATION_KEY
+    # $3 the secret dir (these files will be updated)
+
+    tmp_dir=$(mktemp -d -t "b2-secrets-XXXXX")
+    if [[ ! "$tmp_dir" || ! -d "$tmp_dir" ]]; then
+        echo-fail "Could not create temp dir"
+    else
+        trap "exit 1"            HUP INT PIPE QUIT TERM
+        trap 'rm -rf "$tmp_dir"' EXIT
+
+        sync_b2_secrets_to_target "$1" "$2" "$tmp_dir"
+        merge_keepass_dbs "$3" "$tmp_dir"
     fi
 }
