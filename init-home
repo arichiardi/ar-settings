@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
-
+#
+# Initialize a home directory.
+#
+# The scripts has to be run from the ar-settings repository.
+#
 set -euo pipefail
 
 # For skipping sections, use this trick:
