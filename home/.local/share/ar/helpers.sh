@@ -41,6 +41,12 @@ function pkg_install () {
     fi
 }
 
+function cleanup_after_error() {
+    # $1 The dir to remove
+    rm -rf "$1"
+    exit 1
+}
+
 function sync_dir_to_b2 () {
     # $1 B2_APPLICATION_KEY_ID
     # $2 B2_APPLICATION_KEY
@@ -111,10 +117,11 @@ function merge_b2_secrets () {
     if [[ ! "$tmp_dir" || ! -d "$tmp_dir" ]]; then
         echo-fail "Could not create temp dir"
     else
-        trap "exit 1"            HUP INT PIPE QUIT TERM
-        trap 'rm -rf "$tmp_dir"' EXIT
+        trap "cleanup_after_error $tmp_dir" SIGINT SIGHUP SIGPIPE SIGQUIT SIGTERM
 
         sync_b2_secrets_to_target "$1" "$2" "$tmp_dir"
         merge_keepass_dbs "$3" "$tmp_dir"
+	
+        rm -rf $tmp_dir
     fi
 }
