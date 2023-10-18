@@ -44,6 +44,16 @@ mount: ${MOUNT_PATH}
 extract: ${MOUNT_PATH} ${ZIP}
 	unzip -x -d ${MOUNT_PATH} ${ZIP}
 
+.PHONY: bootable
+bootable: ${MOUNT_PATH}
+	@pushd ${MOUNT_PATH}
+	bash makeboot.sh ${DEVICE_NAME}
+	@popd
+
 .PHONY: unmount
 unmount: ${MOUNT_PATH}
 	sudo umount ${MOUNT_PATH}
+
+.PHONY: clean
+clean: unmount
+	rm -vf ${SIG} ${CHECKSUM} ${ZIP}
