@@ -1,5 +1,7 @@
 .DEFAULT_GOAL := build
 
+SECRET = home/.local/bin/secret
+
 # stable is Debian, alternative is Ubuntu
 TAG = alternative
 VERSION = 20230426-lunar
@@ -15,13 +17,21 @@ endif
 
 DEVICE_MOUNT_DIR = live-usb
 
-FILESYSTEM_PATH = ${DEVICE_MOUNT_DIR}/live/filesystem.squashfs
+SQUASHFS_PATH = ${DEVICE_MOUNT_DIR}/live/filesystem.squashfs
 
-FILESYSTEM_MOUNT_DIR = fin
-FILESYSTEM_WORK_DIR = ${FILESYSTEM_MOUNT_DIR}/work
-FILESYSTEM_LOWER_DIR = ${FILESYSTEM_MOUNT_DIR}/lower
-FILESYSTEM_LOWER_DIR = ${FILESYSTEM_MOUNT_DIR}/upper
-FILESYSTEM_TARGET_DIR = ${FILESYSTEM_TARGET_DIR}/upper
+FILESYSTEM_ROOT_DIR = squashfs
+
+# From https://unix.stackexchange.com/a/377269
+FILESYSTEM_WORK_DIR = ${FILESYSTEM_ROOT_DIR}/tmp
+# We mount into the lower/from dir
+FILESYSTEM_LOWER_DIR = ${FILESYSTEM_ROOT_DIR}/current
+FILESYSTEM_UPPER_DIR = ${FILESYSTEM_ROOT_DIR}/new
+# The merge result will be in the target dir
+FILESYSTEM_TARGET_DIR = ${FILESYSTEM_ROOT_DIR}/target
+
+############
+# DOWNLOAD #
+############
 
 ${ZIP}:
 	curl --fail --fail-early -L -o ${ZIP} \
@@ -43,17 +53,44 @@ verify: ${SIG} ${CHECKSUM} ${ZIP}
 	gpg --verify ${SIG} ${CHECKSUM}
 	sha256sum -c --ignore-missing ${CHECKSUM}
 
-${DEVICE_MOUNT_DIR}:
-	mkdir -p ${DEVICE_MOUNT_DIR}
-	sudo mount ${DEVICE} ${DEVICE_MOUNT_DIR}
-
-${FILESYSTEM_MOUNT_DIR}:
-	mkdir -p ${FILESYSTEM_MOUNT_DIR}
-	sudo mount ${FILESYSTEM_PATH} ${FILESYSTEM_MOUNT_PATH}
-
 .PHONY: extract
 extract: ${DEVICE_MOUNT_DIR} verify
 	unzip -x -d ${DEVICE_MOUNT_DIR} ${ZIP}
+
+##########
+# DEVICE #
+##########
+
+${DEVICE_MOUNT_DIR}:
+	mkdir -p ${DEVICE_MOUNT_DIR}
+	sudo mount ${DEVICE} ${DEVICE_MOUNT_DIR} -o uid=$(shell id -u),gid=$(shell id -g)
+
+############
+# SQUASHFS #
+############
+
+${FILESYSTEM_ROOT_DIR}:
+	mkdir -p ${FILESYSTEM_ROOT_DIR}
+
+${FILESYSTEM_WORK_DIR}: ${FILESYSTEM_ROOT_DIR}
+	@mkdir -p ${FILESYSTEM_WORK_DIR}
+
+${FILESYSTEM_TARGET_DIR}: ${FILESYSTEM_ROOT_DIR}
+	@mkdir -p ${FILESYSTEM_TARGET_DIR}
+
+${FILESYSTEM_UPPER_DIR}: ${FILESYSTEM_ROOT_DIR}
+	@mkdir -p ${FILESYSTEM_UPPER_DIR}
+
+${FILESYSTEM_LOWER_DIR}: ${FILESYSTEM_ROOT_DIR}
+	@mkdir -p ${FILESYSTEM_LOWER_DIR}
+	sudo mount -t squashfs ${SQUASHFS_PATH} ${FILESYSTEM_LOWER_DIR}
+
+.PHONY: overlay
+overlay: ${FILESYSTEM_WORK_DIR} ${FILESYSTEM_LOWER_DIR} ${FILESYSTEM_UPPER_DIR} ${FILESYSTEM_TARGET_DIR}
+	fuse-overlayfs -o uidmapping=0:$(shell id -u):100,gidmapping=0:$(shell id -g):100,lowerdir=$(realpath ${FILESYSTEM_LOWER_DIR}),upperdir=$(realpath ${FILESYSTEM_UPPER_DIR}),workdir=$(realpath ${FILESYSTEM_WORK_DIR}) ${FILESYSTEM_TARGET_DIR}
+
+${FILESYSTEM_LOWER_DIR}/etc/passwd-s3fs: overlay
+	${SECRET} -r -s passwd-s3fs.enc -d ${FILESYSTEM_TARGET_DIR}/etc/passwd-s3fs
 
 # Not Required
 #
@@ -68,12 +105,13 @@ extract: ${DEVICE_MOUNT_DIR} verify
 .PHONY: unmount
 unmount:
 	-sudo umount ${DEVICE_MOUNT_DIR}
-	-sudo umount ${FILESYSTEM_MOUNT_PATH}
+	-sudo umount ${FILESYSTEM_TARGET_PATH}
+	-sudo umount ${FILESYSTEM_LOWER_DIR}
 
 .PHONY: build
-build: extract
+build: extract ${FILESYSTEM_LOWER_DIR}/etc/passwd-s3fs
 
 .PHONY: clean
 clean: unmount
 	rm -vf ${SIG} ${CHECKSUM} ${ZIP}
-	rmdir -v ${DEVICE_MOUNT_DIR}
+	rmdir -v ${DEVICE_MOUNT_DIR} ${FILESYSTEM_WORK_DIR} ${FILESYSTEM_LOWER_DIR} ${FILESYSTEM_UPPER_DIR} ${FILESYSTEM_TARGET_DIR} ${FILESYSTEM_ROOT_DIR}
