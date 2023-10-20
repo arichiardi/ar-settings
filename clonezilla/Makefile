@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := build
 
-SECRET = home/.local/bin/secret
+SECRET = ../home/.local/bin/secret
 
 # stable is Debian, alternative is Ubuntu
 TAG = alternative
@@ -16,8 +16,9 @@ ifeq ($(DEVICE),)
 endif
 
 DEVICE_MOUNT_DIR = live-usb
+DEVICE_MOUNT_LIVE_DIR = ${DEVICE_MOUNT_DIR}/live
 
-SQUASHFS_PATH = ${DEVICE_MOUNT_DIR}/live/filesystem.squashfs
+SQUASHFS_PATH = ${DEVICE_MOUNT_LIVE_DIR}/filesystem.squashfs
 
 FILESYSTEM_ROOT_DIR = squashfs
 
@@ -87,10 +88,22 @@ ${FILESYSTEM_LOWER_DIR}: ${FILESYSTEM_ROOT_DIR}
 
 .PHONY: overlay
 overlay: ${FILESYSTEM_WORK_DIR} ${FILESYSTEM_LOWER_DIR} ${FILESYSTEM_UPPER_DIR} ${FILESYSTEM_TARGET_DIR}
-	fuse-overlayfs -o uidmapping=0:$(shell id -u):100,gidmapping=0:$(shell id -g):100,lowerdir=$(realpath ${FILESYSTEM_LOWER_DIR}),upperdir=$(realpath ${FILESYSTEM_UPPER_DIR}),workdir=$(realpath ${FILESYSTEM_WORK_DIR}) ${FILESYSTEM_TARGET_DIR}
+	fuse-overlayfs -o uidmapping=0:$(shell id -u):1:1:110000:65536,gidmapping=0:$(shell id -u):1:1:110000:65536,lowerdir=$(realpath ${FILESYSTEM_LOWER_DIR}),upperdir=$(realpath ${FILESYSTEM_UPPER_DIR}),workdir=$(realpath ${FILESYSTEM_WORK_DIR}) ${FILESYSTEM_TARGET_DIR}
 
-${FILESYSTEM_LOWER_DIR}/etc/passwd-s3fs: overlay
-	${SECRET} -r -s passwd-s3fs.enc -d ${FILESYSTEM_TARGET_DIR}/etc/passwd-s3fs
+${FILESYSTEM_UPPER_DIR}/etc: overlay
+	mkdir -p ${FILESYSTEM_UPPER_DIR}/etc
+
+${FILESYSTEM_UPPER_DIR}/etc/passwd-s3fs: ${FILESYSTEM_UPPER_DIR}/etc
+	${SECRET} -r -s passwd-s3fs.enc -d ${FILESYSTEM_UPPER_DIR}/etc/passwd-s3fs
+
+${FILESYSTEM_UPPER_DIR}/usr/local/bin: overlay
+	mkdir -p ${FILESYSTEM_UPPER_DIR}/usr/local/bin
+
+${FILESYSTEM_UPPER_DIR}/usr/local/bin/mount-clones: ${FILESYSTEM_UPPER_DIR}/usr/local/bin
+	cp mount-clones ${FILESYSTEM_UPPER_DIR}/usr/local/bin/mount-clones
+
+${SQUASHFS_PATH}:
+	mksquashfs ${FILESYSTEM_TARGET_DIR} ${SQUASHFS_PATH}
 
 # Not Required
 #
@@ -105,11 +118,11 @@ ${FILESYSTEM_LOWER_DIR}/etc/passwd-s3fs: overlay
 .PHONY: unmount
 unmount:
 	-sudo umount ${DEVICE_MOUNT_DIR}
-	-sudo umount ${FILESYSTEM_TARGET_PATH}
+	-sudo umount ${FILESYSTEM_TARGET_DIR}
 	-sudo umount ${FILESYSTEM_LOWER_DIR}
 
 .PHONY: build
-build: extract ${FILESYSTEM_LOWER_DIR}/etc/passwd-s3fs
+build: overlay ${FILESYSTEM_UPPER_DIR}/etc/passwd-s3fs ${FILESYSTEM_UPPER_DIR}/usr/local/bin/mount-clones
 
 .PHONY: clean
 clean: unmount
