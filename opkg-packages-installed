@@ -1,0 +1,7 @@
+curl
+dnsmasq-full
+dnsmasq
+luci-app-pbr
+luci-proto-wireguard
+pbr
+wireguard-tools
