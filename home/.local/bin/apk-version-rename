@@ -1,0 +1,23 @@
+#!/bin/bash
+
+set -euo pipefail
+
+apk_path=$1
+badging=$(aapt dump badging $apk_path)
+
+version_code=$(echo $badging | grep -Po "versionCode=\'\K[^\s\']+")
+version_name=$(echo $badging | grep -Po "versionName=\'\K[^\s\']+")
+package=$(echo $badging | grep -Po "package: name=\'\K[^\s\']+")
+label=$(echo $badging | grep -Po "application-label:\'\K[^\s\']+")
+
+new_apk_name="${package}_${version_code}.apk"
+new_path=$(dirname $apk_path)/$new_apk_name
+
+echo "label:       $label"
+echo "package:     $package"
+echo "versionCode: $version_code"
+echo "versionName: $version_name"
+echo "original:    $apk_path"
+echo "renamed:     $new_path"
+
+mv -iv "$apk_path" "$new_path"
