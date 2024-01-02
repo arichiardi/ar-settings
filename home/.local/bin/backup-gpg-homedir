@@ -5,30 +5,31 @@ script_name=$(basename "$0")
 do_usage() {
     echo -n
     echo "Usage:"
-    echo "$script_name [-s|--secret] [-l|--label *file label*]  -d|--dest *destination folder*"
-    exit 1
+    echo "$script_name [--homedir *GPG home dir*] [-s|--secret] [-l|--label *file label*] -d|--dest *destination folder*"
 }
 
 set +e
-TEMP=`getopt -o hsod:l: --long help,secret,overwrite,dest:,label: -n "$script_name" -- "$@"`
+TEMP=`getopt -o hsd:l: --long help,homedir:,secret,no-overwrite,dest:,label: -n "$script_name" -- "$@"`
 set -e
 eval set -- "$TEMP"
 
+gpg_homedir=${GNUPGHOME:=$HOME/.gnupg}
 is_secret=false
-overwrite=false
+no_overwrite=false
 dest_dir=
 dest_label=
 
 # extract options and their arguments into variables.
 while true ; do
     case "$1" in
+        --homedir) gpg_homedir="$2" ; shift 2 ;;
         -s|--secret) is_secret=true ; shift ;;
-        -o|--overwrite) overwrite=true ; shift ;;
+        --no-overwrite) no_overwrite=true ; shift ;;
         -l|--label) dest_label="$2"; shift 2 ;;
         -d|--dest) dest_dir="$2" ; shift 2 ;;
         -h|--help) shift ; do_usage ; break ;;
         --) shift ; break ;;
-        :) echo "Error: -${OPTARG} requires an argument." ; do_usage ;;
+        :) echo "Error: -${OPTARG} requires an argument." ; do_usage ; exit 2 ;;
         *) do_usage ; exit 1 ;;
     esac
 done
@@ -40,33 +41,42 @@ if [ -z "$dest_dir" ] ; then
 fi
 
 dest_dir=$(readlink -e "$dest_dir")
-
 if [ ! -d "$dest_dir" ] ; then
     echo "Destination $dest_dir not found."
+    do_usage
+    exit 1
+fi
+
+gpg_homedir=$(readlink -e "$gpg_homedir")
+if [ ! -d "$gpg_homedir" ]; then
+    echo "GPG home dir $gpg_homedir not found."
+    do_usage
     exit 1
 fi
 
 dest_name=gnupg
-
 if [ -n "$dest_label" ] ; then
     dest_name=$dest_name-$dest_label
 fi
 
-if [ "$overwrite" == "false" ] ; then
+if [ "$no_overwrite" == "true" ] ; then
     dest_name=$dest_name-$(date "+%Y%m%d")
 fi
 
 dest_file="$dest_dir/$dest_name.tar"
-
-if [ -f "$dest_file" ] && [ "$overwrite" == "false" ] ; then
+if [ -f "$dest_file" ] && [ "$no_overwrite" == "true" ] ; then
     echo -e "File \"$dest_file\" exists.\nAborting."
     exit 1
 fi
 
+target_dir=$(basename $gpg_homedir)
+target_path=$(dirname $gpg_homedir)
+
 tar -cf "$dest_file" \
     --exclude "*/.#*" \
     --exclude "*~" \
-    -C "$HOME" .gnupg
+    --transform "s|$target_dir|.gnupg|" \
+    -C "$target_path" "$target_dir"
 
 if [ "$is_secret" == "true" ]; then
     secret --backup --src "$dest_file" --dest "$dest_file".enc
