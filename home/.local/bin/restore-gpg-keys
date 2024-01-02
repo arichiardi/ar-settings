@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+
+script_name=$(basename "$0")
+
+do_usage() {
+    echo -n
+    echo "Usage:"
+    echo "$script_name [--homedir <GnuPG home dir>] -s|--src <source dir>"
+}
+
+set +e
+TEMP=`getopt -o hs: --long help,homedir:,src:, -n "$script_name" -- "$@"`
+set -e
+eval set -- "$TEMP"
+
+gpg_homedir=
+src_dir=
+
+# extract options and their arguments into variables.
+while true ; do
+    case "$1" in
+        -s|--src) src_dir="$2" ; shift 2 ;;
+        --homedir) gpg_homedir="$2" ; shift 2 ;;
+        -h|--help) shift ; do_usage ; break ;;
+        --) shift ; break ;;
+        :) echo "Error: -${OPTARG} requires an argument." ; do_usage ;;
+        *) do_usage ; exit 1 ;;
+    esac
+done
+
+src_dir=$(readlink -e "${src_dir:=.}")
+if [ ! -d "$src_dir" ]; then
+    echo "Source $src_dir not found."
+    do_usage
+    exit 1
+fi
+
+gpg_args=""
+if [ -n "$gpg_homedir" ]; then
+    gpg_args+=" --homedir $gpg_homedir"
+fi
+
+source gpg-helpers.sh
+
+gpg_import_args+=" --quiet --import --import-options restore $gpg_s2k_args"
+
+echo "Importing public keys..."
+for f in $(find $src_dir -maxdepth 1 -name '*.pub');
+do
+    echo "  $f..."
+    gpg $gpg_args $gpg_import_args "$f"
+done
+
+echo "Importing private keys..."
+for f in $(find $src_dir -maxdepth 1 -name '*.gpg');
+do
+    echo "  $f..."
+    gpg $gpg_args $gpg_import_args "$f"
+done
+
+echo "Import owner trust..."
+gpg --decrypt --quiet $gpg_symmetric_args $src_dir/ownertrust.enc | \
+    gpg $gpg_args --import-ownertrust

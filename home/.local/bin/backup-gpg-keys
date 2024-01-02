@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+
+script_name=$(basename "$0")
+
+do_usage() {
+    echo -n
+    echo "Usage:"
+    echo "$script_name [--homedir <GnuPG home dir>] -i|--identity <gpg email> -d|--dest <destination dir>"
+}
+
+set +e
+TEMP=`getopt -o hd:i: --long help,homedir:,dest:,identity: -n "$script_name" -- "$@"`
+set -e
+eval set -- "$TEMP"
+
+gpg_homedir=
+gpg_identity=
+dest_dir=
+
+# extract options and their arguments into variables.
+while true ; do
+    case "$1" in
+        -d|--dest) dest_dir="$2" ; shift 2 ;;
+        -i|--identity) gpg_identity="$2" ; shift 2 ;;
+        --homedir) gpg_homedir="$2" ; shift 2 ;;
+        -h|--help) shift ; do_usage ; break ;;
+        --) shift ; break ;;
+        :) echo "Error: -${OPTARG} requires an argument." ; do_usage ;;
+        *) do_usage ; exit 1 ;;
+    esac
+done
+
+if [ -z "$gpg_identity" ]; then
+    echo "The GPG identity is required."
+    do_usage
+    exit 1
+fi
+
+dest_dir=$(readlink -e "${dest_dir:=.}")
+if [ ! -d "$dest_dir" ]; then
+    echo "Destination $dest_dir not found."
+    do_usage
+    exit 1
+fi
+
+gpg_args=""
+if [ -n "$gpg_homedir" ]; then
+    gpg_args+=" --homedir $gpg_homedir"
+fi
+
+source gpg-helpers.sh
+
+declare -a keyids
+for keyid in $(gpg $gpg_args -K --with-colons --keyid-format long \
+                   $gpg_identity \
+                   | awk -F: '$1 == "fpr" || $1 == "fp2" {print $10}');
+do
+    keyids+=("$keyid")
+done
+
+for keyid in ${keyids[@]}
+do
+    short_keyid=${keyid: -16}
+    echo "Exporting 0x$short_keyid..."
+    gpg_args+=" --quiet --armor --export-options backup $gpg_s2k_args"
+    gpg $gpg_args --export --output "$dest_dir/$keyid.pub" "$keyid"!
+    gpg $gpg_args --export-secret-keys --output "$dest_dir/$keyid.gpg" "$keyid"!
+done
+
+echo "Exporting owner trust for $gpg_identity..."
+gpg --export-ownertrust | \
+    grep -E "${keyids// /|}" | \
+    gpg --symmetric $gpg_symmetric_args > "$dest_dir/ownertrust.enc"

@@ -3,6 +3,6 @@ set -euo pipefail
 
 source ./helpers
 
-echo-info "Clone ar-settings into $HOME/git"
+echo "Clone ar-settings into $HOME/git"
 mkdir -p $HOME/git
 git clone git@github.com:arichiardi/ar-settings.git $HOME/git/ar-settings
