@@ -1,35 +1,35 @@
 #!/bin/bash
+set -euo pipefail
 
 # Delay before starting. This should be 10 because send-notify is dumb on Ubuntu.
-DELAY=5
+delay=5
 
-DURATION=10
+duration=
 
-FOLDER="$HOME/tmp"
+folder="$HOME/tmp"
 
-TIME=$(date +"%Y-%m-%d_%H%M%S")
+time=$(date +"%Y-%m-%d_%H%M%S")
 
-USERDUR=$(gdialog --title "Duration?" --inputbox "Please enter the screencast duration in seconds" 200 100 2>&1)
-# Duration and output file
-if [ $USERDUR -gt 0 ]; then
-    D=$USERDUR
+userdur=$(zenity --entry --title "Duration?" --text "Please enter the screencast duration in seconds")
+if [ $? -gt 0 ]; then
+    duration=$userdur
 else
-    D=$DURATION
+    duration=10
 fi
 
-BEEPSOUND="/usr/share/sounds/freedesktop/stereo/message-new-instant.oga"
+beepsound="/usr/share/sounds/freedesktop/stereo/message-new-instant.oga"
 beep() {
-    paplay $BEEPSOUND &
+    paplay $beepsound &
 }
 
 # xrectsel from https://github.com/lolilolicon/xrectsel
-GEOMETRY=$(xrectsel "--x=%x --y=%y --width=%w --height=%h") || exit -1
+geometry=$(xrectsel "--x=%x --y=%y --width=%w --height=%h") || exit -1
 
 # Notify the user of recording time and delay
-notify-send -t $((DELAY*1000)) -u normal -i info "Byzanz" "Recording in ${DELAY}s"
+notify-send -t $((delay*1000)) -u normal -i info "Byzanz" "Recording in ${delay}s"
 
-sleep $(( $DELAY+1 ))
+sleep $(( $delay+1 ))
 beep
-byzanz-record --delay=0 --duration=$D $GEOMETRY "$FOLDER/recording_$TIME.gif"
+byzanz-record --delay=0 --duration=$duration $geometry "$folder/recording_$time.gif"
 beep
-notify-send -u normal -i info "Byzanz" "Recorded in ${FOLDER}/recording_${TIME}.gif"
+notify-send -u normal -i info "Byzanz" "Recorded in ${folder}/recording_${time}.gif"
