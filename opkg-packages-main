@@ -1,0 +1,5 @@
+curl
+libcurl4
+libnghttp3
+libngtcp2
+luci-app-https-dns-proxy
