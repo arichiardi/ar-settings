@@ -41,6 +41,27 @@ function pkg_install () {
     fi
 }
 
+# The following replaces "readlink -f" behavior for macOS
+# see https://stackoverflow.com/a/22971167/1888507
+_canonicalize_dir_path() {
+    (cd "$1" 2>/dev/null && pwd -P)
+}
+
+_canonicalize_file_path() {
+    local dir file
+    dir=$(dirname -- "$1")
+    file=$(basename -- "$1")
+    (cd "$dir" 2>/dev/null && printf '%s/%s\n' "$(pwd -P)" "$file")
+}
+
+canonicalize_path() {
+    if [ -d "$1" ]; then
+        _canonicalize_dir_path "$1"
+    else
+        _canonicalize_file_path "$1"
+    fi
+}
+
 function cleanup_after_error() {
     # $1 The dir to remove
     rm -rf "$1"

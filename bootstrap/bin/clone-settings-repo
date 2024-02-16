@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-source ./helpers
-
-echo "Clone ar-settings into $HOME/git"
-mkdir -p $HOME/git
-git clone git@github.com:arichiardi/ar-settings.git $HOME/git/ar-settings

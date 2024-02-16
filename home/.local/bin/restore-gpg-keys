@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 
-script_name=$(basename "$0")
+script_path="${BASH_SOURCE[0]}"
+script_dir=$(dirname "$script_path")
+script_name=$(basename "$script_path")
 
 do_usage() {
     echo -n
     echo "Usage:"
-    echo "$script_name [--homedir <GnuPG home dir>] -s|--src <source dir>"
+    echo "$script_name [--homedir <GnuPG home dir>] -s|--src <source dir or \"gpg\" in working dir>"
 }
 
 set +e
@@ -28,7 +30,7 @@ while true ; do
     esac
 done
 
-src_dir=$(readlink -e "${src_dir:=.}")
+src_dir=$(readlink -e "${src_dir:=gpg}")
 if [ ! -d "$src_dir" ]; then
     echo "Source $src_dir not found."
     do_usage
@@ -40,7 +42,7 @@ if [ -n "$gpg_homedir" ]; then
     gpg_args+=" --homedir $gpg_homedir"
 fi
 
-source gpg-helpers.sh
+source $(readlink -e "$script_dir/gpg-helpers.sh")
 
 gpg_import_args+=" --quiet --import --import-options restore $gpg_s2k_args"
 
