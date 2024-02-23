@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-set -euo pipefail
-
-source ./helpers
-
-echo-info "Installing Emacs from the AUR..."
-pkg_install emacs28-git
