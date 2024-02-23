@@ -1,5 +1,8 @@
+ca-bundle
 curl
+ddns-scripts
 libcurl4
 libnghttp3
 libngtcp2
+luci-app-ddns
 luci-app-https-dns-proxy
