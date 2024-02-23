@@ -1,29 +1,25 @@
-{:deps    {org.clojure/clojure {:mvn/version "1.10.0"}}
- :aliases {:cljs {:extra-deps
-                  {org.clojure/clojurescript {:mvn/version "1.10.339"}}}
+{:deps    {org.clojure/clojure {:mvn/version "1.11.1"}}
+ :aliases {:figwheel {:extra-deps {com.bhauman/figwheel-main {:mvn/version "0.1.9"}}}
 
-           :cljs-canary {:extra-deps
-                         {org.clojure/clojurescript {:mvn/version "1.10.520"}}}
+           :nrepl {:extra-deps {cider/cider-nrepl             {:mvn/version "0.44.0"}
+                                refactor-nrepl/refactor-nrepl {:mvn/version "3.6.0"}
+                                org.clojure/tools.deps.alpha
+                                {:git/url "https://github.com/clojure/tools.deps.alpha"
+                                 :git/sha "07447d8436ed27ab049efe4b8ba0e91f6c7142a6"}}}
 
-           :figwheel {:extra-deps {com.bhauman/figwheel-main {:mvn/version "0.1.9"}}}
+           :nrepl-main {:extra-deps {cider/cider-nrepl             {:mvn/version "0.44.0"}
+                                     refactor-nrepl/refactor-nrepl {:mvn/version "3.6.0"}
+                                     org.clojure/tools.deps.alpha
+                                     {:git/url "https://github.com/clojure/tools.deps.alpha"
+                                      :git/sha "07447d8436ed27ab049efe4b8ba0e91f6c7142a6"}}
+                        :main-opts  ["-m" "nrepl.cmdline" "--middleware" "[cider.nrepl/cider-middleware]"]}
 
-           :nrepl-clj {:extra-deps {cider/cider-nrepl             {:mvn/version "0.25-SNAPSHOT"}
-                                    refactor-nrepl/refactor-nrepl {:mvn/version "2.4.0"}
-                                    zprint/zprint                 {:mvn/version "0.4.15"}}
-                       :main-opts  ["-m" "nrepl.cmdline" "--middleware" "[cider.nrepl/cider-middleware]"]}
-
-           :nrepl-cljs {:extra-deps {cider/cider-nrepl             {:mvn/version "0.25-SNAPSHOT"}
-                                     refactor-nrepl/refactor-nrepl {:mvn/version "2.4.0"}
-                                     cider/piggieback              {:mvn/version "0.3.9"}
-                                     zprint/zprint                 {:mvn/version "0.4.15"}}
-                        :main-opts  ["-m" "nrepl.cmdline" "--middleware" "[cider.nrepl/cider-middleware,cider.piggieback/wrap-cljs-repl]"]}
-
-           :editor {:extra-deps {cider/cider-nrepl             {:mvn/version "0.25-SNAPSHOT"}
-                                 refactor-nrepl/refactor-nrepl {:mvn/version "2.4.0"}
-                                 cider/piggieback              {:mvn/version "0.3.10"}
-                                 zprint/zprint                 {:mvn/version "0.4.15"}}}
-
-           :nrepl {:extra-deps {nrepl/nrepl {:mvn/version "0.6.0"}}}
+           :nrepl-cljs {:extra-deps {cider/cider-nrepl             {:mvn/version "0.44.0"}
+                                     refactor-nrepl/refactor-nrepl {:mvn/version "3.6.0"}
+                                     cider/piggieback              {:mvn/version "0.5.3"}}
+                        :main-opts  ["-m" "nrepl.cmdline"
+                                     "--interactive"
+                                     "--middleware" "[cider.nrepl/cider-middleware,cider.piggieback/wrap-cljs-repl]"]}
 
            :rebel {:extra-deps {com.bhauman/rebel-readline {:mvn/version "0.1.4"}}
                    :main-opts  ["-m" "rebel-readline.main"]}
@@ -34,24 +30,9 @@
                         :main-opts  ["-e" "(require,'suitable.hijack-rebel-readline-complete)"
                                      "-m" "rebel-readline.cljs.main"]}
 
-           :new {:extra-deps {seancorfield/clj-new {:git/url "https://github.com/seancorfield/clj-new"
-                                                    :sha     "4c8b21e1d33d96784e386754d99708772f5ba6e5"}}
-                 :main-opts  ["-m" "clj-new.create"]}
+           :zprint {:extra-deps {zprint/zprint {:mvn/version "1.2.3"}}}
 
-           :gen {:extra-deps {seancorfield/clj-new {:git/url "https://github.com/seancorfield/clj-new"
-                                                    :sha     "4c8b21e1d33d96784e386754d99708772f5ba6e5"}}
-                 :main-opts  ["-m" "clj-new.generate"]}
-
-           :ancient {:extra-deps {olical/depot {:mvn/version "1.4.0"}}
-                     :main-opts  ["-m" "depot.outdated.main"]}
-
-           :depify {:extra-deps {org.clojure/clojure {:mvn/version "1.9.0"}
-                                 depify/depify       {:git/url "https://github.com/hagmonk/depify"
-                                                      :sha     "b3f61517c860518c1990133aa6eb54caf1e4d591"}}
-                    :main-opts  ["-m" "depify.project"]}
-
-           :zprint/zprint {:extra-deps {zprint/zprint {:mvn/version "0.4.15"}}}
-
-           :pack {:extra-deps {pack/pack.alpha {:git/url "https://github.com/juxt/pack.alpha.git"
-                                                :sha     "e64139d27febd5e127bf588fbf065c24d2503279"}}
-                  :main-opts  ["-m" "mach.pack.alpha.skinny" "--no-libs"]}}}
+           :xtdb-canary {:override-deps {com.xtdb/xtdb-core                  {:mvn/version "dev-SNAPSHOT"}
+                                         com.xtdb/xtdb-http-server           {:mvn/version "dev-SNAPSHOT"}
+                                         com.xtdb/xtdb-jdbc                  {:mvn/version "dev-SNAPSHOT"}
+                                         com.xtdb/xtdb-lmdb                  {:mvn/version "dev-SNAPSHOT"}}}}}
