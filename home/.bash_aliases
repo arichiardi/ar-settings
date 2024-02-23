@@ -16,11 +16,12 @@ alias head1='head -n1'
 alias tail1='tail -n1'
 alias load-env='function load-env { export $(cat $1 | grep -v ^# | xargs); }; load-env'
 alias commit-ts='function commit-ts-fn { local datetime=$(date --iso-8601=second); local submodule_message="Commit on $datetime"; git add . ; git commit -m "$submodule_message"; }; commit-ts-fn'
+alias docker-gateway="docker network inspect bridge --format='{{(index .IPAM.Config 0).Gateway}}'"
 
 # Clojure
 alias l='lein'
 alias b='boot'
-alias clj-repl='function do_repl { clojure -J-Dclojure.server.repl="{:port ${1:-5555} :accept clojure.core.server/repl}" -M:rebel; }; do_repl'
+alias clj-repl='function do_repl { clojure -J-Dclojure.server.repl="{:port ${1:-5555} :accept clojure.core.server/repl}" -M:rebel:zprint; }; do_repl'
 alias cljs-node-repl='function do_repl { clojure -J-Dclojure.server.repl="{:port ${1:-5555} :accept cljs.server.node/repl}" -R:cljs-canary -M:rebel-cljs -m cljs.main -re node -r; }; do_repl'
 
 # Emacs
@@ -51,3 +52,6 @@ alias mcisst='mvn clean install -DskipTests -DskipITests -DskipAllTests -Dskip.c
 # Docker
 alias docker-tcp='sudo systemctl stop docker; nohup sudo docker daemon -H tcp://localhost:4243 --raw-logs > /dev/null 2>&1 &'
 alias docker-rmia='docker rmi $(docker images -qf "dangling=true")'
+
+# Asciidoc
+alias asciidoc-docker-pdf='docker run --rm -v $(pwd):/documents/ asciidoctor/docker-asciidoctor asciidoctor-pdf'
