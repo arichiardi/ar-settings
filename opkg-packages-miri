@@ -8,12 +8,15 @@ curl
 ddns-scripts
 kmod-gpio-button-hotplug
 kmod-usb-net-qmi-wwan
+kmod-usb-serial
+kmod-usb-serial-option
 kmod-usb-storage
 kmod-usb2
 libcurl4
 libnghttp3
 libngtcp2
 luci-app-ddns
+luci-app-lite-watchdog  # https://github.com/4IceG/luci-app-lite-watchdog/tree/main
 luci-mod-rpc
 luci-proto-qmi
 odhcp6c
@@ -21,6 +24,7 @@ odhcpd-ipv6only
 picocom
 ppp
 ppp-mod-pppoe
+sms-tool
 uboot-envtools
 unzip
 uqmi
