@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -u
 
 script_path="${BASH_SOURCE[0]}"
 script_name=$(basename "$script_path")
@@ -33,7 +33,7 @@ while true ; do
     esac
 done
 
-src_dir=$(readlink -f "${src_dir:=gpg}")
+src_dir=$(readlink -m "${src_dir:=gpg}")
 if [ ! -d "$src_dir" ]; then
     echo "Source $src_dir not found."
     do_usage
@@ -48,4 +48,4 @@ cp -iv "$src_dir/gpg-agent.conf" "$gpg_homedir"
 cp -iv "$src_dir/dirmngr.conf" "$gpg_homedir"
 
 echo-info "Restoring sshcontrol"
-$secret_bin --restore --src "$src_dir/sshcontrol.enc" --dest "$gpg_homedir"
+$secret_bin --restore --src "$src_dir/sshcontrol.enc" --dest "$gpg_homedir/sshcontrol"
