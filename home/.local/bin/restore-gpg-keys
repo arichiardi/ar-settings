@@ -32,7 +32,7 @@ while true ; do
     esac
 done
 
-src_dir=$(readlink -f "${src_dir:=gpg}")
+src_dir=$(readlink -m "${src_dir:=gpg}")
 if [ ! -d "$src_dir" ]; then
     echo "Source $src_dir not found."
     do_usage
