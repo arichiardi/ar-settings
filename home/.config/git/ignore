@@ -5,3 +5,4 @@ gtags.files
 GPATH
 GRTAGS
 GTAGS
+transient/history.el
