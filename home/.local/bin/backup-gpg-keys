@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 script_name=$(basename "$0")
 
 do_usage() {
@@ -36,7 +35,7 @@ if [ -z "$gpg_identity" ]; then
     exit 1
 fi
 
-dest_dir=$(readlink -e "${dest_dir:=.}")
+dest_dir=$(readlink -m "${dest_dir:=.}")
 if [ ! -d "$dest_dir" ]; then
     echo "Destination $dest_dir not found."
     do_usage
