@@ -103,8 +103,6 @@
     sa = "stash apply"
     sl = "stash list"
     ski = "stash save --keep-index"
-[protocol "keybase"]
-    allow = always
 [credential]
     # Compile the git-credential-netrc helper from the git repo
     # https://andrearichiardi.com/blog/posts/git-credential-netrc.html
