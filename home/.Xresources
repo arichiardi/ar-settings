@@ -5,9 +5,7 @@
 !! Emacs - https://www.gnu.org/software/emacs/manual/html_node/emacs/X-Resources.html
 Emacs.menuBar:     0
 Emacs.toolBar:     0
-Emacs.FontBackend: xfthb
-Emacs.font:        JetBrains Mono-11
-! Emacs.lineSpacing: 1.2
+Emacs.font:        JetBrains Mono-12
 
 ! Xft settings ---------------------------------------------------------------
 Xft.dpi:       96
@@ -15,7 +13,7 @@ Xft.antialias: true
 Xft.hinting:   false
 Xft.rgba:      none
 Xft.autohint:  false
-Xft.hintstyle: hintslight
+Xft.hintstyle: hintmedium
 Xft.lcdfilter: lcddefault
 
 XTerm*background:        #222D31

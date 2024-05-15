@@ -8,9 +8,9 @@ URxvt*rewrapMode: never
 URxvt*geometry: 95x240+0+0
 URxvt*scrollBar: false
 URxvt*saveLines: 16384
-URxvt*font: xft:JetBrains Mono:style=g:antialias=true:size=11
-URxvt*boldFont: xft:JetBrains Mono:style=g:bold:antialias=true:size=11
-URxvt*letterSpace: -1
+URxvt*font: xft:JetBrains Mono:style=g:antialias=false:size=12
+URxvt*boldFont: xft:JetBrains Mono:style=g:bold:antialias=false:size=12
+URxvt*letterSpace: 0
 URxvt*lineSpace: -1
 URxvt*reverseVideo: off
 URxvt*fading: 25
