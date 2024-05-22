@@ -1,10 +1,24 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
-muted_icon=/path/to/audio-input-microphone-muted-symbolic
-unmuted_icon=/path/to/audio-input-microphone-symbolic
-notify_cmd="notify-send -t 500 -u critical -h string:x-canonical-private-synchronous:anything"
+muted_icon=/usr/share/icons/Adwaita/symbolic/status/microphone-disabled-symbolic.svg
+unmuted_icon=/usr/share/icons/Adwaita/scalable/devices/microphone.svg
+notify_cmd="notify-send -t 750 -u normal -h string:x-canonical-private-synchronous:anything"
 
-amixer -D pulse set Capture toggle | grep '\[off\]' \
-    && $($notify_cmd -i $muted_icon "Microphone" "muted") \
-    || $($notify_cmd -i $unmuted_icon "Microphone" "unmuted")
+# Thank you stranger:
+#   https://askubuntu.com/a/1291627
+
+# Get active audio source index
+current_source=$(pactl info | grep "Default Source" | cut -f3 -d" ")
+
+# List lines in pactl after the source name match and pick mute status
+set +e
+source_muted=$(pactl list sources | grep -A 10 $current_source | grep -c "Mute: yes")
+set -e
+if [ "$source_muted" -eq 0 ]; then
+    pactl set-source-mute "$current_source" false
+    $notify_cmd -i $unmuted_icon "Microphone" "unmuted"
+else
+    pactl set-source-mute "$current_source" true
+    $notify_cmd -i $muted_icon "Microphone" "muted"
+fi
