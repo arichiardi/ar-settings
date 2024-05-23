@@ -1,6 +1,6 @@
-set mainfont {{Noto Sans} 10}
+set mainfont {{Liberation Sans} 11}
 set textfont {{JetBrains Mono} 10}
-set uifont {{Noto Sans} 10}
+set uifont {{Liberation Sans} 11}
 set tabstop 8
 set findmergefiles 0
 set maxgraphpct 50
