@@ -432,11 +432,11 @@ mode "$mode_gaps_outer" {
         bindsym Escape mode "default"
 }
 
-set $mode_display HDMI display (a)uto, primary (r)ight, primary (l)eft
+set $mode_display HDMI display (a)uto, (h)ome, (l)aptop only
 mode "$mode_display" {
   bindsym a exec --no-startup-id "xrandr --auto; sleep 0.5; nitrogen --restore"
-  bindsym r exec --no-startup-id "primary-right-of-secondary.sh $primary-display-id $secondary-display-id; sleep 0.5; nitrogen --restore"
-  bindsym l exec --no-startup-id "primary-left-of-secondary.sh $primary-display-id $secondary-display-id; sleep 0.5; nitrogen --restore"
+  bindsym h exec --no-startup-id "$HOME/.screenlayout/setup-home.sh; sleep 0.5; nitrogen --restore"
+  bindsym l exec --no-startup-id "$HOME/.screenlayout/setup-laptop-only.sh; sleep 0.5; nitrogen --restore"
 
   # back to normal: Enter or Escape
   bindsym Return mode "default"
@@ -466,36 +466,4 @@ bindsym XF86AudioMute exec --no-startup-id mute-mic # As opposed to XF86AudioMic
 exec --no-startup-id i3-battery-popup -n -m 'Battery level is getting low' -i $battery-low-icon
 
 # Display
-#exec --no-startup-id "primary-between-displays.sh --primary $primary-display-id --left $secondary-display-id --right eDP-1; sleep 0.5; nitrogen --restore"
-
-# Cohesic
-assign [class="^URxvt$" title="^cohesic-appserver"] $ws3
-assign [class="^Chromium$" window_role="browser" title="^cardioDI"] $ws3
-
-assign [class="^URxvt$" title="^cohesic-sql"] $ws10
-assign [class="^URxvt$" title="^cohesic-api"] $ws10
-assign [class="^URxvt$" title="^cohesic-web"] $ws10
-assign [class="^URxvt$" title="^cohesic-report"] $ws10
-assign [class="^URxvt$" title="^cohesic-storybook"] $ws10
-assign [class="^URxvt$" title="^cohesic-doc"] $ws10
-assign [class="^URxvt$" title="^cohesic-sql-reset"] $ws10
-assign [class="^URxvt$" title="^cohesic-openapi"] $ws10
-assign [class="^URxvt$" title="^cohesic-sql-state"] $ws10
-
-set $mode_cardiodi Start (e)2e Appserver, (l)egacy api, (w)eb, story(b)ook, (r)eport, (o)penapi, (d)ocumentation, (s)tate service, (Shift+R)eset database
-mode "$mode_cardiodi" {
-        bindsym e exec --no-startup-id "urxvt -ls -hold -title cohesic-appserver -cd $HOME/git/cohesic/acuity/appserver -e sh -c 'bash -i bin/serve-e2e'"
-        bindsym l exec --no-startup-id "urxvt -ls -hold -title cohesic-api -cd $HOME/git/cohesic/acuity -e sh -c 'bash -i $(pwd)/scripts/start-services.sh api'"
-        bindsym w exec --no-startup-id "urxvt -ls -hold -title cohesic-web -cd $HOME/git/cohesic/acuity -e sh -c 'bash -i cdt start client'"
-        bindsym b exec --no-startup-id "urxvt -ls -hold -title cohesic-storybook -cd $HOME/git/cohesic/acuity -e sh -c 'bash -i $(pwd)/scripts/start-services.sh storybook --cardiodi'"
-        bindsym r exec --no-startup-id "urxvt -ls -hold -title cohesic-report -cd $HOME/git/cohesic/acuity -e sh -c 'bash -i $(pwd)/scripts/start-services.sh report'"
-        bindsym o exec --no-startup-id "urxvt -ls -hold -title cohesic-openapi -cd $HOME/git/cohesic/acuity -e sh -c 'bash -i $(pwd)/scripts/start-services.sh openapi'"
-        bindsym d exec --no-startup-id "urxvt -ls -hold -title cohesic-doc -cd $HOME/git/cohesic-internal-site -e bash -i -c 'make serve-local'"
-        bindsym s exec --no-startup-id "urxvt -ls -hold -title cohesic-sql-state -cd $HOME/git/cohesic/acuity -e sh -c 'bash -i cdt start state-service'"
-        bindsym Shift+r exec --no-startup-id "urxvt -ls -hold -title cohesic-sql-reset -cd $HOME/git/cohesic/acuity -e sh -c 'bash -i cdt db reset'"
-
-        # exit mode: Enter or Escape
-        bindsym Return mode "default"
-        bindsym Escape mode "default"
-}
-bindsym $mod+Mod1+i mode "$mode_cardiodi"
+exec --no-startup-id "$HOME/.screenlayout/setup-home.sh; sleep 0.5; nitrogen --restore"
