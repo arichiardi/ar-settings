@@ -467,3 +467,6 @@ exec --no-startup-id i3-battery-popup -n -m 'Battery level is getting low' -i $b
 
 # Display
 exec --no-startup-id "$HOME/.screenlayout/setup-home.sh; sleep 0.5; nitrogen --restore"
+
+# Wildcards are expanded:
+include ~/.config/i3/config.d/*.conf
