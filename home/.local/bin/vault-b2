@@ -77,9 +77,8 @@ if [ "$action" == "backup" ]; then
             $vault_file_name
 elif [ "$action" == "restore" ]; then
     if [ ! -f "$vault_local_path" ]; then
-        $b2_bin download-file-by-name \
-                $bucket_name \
-                $vault_file_name \
+        $b2_bin download-file \
+                b2://$bucket_name/$vault_file_name \
                 $vault_local_path
     else
         error_code=66
