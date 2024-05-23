@@ -7,6 +7,7 @@ set $mod Mod4
 # Display management
 set_from_resource $primary-display-id i3wm.primaryDisplayId e-DP1
 set_from_resource $secondary-display-id i3wm.secondaryDisplayId DP-1
+set_from_resource $battery-low-icon i3wm.batteryLowIcon
 
 # set default desktop layout (default is tiling)
 # workspace_layout tabbed <stacking|tabbed>
@@ -462,7 +463,7 @@ bindsym XF86AudioLowerVolume exec "pactl set-sink-volume @DEFAULT_SINK@ -1000"
 bindsym XF86AudioMute exec --no-startup-id mute-mic # As opposed to XF86AudioMicMute
 
 # Battery
-exec --no-startup-id i3-battery-popup -n -m 'Battery level is getting low' -i /usr/share/icons/Vibrancy-Colors/status/scalable/battery-low-symbolic.svg
+exec --no-startup-id i3-battery-popup -n -m 'Battery level is getting low' -i $battery-low-icon
 
 # Display
 #exec --no-startup-id "primary-between-displays.sh --primary $primary-display-id --left $secondary-display-id --right eDP-1; sleep 0.5; nitrogen --restore"
