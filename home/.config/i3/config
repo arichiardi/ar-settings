@@ -48,11 +48,9 @@ bindsym $mod+Escape exec --no-startup-id rofi -show drun
 ## sound-section - DO NOT EDIT if you wish to automatically upgrade Alsa -> Pulseaudio later! ##
 ################################################################################################
 
-exec --no-startup-id volumeicon
-#bindsym $mod+Ctrl+m exec terminal -e 'alsamixer'
 #exec --no-startup-id pulseaudio # not necessary, the distro does it for us
-#exec --no-startup-id pa-applet  # not that good
-bindsym $mod+Mod1+m exec pavucontrol
+exec --no-startup-id pa-applet
+bindsym $mod+Mod1+m exec --no-startup-id pavucontrol
 
 ################################################################################################
 
@@ -459,14 +457,11 @@ bindsym $mod+F4 exec "rhythmbox-client --play-pause"
 bindsym $mod+F5 exec "rhythmbox-client --next"
 bindsym $mod+F6 exec "rhythmbox-client --previous"
 bindsym $mod+F7 exec "rhythmbox-client --clear-queue"
-bindsym XF86AudioRaiseVolume exec "amixer -D pulse sset Master 5%+"
-bindsym XF86AudioLowerVolume exec "amixer -D pulse sset Master 5%-"
-bindsym XF86AudioMute exec "amixer -D pulse sset Master toggle"
 
 # Microphone
-bindsym Shift+XF86AudioRaiseVolume exec "amixer -D pulse set Capture 10%+"
-bindsym Shift+XF86AudioLowerVolume exec "amixer -D pulse set Capture 10%-"
-bindsym XF86AudioMicMute exec mute-mic
+bindsym XF86AudioRaiseVolume exec "pactl set-sink-volume @DEFAULT_SINK@ +1000"
+bindsym XF86AudioLowerVolume exec "pactl set-sink-volume @DEFAULT_SINK@ -1000"
+bindsym XF86AudioMute exec --no-startup-id mute-mic # As opposed to XF86AudioMicMute
 
 # Battery
 exec --no-startup-id i3-battery-popup -n -m 'Battery level is getting low' -i /usr/share/icons/Vibrancy-Colors/status/scalable/battery-low-symbolic.svg
