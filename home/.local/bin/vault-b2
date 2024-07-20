@@ -69,7 +69,7 @@ vault_local_path="$vault_local_dir/$vault_file_name"
 
 if [ "$action" == "backup" ]; then
     vault_sha1=$(sha1sum --binary $vault_local_path | cut -d' ' -f1)
-    $b2_bin upload-file \
+    $b2_bin file upload \
             --info large_file_sha1=$vault_sha1 \
             --sha1 $vault_sha1 \
             $bucket_name \
@@ -77,7 +77,7 @@ if [ "$action" == "backup" ]; then
             $vault_file_name
 elif [ "$action" == "restore" ]; then
     if [ ! -f "$vault_local_path" ]; then
-        $b2_bin download-file \
+        $b2_bin file download \
                 b2://$bucket_name/$vault_file_name \
                 $vault_local_path
     else
