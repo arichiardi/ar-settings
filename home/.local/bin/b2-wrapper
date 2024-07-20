@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
-set -x
-b2_bin=backblaze-b2
+
+b2_bin=bbb2
 
 cleanup() {
-  if account_info=$($b2_bin get-account-info 2>&1); then
+  if account_info=$($b2_bin account get 2>&1); then
     local account_file_path=$(echo "$account_info" | python -c 'import json,sys;obj=json.load(sys.stdin);print(obj["accountFilePath"])')
     if [ -n "$account_file_path" ]; then
       rm -f $account_file_path
