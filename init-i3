@@ -16,17 +16,19 @@ home_dir=$(pwd)/home
 secret_bin=$home_dir/.local/bin/secret
 temp_dir=$(mktemp -d -t "ar-init-i3.XXXXXXXXXX")
 
+diff_tool=emacsclient-ediff-diff.sh
+
 source $home_dir/.local/share/ar/helpers.sh
 
 echo-info "Installing i3 and related packages"
-pkg_install i3-wm i3blocks i3exit i3lock i3status i3-battery-popup-git rofi conky pcmanfm-gtk3 keepassxc ttf-jetbrains-mono
+pkg_install i3-wm i3blocks i3exit i3lock i3status i3-battery-popup-git rofi conky pcmanfm-git keepassxc ttf-jetbrains-mono
 
 pushd $home_dir > /dev/null
 
-config_files="$home_dir/.config/i3-scrot.conf \
-    $home_dir/.config/i3status/config \
-    $home_dir/.config/i3/config \
-    $home_dir.config/rofi/config.rasi" 
+config_files=".config/i3-scrot.conf \
+    .config/i3status/config \
+    .config/i3/config \
+    .config/rofi/config.rasi"
 
 echo-info "Diffing i3 config files"
 for f in $config_files; do
@@ -42,7 +44,7 @@ for f in $config_files; do
 
     case $exit_code in
         0) echo-info "File $local_f already up-to-date.";;
-        1) echo-warn "File $local_f is outdated or missing, opening diff tool..."; set +e; vimdiff "$local_f" "$f"; set -e;;
+        1) echo-warn "File $local_f is outdated or missing, opening diff tool..."; set +e; $diff_tool "$local_f" "$f"; set -e;;
         *) echo-fail "Unidentified $f diff exit code ($exit_code), skipping.";;
     esac
 done
