@@ -25,4 +25,4 @@ if [[ ! ( ! "$emacs_params" =~ "-c" && ! "$emacs_params" =~ "-nw" ) ]]; then
     emacs_param="-c $EMACS_PARAMS"
 fi
 
-$emacsclient_bin $emacs_params $@
+$emacsclient_bin $emacs_params "$@"
