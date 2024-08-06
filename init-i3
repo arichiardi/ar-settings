@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+#
+# Initialize i3 within this system.
+#
+# The scripts has to be run from the ar-settings repository.
+#
+set -euo pipefail
+
+# For skipping sections, use this trick:
+#
+#   cat >/dev/null <<LABEL
+#
+# see the brilliant answer here: https://stackoverflow.com/a/45538151
+
+home_dir=$(pwd)/home
+secret_bin=$home_dir/.local/bin/secret
+temp_dir=$(mktemp -d -t "ar-init-i3.XXXXXXXXXX")
+
+source $home_dir/.local/share/ar/helpers.sh
+
+echo-info "Installing i3 and related packages"
+pkg_install i3-wm i3blocks i3exit i3lock i3status i3-battery-popup-git rofi conky pcmanfm-gtk3 keepassxc ttf-jetbrains-mono
+
+pushd $home_dir > /dev/null
+
+config_files="$home_dir/.config/i3-scrot.conf \
+    $home_dir/.config/i3status/config \
+    $home_dir/.config/i3/config \
+    $home_dir.config/rofi/config.rasi" 
+
+echo-info "Diffing i3 config files"
+for f in $config_files; do
+    local_f=$(readlink --no-newline --canonicalize-missing "$HOME/$f")
+    set +e
+    (set -x; diff --new-file "$local_f" "$f" > /dev/null)
+    exit_code=$?
+    set -e
+
+    local_d=$(dirname "$local_f")
+    echo-info "Creating $local_d directory..."
+    mkdir -p "$local_d"
+
+    case $exit_code in
+        0) echo-info "File $local_f already up-to-date.";;
+        1) echo-warn "File $local_f is outdated or missing, opening diff tool..."; set +e; vimdiff "$local_f" "$f"; set -e;;
+        *) echo-fail "Unidentified $f diff exit code ($exit_code), skipping.";;
+    esac
+done
+
+popd > /dev/null

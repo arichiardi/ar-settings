@@ -17,23 +17,35 @@ function skipping    { echo-skip "   already installed; skipping."; }
 function success     { echo-ok   "   success!"; }
 
 function pkg_install () {
+    local packages=$1
+
     local distro;
     local cmd;
-    local usesudo
+    local usesudo=
 
     declare -A pkgmgr
     pkgmgr=( \
       [arch]="pacman -S --noconfirm" \
+      [arch-yay]="yay -Sy" \
       [alpine]="apk add --no-cache" \
       [debian]="apt-get install -y" \
       [ubuntu]="apt-get install -y" \
     )
 
-    distro=$(cat /etc/os-release | tr [:upper:] [:lower:] | grep -Poi '(debian|ubuntu|red hat|centos|arch|alpine)' | uniq)
-    cmd="${pkgmgr[$distro]}"
+    distro=$(cat /etc/os-release | tr [:upper:] [:lower:] | grep -Poi '(debian|ubuntu|red hat|centos|arch|alpine)' | uniq) 
+    modifier=
+    if [ $(which yay) ]; then
+	modifier=-yay
+    fi
+
+    cmd="${pkgmgr[$distro$modifier]}"
     [[ ! $cmd ]] && return 1
-    if [[ $1 ]]; then
-        [[ ! $EUID -eq 0 ]] && usesudo=sudo
+
+    if [[ $packages ]]; then
+	# We cannot run sudo yay if there are aur packages - the following workaround is horrible.
+        if [[ ! $EUID -eq 0 ]] && [[ ! "$modifier" =~ "yay" ]]; then
+            usesudo=sudo
+	fi
         echo-info Installing package with: $usesudo $cmd $@
         $usesudo $cmd $@
     else
