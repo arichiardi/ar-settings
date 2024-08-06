@@ -39,13 +39,13 @@ for f in $config_files; do
     set -e
 
     local_d=$(dirname "$local_f")
-    echo-info "Creating $local_d directory..."
+    echo-info "Creating $local_d directory"
     mkdir -p "$local_d"
 
     case $exit_code in
-        0) echo-info "File $local_f already up-to-date.";;
-        1) echo-warn "File $local_f is outdated or missing, opening diff tool..."; set +e; $diff_tool "$local_f" "$f"; set -e;;
-        *) echo-fail "Unidentified $f diff exit code ($exit_code), skipping.";;
+        0) echo-info "File $local_f already up-to-date";;
+	1) echo-warn "File $local_f is outdated or missing, opening diff tool"; set +e; touch "$local_f"; $diff_tool "$local_f" "$f"; set -e;;
+        *) echo-fail "Unidentified $f diff exit code ($exit_code), skipping";;
     esac
 done
 
