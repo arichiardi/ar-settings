@@ -1,21 +1,19 @@
 #!/bin/bash
 # set -x
 
-# test args
 if [ ! ${#} -ge 3 ]; then
     echo 1>&2 "Usage: ${0} LOCAL REMOTE MERGED BASE"
     echo 1>&2 "       (LOCAL, REMOTE, MERGED, BASE can be provided by \`git mergetool'.)"
     exit 1
 fi
 
-# tools
-_EMACSCLIENT=$(which emacsclient)
+_EMACSCLIENT=emacsclient-daemon.sh # using custom wrapper
 _BASENAME=$(which basename)
 _CP=$(which cp)
 _EGREP=$(which egrep)
 _MKTEMP=$(which mktemp)
 
-# args
+# args coming from git
 _LOCAL=${1}
 _REMOTE=${2}
 _MERGED=${3}
@@ -29,16 +27,7 @@ else
     _EVAL="${_EDIFF} \"${_LOCAL}\" \"${_REMOTE}\" nil \"${_MERGED}\""
 fi
 
-# console vs. X
-if [ "${TERM}" = "linux" ]; then
-    unset DISPLAY
-    _EMACSCLIENTOPTS="-t"
-else
-    _EMACSCLIENTOPTS="-c"
-fi
-
-# run emacsclient
-${_EMACSCLIENT} ${_EMACSCLIENTOPTS} -a "" -e "(${_EVAL})" 2>&1
+${_EMACSCLIENT} -nw --eval "(${_EVAL})" 2>&1
 
 # check modified file for unwanted conflict markers
 # echo $_MERGED | xargs egrep '[><]{7}' -H -I --line-number
