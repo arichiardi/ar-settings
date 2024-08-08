@@ -12,15 +12,18 @@ application/x-extension-xhtml=firefox.desktop
 application/x-extension-xht=firefox.desktop
 image/jpeg=viewnior.desktop;gpicview.desktop;
 image/png=viewnior.desktop;gpicview.desktop;
+image/vnd.djvu=qpdfview.desktop
 text/plain=mousepad.desktop
 x-scheme-handler/mailto=userapp-Thunderbird-70HPT0.desktop
 message/rfc822=userapp-Thunderbird-70HPT0.desktop
-application/pdf=epdfview.desktop
+application/pdf=qpdfview.desktop
 application/x-bittorrent=deluge.desktop
 x-scheme-handler/webcal=chromium.desktop
 x-scheme-handler/news=userapp-Thunderbird-E1DP8Z.desktop
 x-scheme-handler/snews=userapp-Thunderbird-E1DP8Z.desktop
 x-scheme-handler/nntp=userapp-Thunderbird-E1DP8Z.desktop
+x-scheme-handler/pdf=qpdfview.desktop
+inode/directory=pcmanfm.desktop
 
 [Added Associations]
 x-scheme-handler/http=userapp-Chromium.desktop;firefox.desktop;
@@ -28,6 +31,7 @@ x-scheme-handler/https=userapp-Chromium.desktop;firefox.desktop;
 x-scheme-handler/ftp=userapp-Chromium.desktop;firefox.desktop;
 x-scheme-handler/chrome=userapp-Chromium.desktop;firefox.desktop;
 text/html=userapp-Chromium.desktop;firefox.desktop;
+application/pdf=qpdfview.desktop
 application/x-extension-htm=userapp-Chromium.desktop;firefox.desktop;
 application/x-extension-html=userapp-Chromium.desktop;firefox.desktop;
 application/x-extension-shtml=userapp-Chromium.desktop;firefox.desktop;
@@ -36,15 +40,16 @@ application/x-extension-xhtml=userapp-Chromium.desktop;firefox.desktop;
 application/x-extension-xht=userapp-Chromium.desktop;firefox.desktop;
 image/jpeg=viewnior.desktop;gpicview.desktop;
 image/png=viewnior.desktop;gpicview.desktop;
+image/vnd.djvu=qpdfview.desktop;
 text/plain=mousepad.desktop;
 x-scheme-handler/mailto=userapp-Thunderbird.desktop;userapp-Thunderbird-8ELR8Z.desktop;userapp-Thunderbird-70HPT0.desktop;
 message/rfc822=userapp-Thunderbird.desktop;userapp-Thunderbird-8ELR8Z.desktop;userapp-Thunderbird-70HPT0.desktop;
-application/pdf=epdfview.desktop;
 application/x-bittorrent=deluge.desktop;
 x-scheme-handler/news=userapp-Thunderbird-E1DP8Z.desktop;
 x-scheme-handler/snews=userapp-Thunderbird-E1DP8Z.desktop;
 x-scheme-handler/nntp=userapp-Thunderbird-E1DP8Z.desktop;
 application/json=emacs.desktop;
-video/mp4=userapp-vlc-4G6DG0.desktop;vlc.desktop;
+video/mp4=mpv.desktop;viewnior.desktop;userapp-vlc-4G6DG0.desktop;vlc.desktop;
+application/pgp-keys=emacsclient.desktop;
 
 [Removed Associations]
