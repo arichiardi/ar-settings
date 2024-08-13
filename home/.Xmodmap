@@ -5,4 +5,3 @@ clear Lock
 keycode 66 = Hyper_L
 ! The following might be necessary in some keyboard
 !add mod3 = Hyper_L
-
