@@ -21,7 +21,7 @@ diff_tool=emacsclient-ediff-diff.sh
 source $home_dir/.local/share/ar/helpers.sh
 
 echo-info "Installing i3 and related packages"
-pkg_install i3-wm i3blocks i3exit i3lock i3status i3-battery-popup-git rofi conky pcmanfm-git keepassxc ttf-jetbrains-mono
+pkg_install i3-wm i3blocks i3exit i3lock i3status i3-battery-popup-git rofi conky pcmanfm-git keepassxc ttf-jetbrains-mono lxsession-gtk3
 
 pushd $home_dir > /dev/null
 
