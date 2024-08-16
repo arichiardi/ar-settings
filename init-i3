@@ -19,7 +19,7 @@ temp_dir=$(mktemp -d -t "ar-init-i3.XXXXXXXXXX")
 source ./home/.local/share/ar/helpers.sh
 
 echo-info "Installing i3 and related packages"
-pkg_install i3-wm i3blocks i3exit i3lock i3status i3-battery-popup-git rofi conky pcmanfm-git keepassxc ttf-jetbrains-mono lxsession-gtk3
+pkg_install i3-wm i3blocks i3exit i3lock i3status i3-battery-popup-git rofi conky pcmanfm-git keepassxc ttf-jetbrains-mono lxsession-gtk3 lightdm-gtk-greeter lightdm onboard
 
 pushd $home_dir > /dev/null
 
