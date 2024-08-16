@@ -1,5 +1,7 @@
 #!/bin/bash
 
+diff_tool=emacsclient-ediff-diff.sh
+
 light_green='\033[1;32m'
 light_red='\033[1;31m'
 light_yellow='\033[1;33m'

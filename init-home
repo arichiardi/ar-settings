@@ -15,7 +15,7 @@ set -euo pipefail
 secret_bin=$(pwd)/home/.local/bin/secret
 temp_dir=$(mktemp -d -t "ar-init-home.XXXXXXXXXX")
 
-source ./helpers
+source ./home/.local/share/ar/helpers.sh
 
 echo-info "Installing diffing tools..."
 pkg_install vim
@@ -41,7 +41,7 @@ for f in $(find . -type f -and -not -name '*.enc'); do
 
     case $exit_code in
         0) echo-info "File $local_f already up-to-date.";;
-        1) echo-warn "File $local_f is outdated or missing, opening diff tool..."; set +e; vimdiff "$local_f" "$f"; set -e;;
+        1) echo-warn "File $local_f is outdated or missing, opening diff tool..."; set +e; $diff_tool "$local_f" "$f"; set -e;;
         *) echo-fail "Unidentified $f diff exit code ($exit_code), skipping.";;
     esac
 done
@@ -57,7 +57,7 @@ for f in $(find . -type f -and -name '*.enc'); do
     set +e
     $secret_bin -r -s "$encrypted_f" -d "$temp_f"
     if [ $? -eq 0 ]; then
-        vimdiff "$HOME/$f" "$temp_f"
+        $diff_tool "$HOME/$f" "$temp_f"
     fi
     shred -u -n 19 "$temp_f"
     set -e
