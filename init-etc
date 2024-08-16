@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+#
+# Initialize /etc directory.
+#
+# The scripts has to be run from the ar-settings repository.
+#
+set -euo pipefail
+
+# For skipping sections, use this trick:
+#
+#   cat >/dev/null <<LABEL
+#
+# see the brilliant answer here: https://stackoverflow.com/a/45538151
+
+secret_bin=$(pwd)/home/.local/bin/secret
+temp_dir=$(mktemp -d -t "ar-init-home.XXXXXXXXXX")
+
+source ./home/.local/share/ar/helpers.sh
+
+dest_dir=/etc
+
+pushd ./etc > /dev/null
+
+echo-info "Diffing unencrypted files"
+for f in $(find . -type f -and -not -name '*.enc'); do
+    dest_f=$dest_dir/$f
+
+    set +e
+    local_f=$(readlink --no-newline --canonicalize-existing "$dest_f")
+    exit_code=$?
+    set -e
+    if [ $exit_code -eq 0 ] && [ $local_f ]; then
+        set +e
+        (set -x; diff --new-file "$local_f" "$f" > /dev/null)
+        exit_code=$?
+        set -e
+
+        local_d=$(dirname "$local_f")
+        echo-info "Creating $local_d directory..."
+        mkdir -p "$local_d"
+
+        case $exit_code in
+            0) echo-info "File $local_f already up-to-date";;
+            1) echo-warn "File $local_f is outdated or missing - merging needed"; set +e; vimdiff "$local_f" "$f"; set -e;;
+            *) echo-fail "Unidentified $f diff exit code ($exit_code) - skipping";;
+        esac
+   else
+        cp -iv "$f" "$(readlink --no-newline --canonicalize-missing "$dest_f")"
+   fi
+done
+
+echo-info "Diffing encrypted files"
+for f in $(find . -type f -and -name '*.enc'); do
+    dest_f="$dest_dir/$f"
+
+    set +e
+    encrypted_f=$(readlink -f --no-newline --canonicalize-existing "$f")
+    exit_code=$?
+    set -e
+    if [ $exit_code -eq 0 ] && [ ! $encrypted_f ]; then
+        temp_f=$(readlink -f --no-newline --canonicalize-missing "$temp_dir/${f%.enc}")
+
+        set +e
+        $secret_bin -r -s "$encrypted_f" -d "$temp_f"
+        if [ $? -eq 0 ]; then
+            vimdiff "$dest_f" "$temp_f"
+        fi
+        shred -u -n 19 "$temp_f"
+        set -e
+    else
+        $secret_bin -r -s "$encrypted_f" -d "$(readlink --no-newline --canonicalize-missing ${dest_f%.enc})"
+    fi
+done
+
+popd > /dev/null
