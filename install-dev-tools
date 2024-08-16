@@ -10,7 +10,9 @@ set -euo pipefail
 tmpdir=$(mktemp -d -t "ar-settings-install-scripts.XXXXXXXXXX")
 bindir=$(systemd-path user-binaries)
 
-source ./helpers
+source ./home/.local/share/ar/helpers.sh
+
+# cat >/dev/null <<GOTO_ASDF
 
 target_arch=linux-amd64
 
@@ -29,68 +31,7 @@ function maybe_install_sdkman {
   fi
 }
 
-function safe_sdk {
-  local args="$@"
-  set +u
-  source $SDKMAN_DIR/bin/sdkman-init.sh
-  eval sdk $args
-  set -u
-}
-
-function safe_nvm {
-  local args="$@"
-  set +u
-  export NVM_DIR="$HOME/.nvm"
-  source "$NVM_DIR/nvm.sh"
-  eval nvm $args
-  set -u
-}
-
-installing "clojure"
-if command -v clojure >/dev/null 2>&1; then
-  skipping
-else
-  installer_name=linux-install-1.10.1.763.sh
-  pushd $tmpdir >/dev/null
-
-  curl -fsSLO https://download.clojure.org/install/$installer_name \
-      && chmod u+x $tmpdir/$installer_name
-  $tmpdir/$installer_name --prefix "$HOME/.local"
-
-  popd >/dev/null
-  success
-fi
-
-# Node
-installing "node"
-if [ -n $NVM_DIR ] && [ -d $NVM_DIR ]; then
-  skipping
-else
-  github_coordinates=creationix/nvm
-  latest_tag=$(latest_releases $github_coordinates | grep -Po '"tag_name": "\K.*?(?=")')
-  curl -fs -o- "https://raw.githubusercontent.com/$github_coordinates/$latest_tag/install.sh" | bash
-
-  export NVM_DIR="$HOME/.nvm"
-  source "$NVM_DIR/nvm.sh"
-  # Install current and future LTS versions
-  safe_nvm install --lts=*
-
-  # But set current to default and use current
-  safe_nvm alias default lts/*
-  safe_nvm use default
-  success
-fi
-
-installing "bash completions"
-installnote "docker-compose completions"
-if [ -f /etc/bash_completion.d/docker-compose ]; then
-    skipping
-else
-    curl -o- https://raw.githubusercontent.com/docker/compose/$(docker-compose version --short)/contrib/completion/bash/docker-compose > $tmpdir/docker-compose
-    sudo cp --no-preserve=mode,ownership $tmpdir/docker-compose /etc/bash_completion.d/docker-compose
-    success
-fi
-
+installing "eldev"
 if command -v eldev >/dev/null 2>&1; then
     skipping
 else
@@ -127,3 +68,18 @@ END
 
   popd
 fi
+
+# GOTO_ASDF
+
+echo-info "Installing asdf"
+pkg_install asdf-vm
+
+asdf plugin-add java
+asdf plugin-add maven
+
+asdf plugin add clojure
+asdf plugin add babashka
+asdf plugin add clj-kondo
+asdf plugin-add zprint
+
+asdf install
