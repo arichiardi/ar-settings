@@ -1,8 +1,3 @@
-!! see .i3/config
-! i3wm.primaryDisplayId: the xrandr id will go here
-! i3wm.secondaryDisplayId: the xrandr id will go here
-i3wm.batteryLowIcon: /usr/share/icons/Adwaita/symbolic/status/battery-low-symbolic.svg
-
 !! Emacs - https://www.gnu.org/software/emacs/manual/html_node/emacs/X-Resources.html
 Emacs.menuBar:     0
 Emacs.toolBar:     0
@@ -89,3 +84,4 @@ Xcursor.size:  0
 ! X Colors settings
 #include ".Xresources.d/theme"
 #include ".Xresources.d/urxvt"
+#include ".Xresources.d/i3"

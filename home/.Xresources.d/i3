@@ -1,0 +1,4 @@
+!! see .i3/config
+i3wm.primaryDisplayId: HDMI-0
+i3wm.secondaryDisplayId: DP-2
+i3wm.batteryLowIcon: /usr/share/icons/Adwaita/symbolic/status/battery-low-symbolic.svg
