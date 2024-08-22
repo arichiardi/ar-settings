@@ -136,7 +136,7 @@
 
     ### Text ###
 
-    font = JetBrainsMono Nerd Font Mono 10
+    font = NotoSans Nerd Font 12
 
     # The spacing between lines.  If the height is smaller than the
     # font height, it will get raised to the font height.
@@ -333,23 +333,23 @@
 [urgency_low]
     # IMPORTANT: colors have to be defined in quotation marks.
     # Otherwise the "#" and following would be interpreted as a comment.
-    background = "#222222"
-    foreground = "#888888"
+    background = "#F9FAF9"
+    foreground = "#ADADAD"
     timeout = 10
     # Icon for notifications with low urgency, uncomment to enable
     #default_icon = /path/to/icon
 
 [urgency_normal]
-    background = "#5D7B86"
-    foreground = "#F9FAF9"
+    background = "#F9FAF9"
+    foreground = "#5D7B86"
     timeout = 10
     override_pause_level = 30
     # Icon for notifications with normal urgency, uncomment to enable
     #default_icon = /path/to/icon
 
 [urgency_critical]
-    background = "#A07B86"
-    foreground = "#F9FAF9"
+    background = "#F9FAF9"
+    foreground = "#A07B86"
     timeout = 0
     override_pause_level = 60
     # Icon for notifications with critical urgency, uncomment to enable
