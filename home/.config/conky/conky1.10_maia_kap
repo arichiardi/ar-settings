@@ -16,6 +16,7 @@ conky.config = {
 	own_window_transparent = true,
 	update_interval = 1.0,
 	use_xft = true,
+    if_up_strictness = "address"
 }
 conky.text = [[
 ${voffset 8}$color2${font Bitstream Vera Sans:size=16}${time %A}$font\
@@ -41,23 +42,22 @@ ${voffset 10}${goto 40}${color}Swap${font Bitstream Vera Sans:bold:size=8}$align
 #
 # Added networking to the code copied from /usr/share/conky/conky_maia
 #
-${if_existing /sys/class/net/wlo1/operstate up} ${voffset 20}${goto 40}${color}Wireless
-${voffset 5}${goto 40}$font${color2}SSID$alignr$color${wireless_essid wlo1}
-${voffset 5}${goto 40}$font${color2}IP address$alignr$color${addr wlo1}
-${voffset 5}${goto 40}$font${color2}Connection quality$alignr$color${wireless_link_qual_perc wlo1}%
-${voffset 5}${goto 40}$font${color2}Bitrate$alignr$color${wireless_bitrate wlo1}
-${voffset 5}${goto 40}$font${color2}Downspeed$alignr$color${downspeed wlo1}
-${voffset 5}${goto 40}$font${color2}Upspeed$alignr$color${upspeed wlo1}
-#
-${if_existing /sys/class/net/eno2/operstate up} ${voffset 20}${goto 40}${color}Wired
-${voffset 5}${goto 40}$font${color2}IP address$alignr$color${addr eno2}
-${voffset 5}${goto 40}$font${color2}Downspeed$alignr$color${downspeed eno2}
-${voffset 5}${goto 40}$font${color2}Upspeed$alignr$color${upspeed eno2}
+${if_up wlp11s0} ${voffset 20}${goto 40}${color}Wireless
+${voffset 5}${goto 40}$font${color2}SSID$alignr$color${wireless_essid wlp11s0}
+${voffset 5}${goto 40}$font${color2}IP address$alignr$color${addr wlp11s0}
+${voffset 5}${goto 40}$font${color2}Connection quality$alignr$color${wireless_link_qual_perc wlp11s0}%
+${voffset 5}${goto 40}$font${color2}Bitrate$alignr$color${wireless_bitrate wlp11s0}
+${voffset 5}${goto 40}$font${color2}Downspeed$alignr$color${downspeed wlp11s0}
+${voffset 5}${goto 40}$font${color2}Upspeed$alignr$color${upspeed wlp11s0}
 ${endif}
 #
-${voffset 15}$font$alignr${execi 10000 awk -F= '/TION/ {print $2}' /etc/lsb-release |sed 's/"//g'} \
-${execi 10000 awk -F= '/EASE=/ {printf $2" "} /NAME/ {print $2}' /etc/lsb-release}
-${voffset 10}${color2}${alignr}${execi 1200 whoami}@${nodename}
-${alignr}${color2}${font Bitstream Vera Sans:size=8}uptime: ${color}${uptime_short}
-${voffset 5}${color2}${font Bitstream Vera Sans:size=8}${alignr}kernel: ${color}${kernel}
+${if_up eno1} ${voffset 20}${goto 40}${color}Wired
+${voffset 5}${goto 40}$font${color2}IP address$alignr$color${addr eno1}
+${voffset 5}${goto 40}$font${color2}Downspeed$alignr$color${downspeed eno1}
+${voffset 5}${goto 40}$font${color2}Upspeed$alignr$color${upspeed eno1}
+${endif}
+#
+${goto 40}$font${color2}${alignr}${execi 3600 awk -F= '$1=="PRETTY_NAME" { print $2 ;}' /etc/os-release | tr -d '"'}
+${color2}${font Noto Sans:size=8}${alignr}kernel: ${color}${kernel}
+${alignr}${color2}${font Noto Sans:size=8}uptime: ${color}${uptime_short}
 ]]
