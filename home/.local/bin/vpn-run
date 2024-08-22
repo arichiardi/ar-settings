@@ -1,0 +1,6 @@
+#!/bin/bash
+set -e
+
+sudo ip netns exec vpn \
+  su ${SUDO_USER:-$(id -un)} --login --command \
+    "env DISPLAY=unix/:1 $*"
