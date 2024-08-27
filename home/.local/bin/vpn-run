@@ -1,6 +1,23 @@
 #!/bin/bash
 set -e
 
-sudo ip netns exec vpn \
-  su ${SUDO_USER:-$(id -un)} --login --command \
-    "env DISPLAY=unix/:1 $*"
+# For pulseaudio to work set some environment variables.
+#   https://unix.stackexchange.com/questions/517401/sound-is-not-detected-in-a-namespace
+
+if [[ $(wg-netns list) =~ "vpn" ]]; then
+    sudo ip netns exec vpn \
+      bash -c \
+      "run_as_user=${SUDO_USER:-$(id -un)}; \
+       run_as_uid=$(id -u $run_as_user); \
+         echo \$run_as_user;
+         runuser -l \$run_as_user --login --command \
+         \"env DISPLAY=unix/:0 \
+             PULSE_SERVER=/run/user/\$run_as_uid/pulse/native \
+             PULSE_COOKIE=/home/\$run_as_user/.config/pulse/cookie \
+             $*\""
+else
+    notify-send "VPN Not Connected" \
+      --icon='/usr/share/icons/Adwaita/symbolic/status/network-vpn-disconnected-symbolic.svg' \
+      --category="network.error" \
+      --urgency=low
+fi
