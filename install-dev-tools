@@ -81,5 +81,6 @@ asdf plugin add clojure
 asdf plugin add babashka
 asdf plugin add clj-kondo
 asdf plugin-add zprint
+asdf plugin add process-compose https://github.com/martino/asdf-process-compose.git
 
 asdf install
