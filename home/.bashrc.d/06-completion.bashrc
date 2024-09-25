@@ -1,4 +1,4 @@
-if `if_os darwin`; then
+if `is_os darwin`; then
     if type brew &>/dev/null
     then
       HOMEBREW_PREFIX="$(brew --prefix)"
@@ -14,7 +14,7 @@ if `if_os darwin`; then
     fi
 fi
 
-if `if_os linux`; then
+if `is_os linux`; then
     source /usr/share/bash-completion/completions/git
     __git_complete g __git_main
 fi
