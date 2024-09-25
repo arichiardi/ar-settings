@@ -1,5 +1,5 @@
-if_os darwin && asdf_script_dir=${HOMEBREW_PREFIX}/opt/asdf/libexec
-if_os linux && asdf_script_dir=/opt/asdf-vm
+is_os darwin && asdf_script_dir=${HOMEBREW_PREFIX}/opt/asdf/libexec
+is_os linux && asdf_script_dir=/opt/asdf-vm
 
 # https://asdf-vm.com
 source $asdf_script_dir/asdf.sh
