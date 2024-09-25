@@ -47,11 +47,9 @@ notify-after () {
     return $RETCODE
 }
 
-# Nice approach taken from here:
-#
-# https://stackoverflow.com/a/29239609
-if_os () { [[ $OSTYPE == *$1* ]]; }
-if_nix () {
+# Nice approach taken from here: https://stackoverflow.com/a/29239609
+is_os () { [[ $OSTYPE == *$1* ]]; }
+is_nix () {
     case "$OSTYPE" in
         *linux*|*hurd*|*msys*|*cygwin*|*sua*|*interix*) sys="gnu";;
         *bsd*|*darwin*) sys="bsd";;
