@@ -46,3 +46,16 @@ notify-after () {
     fi
     return $RETCODE
 }
+
+# Nice approach taken from here:
+#
+# https://stackoverflow.com/a/29239609
+if_os () { [[ $OSTYPE == *$1* ]]; }
+if_nix () {
+    case "$OSTYPE" in
+        *linux*|*hurd*|*msys*|*cygwin*|*sua*|*interix*) sys="gnu";;
+        *bsd*|*darwin*) sys="bsd";;
+        *sunos*|*solaris*|*indiana*|*illumos*|*smartos*) sys="sun";;
+    esac
+    [[ "${sys}" == "$1" ]];
+}

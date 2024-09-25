@@ -1,7 +1,3 @@
-# Git
-source /usr/share/bash-completion/completions/git
-__git_complete g __git_main
-
 # Java
 export JAVA_HOME=/usr/lib/jvm/default
 export NASHORN_HOME=$JAVA_HOME/bin
