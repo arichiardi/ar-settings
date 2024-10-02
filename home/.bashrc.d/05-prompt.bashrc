@@ -11,14 +11,13 @@ NC="\[\e[0m\]"
 BOLD="\[\e[1m\]"
 BLUE="\[\e[34m\]"
 
-CC_EXCLUDED="0,7,15,17"
 PS1_COLORED_AT='@'
 PS1_COLORED_HOST='\h'
 
 if [[ "$use_color" == "true" ]] && [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
-    PS1_COLORED_HOST=$(context-color --prompt --background --exclude $CC_EXCLUDED --context "hostname")\\h${NC}
+    PS1_COLORED_HOST=$(context-color --prompt --background --context "hostname")\\h${NC}
 else
-    PS1_COLORED_AT=$(context-color --prompt --exclude $CC_EXCLUDED)@${NC}
+    PS1_COLORED_AT=$(context-color --prompt)@${NC}
 fi
 
 GIT_PS1_SHOWUPSTREAM=verbose
