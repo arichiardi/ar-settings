@@ -1,6 +1,9 @@
+export GIT_PS1_SHOWCONFLICTSTATE=yes
+
 if `is_os linux`; then
     source "/usr/share/git/completion/git-prompt.sh"
 elif `is_os darwin`; then
+    export GIT_PS1_SHOWDIRTYSTATE=0 # git is very slow on MacOS
     source "/opt/git/contrib/completion/git-prompt.sh"
 fi
 
