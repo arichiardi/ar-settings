@@ -13,7 +13,7 @@ configuration {
 	case-sensitive: false;
 	sidebar-mode: false;
 	parse-known-hosts: true;
-	combi-modi: "window,file-browser";
+	combi-modi: "run,drun,window,windowcd";
 	tokenize: true;
 	line-margin: 2;
 	separator-style: "solid";
