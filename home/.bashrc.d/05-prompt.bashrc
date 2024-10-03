@@ -1,5 +1,3 @@
-export GIT_PS1_SHOWCONFLICTSTATE=yes
-
 if `is_os linux`; then
     source "/usr/share/git/completion/git-prompt.sh"
 elif `is_os darwin`; then
@@ -20,19 +18,16 @@ else
     PS1_COLORED_AT=$(context-color --prompt)@${NC}
 fi
 
-GIT_PS1_SHOWUPSTREAM=verbose
-GIT_PS1_SHOWUNTRACKEDFILES=1
-GIT_PS1_SHOWSTASHSTATE=1
-GIT_PS1_SHOWDIRTYSTATE=1
-GIT_PS1_DESCRIBE_STYLE="describe"
-
-if ${use_color} ; then
-    GIT_PS1_SHOWCOLORHINTS=1
-fi
+export GIT_PS1_SHOWCONFLICTSTATE=yes
+export GIT_PS1_SHOWUPSTREAM=verbose
+export GIT_PS1_SHOWUNTRACKEDFILES=1
+export GIT_PS1_SHOWSTASHSTATE=1
+export GIT_PS1_SHOWDIRTYSTATE=1
+export GIT_PS1_DESCRIBE_STYLE="describe"
 
 PROMPT_COMMAND=
 if ${use_color} ; then
-    GIT_PS1_SHOWCOLORHINTS=1
+    export GIT_PS1_SHOWCOLORHINTS=1
     PROMPT_COMMAND='__git_ps1 "${BOLD}\u${PS1_COLORED_AT}${PS1_COLORED_HOST} ${BLUE}\w${NC}" "\\$ "'
 else
     PROMPT_COMMAND='__git_ps1 "\u@\h \w" "\\$ "'
