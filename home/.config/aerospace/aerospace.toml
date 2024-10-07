@@ -30,27 +30,27 @@ cmd-shift-down = 'move down'
 cmd-shift-up = 'move up'
 cmd-shift-right = 'move right'
 
-cmd-ctrl-left = 'focus-monitor left'
-cmd-ctrl-down = 'focus-monitor down'
-cmd-ctrl-up = 'focus-monitor up'
-cmd-ctrl-right = 'focus-monitor right'
+cmd-alt-left = 'focus-monitor left'
+cmd-alt-down = 'focus-monitor down'
+cmd-alt-up = 'focus-monitor up'
+cmd-alt-right = 'focus-monitor right'
 
-cmd-shift-ctrl-left = 'move-node-to-monitor left'
-cmd-shift-ctrl-down = 'move-node-to-monitor down'
-cmd-shift-ctrl-up = 'move-node-to-monitor up'
-cmd-shift-ctrl-right = 'move-node-to-monitor right'
+cmd-alt-shift-left = 'move-node-to-monitor left'
+cmd-alt-shift-down = 'move-node-to-monitor down'
+cmd-alt-shift-up = 'move-node-to-monitor up'
+cmd-alt-shift-right = 'move-node-to-monitor right'
 
 # Consider using 'join-with' command as a 'split' replacement if you want to enable normalizations
-cmd-h = 'split horizontal'
-cmd-v = 'split vertical'
+cmd-shift-alt-h = 'split horizontal'
+cmd-shift-alt-v = 'split vertical'
 
-cmd-f = 'fullscreen'
+cmd-shift-alt-f = 'fullscreen'
 
-cmd-s = 'layout v_accordion' # 'layout stacking' in i3
-cmd-w = 'layout h_accordion' # 'layout tabbed' in i3
-cmd-e = 'layout tiles horizontal vertical' # 'layout toggle split' in i3
+cmd-shift-alt-s = 'layout v_accordion' # 'layout stacking' in i3
+cmd-shift-alt-w = 'layout h_accordion' # 'layout tabbed' in i3
+cmd-shift-alt-e = 'layout tiles horizontal vertical' # 'layout toggle split' in i3
 
-cmd-b = 'focus-back-and-forth'
+cmd-shift-alt-b = 'focus-back-and-forth'
 
 cmd-shift-space = 'layout floating tiling' # 'floating toggle' in i3
 
@@ -76,7 +76,7 @@ cmd-shift-5 = 'move-node-to-workspace 5'
 
 cmd-shift-c = 'reload-config'
 
-cmd-r = 'mode resize'
+cmd-alt-r = 'mode resize'
 
 cmd-alt-e = 'exec-and-forget emacsclient-daemon.sh -c'
 cmd-alt-p = 'exec-and-forget open /Applications/KeePassXC.app'
@@ -87,48 +87,49 @@ inherit-env-vars = true
 PATH = '/opt/homebrew/bin:/opt/homebrew/sbin:${HOME}/.local/bin:${PATH}'
 
 [mode.resize.binding]
-h = 'resize width -50'
-j = 'resize height +50'
-k = 'resize height -50'
-l = 'resize width +50'
+right = 'resize width -50'
+up = 'resize height +50'
+down = 'resize height -50'
+left = 'resize width +50'
 enter = 'mode main'
 esc = 'mode main'
 
-[key-mapping.key-notation-to-key-code]
-q = 'q'
-w = 'w'
-f = 'e'
-p = 'r'
-g = 't'
-j = 'y'
-l = 'u'
-u = 'i'
-y = 'o'
-semicolon = 'p'
-leftSquareBracket = 'leftSquareBracket'
-rightSquareBracket = 'rightSquareBracket'
-backslash = 'backslash'
-
-a = 'a'
-r = 's'
-s = 'd'
-t = 'f'
-d = 'g'
-h = 'h'
-n = 'j'
-e = 'k'
-i = 'l'
-o = 'semicolon'
-quote = 'quote'
-
-z = 'z'
-x = 'x'
-c = 'c'
-v = 'v'
-b = 'b'
-k = 'n'
-m = 'm'
-comma = 'comma'
-period = 'period'
-slash = 'slash'
-
+# Using Karabiner to map Colemak
+#
+# [key-mapping.key-notation-to-key-code]
+# q = 'q'
+# w = 'w'
+# f = 'e'
+# p = 'r'
+# g = 't'
+# j = 'y'
+# l = 'u'
+# u = 'i'
+# y = 'o'
+# semicolon = 'p'
+# leftSquareBracket = 'leftSquareBracket'
+# rightSquareBracket = 'rightSquareBracket'
+# backslash = 'backslash'
+#
+# a = 'a'
+# r = 's'
+# s = 'd'
+# t = 'f'
+# d = 'g'
+# h = 'h'
+# n = 'j'
+# e = 'k'
+# i = 'l'
+# o = 'semicolon'
+# quote = 'quote'
+#
+# z = 'z'
+# x = 'x'
+# c = 'c'
+# v = 'v'
+# b = 'b'
+# k = 'n'
+# m = 'm'
+# comma = 'comma'
+# period = 'period'
+# slash = 'slash'
