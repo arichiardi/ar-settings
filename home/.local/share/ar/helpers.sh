@@ -85,8 +85,8 @@ function cleanup_after_error() {
 function sync_dir_to_b2 () {
     # $1 B2_APPLICATION_KEY_ID
     # $2 B2_APPLICATION_KEY
-    # $3 Backblaze bucket name
-    # $4 Dir path
+    # $3 source dir
+    # $4 target bucket
     env \
       B2_APPLICATION_KEY_ID="$1" \
       B2_APPLICATION_KEY="$2" \
@@ -96,21 +96,7 @@ function sync_dir_to_b2 () {
       --keepDays 365 \
       --excludeRegex "(.*\/\..*)|(.*\.DS_Store)|(.*\.Spotlight-V100)|(.*\.Trash.*)|(.*\/wip)|(.*\/WIP)" \
       --excludeAllSymlinks \
-      "$4" "b2://$3"
-}
-
-function sync_b2_secrets_to_target () {
-    # $1 B2_APPLICATION_KEY_ID
-    # $2 B2_APPLICATION_KEY
-    # $3 the target dir
-    local target_dir=$3
-
-    env B2_APPLICATION_KEY_ID="$1" B2_APPLICATION_KEY="$2" \
-        b2-wrapper sync \
-        --replaceNewer \
-        --excludeRegex "(.*bin\/.*)|(vault\.enc)" \
-        --excludeAllSymlinks \
-        "b2://secrets-f3ba7cb4" "$target_dir"
+      "$3" "b2://$4"
 }
 
 function merge_keepass_dbs () {
@@ -123,8 +109,7 @@ function merge_keepass_dbs () {
     while IFS= read -r -d '' file_name; do
         dest_paths+=( "$file_name" )
     done < <(find $dest_dir -maxdepth 1 \
-                  -regextype posix-extended \
-                  -iregex '.*\.kdbx' \
+                  -name '*.kdbx' \
                   -print0)
 
     for dest_path in "${dest_paths[@]}"; do
@@ -146,7 +131,10 @@ function merge_keepass_dbs () {
 function merge_b2_secrets () {
     # $1 B2_APPLICATION_KEY_ID
     # $2 B2_APPLICATION_KEY
-    # $3 the secret dir (these files will be updated)
+    # $3 the source bucket
+    # $4 the secret dir (these files will be updated)
+    local source_bucket=$3
+    local target_dir=$4
 
     tmp_dir=$(mktemp -d -t "b2-secrets-XXXXX")
     if [[ ! "$tmp_dir" || ! -d "$tmp_dir" ]]; then
@@ -154,9 +142,53 @@ function merge_b2_secrets () {
     else
         trap "cleanup_after_error $tmp_dir" SIGINT SIGHUP SIGPIPE SIGQUIT SIGTERM
 
-        sync_b2_secrets_to_target "$1" "$2" "$tmp_dir"
-        merge_keepass_dbs "$3" "$tmp_dir"
-	
+        # overriding $tmp_dir files
+        env B2_APPLICATION_KEY_ID="$1" B2_APPLICATION_KEY="$2" \
+          b2-wrapper sync \
+            --replaceNewer \
+            --excludeRegex "(.*bin\/.*)|(vault\.enc)" \
+            --excludeAllSymlinks \
+            "b2://$secret_bucket" "$target_dir"
+
+        merge_keepass_dbs "$target_dir" "$tmp_dir"
+
         rm -rf $tmp_dir
     fi
+}
+
+function merge_rclone_secrets () {
+    # $1 the rclone remote name
+    # $2 the secret dir (these files will be updated)
+    local rclone_remote_path=$1
+    local target_dir=$2
+
+    tmp_dir=$(mktemp -d -t "rclone-secrets-XXXXX")
+    if [[ ! "$tmp_dir" || ! -d "$tmp_dir" ]]; then
+        echo-fail "Could not create temp dir"
+    else
+        trap "cleanup_after_error $tmp_dir" SIGINT SIGHUP SIGPIPE SIGQUIT SIGTERM
+
+        # overriding $tmp_dir files
+        rclone copy \
+          --no-check-dest \
+          --no-update-modtime \
+          --exclude "(.*bin\/.*)|(vault\.enc)" \
+          --max-size 10M \
+          "$rclone_remote_path" "$tmp_dir"
+
+        merge_keepass_dbs "$target_dir" "$tmp_dir"
+
+        rm -rf $tmp_dir
+    fi
+}
+
+# Nice approach taken from here: https://stackoverflow.com/a/29239609
+is_os () { [[ $OSTYPE == *$1* ]]; }
+is_nix () {
+    case "$OSTYPE" in
+        *linux*|*hurd*|*msys*|*cygwin*|*sua*|*interix*) sys="gnu";;
+        *bsd*|*darwin*) sys="bsd";;
+        *sunos*|*solaris*|*indiana*|*illumos*|*smartos*) sys="sun";;
+    esac
+    [[ "${sys}" == "$1" ]];
 }
