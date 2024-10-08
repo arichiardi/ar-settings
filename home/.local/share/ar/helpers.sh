@@ -34,7 +34,7 @@ function pkg_install () {
       [ubuntu]="apt-get install -y" \
     )
 
-    distro=$(cat /etc/os-release | tr [:upper:] [:lower:] | grep -Poi '(debian|ubuntu|red hat|centos|arch|alpine)' | uniq) 
+    distro=$(cat /etc/os-release | tr [:upper:] [:lower:] | grep -Poi '(debian|ubuntu|red hat|centos|arch|alpine)' | uniq)
     modifier=
     if [ $(which yay) ]; then
 	modifier=-yay
@@ -92,10 +92,10 @@ function sync_dir_to_b2 () {
       B2_APPLICATION_KEY="$2" \
       b2-wrapper sync \
       --threads 3 \
-      --replaceNewer \
-      --keepDays 365 \
-      --excludeRegex "(.*\/\..*)|(.*\.DS_Store)|(.*\.Spotlight-V100)|(.*\.Trash.*)|(.*\/wip)|(.*\/WIP)" \
-      --excludeAllSymlinks \
+      --replace-newer \
+      --keep-days 365 \
+      --exclude-regex "(.*\/\..*)|(.*\.DS_Store)|(.*\.Spotlight-V100)|(.*\.Trash.*)|(.*\/wip)|(.*\/WIP)" \
+      --exclude-all-symlinks \
       "$3" "b2://$4"
 }
 
@@ -145,10 +145,10 @@ function merge_b2_secrets () {
         # overriding $tmp_dir files
         env B2_APPLICATION_KEY_ID="$1" B2_APPLICATION_KEY="$2" \
           b2-wrapper sync \
-            --replaceNewer \
-            --excludeRegex "(.*bin\/.*)|(vault\.enc)" \
-            --excludeAllSymlinks \
-            "b2://$secret_bucket" "$target_dir"
+            --replace-newer \
+            --exclude-regex "(.*bin\/.*)|(vault\.enc)" \
+            --exclude-all-symlinks \
+            "b2://$source_bucket" "$tmp_dir"
 
         merge_keepass_dbs "$target_dir" "$tmp_dir"
 
