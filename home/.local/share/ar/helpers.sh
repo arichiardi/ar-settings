@@ -86,7 +86,14 @@ function sync_dir_to_b2 () {
     # $1 B2_APPLICATION_KEY_ID
     # $2 B2_APPLICATION_KEY
     # $3 source dir
-    # $4 target bucket
+    # $4 target bucket or bucket path
+    # $5 exclude symlinks
+    local exclude_symlinks=${5:-true}
+
+    local extra_args=
+    if [ "$exclude_symlinks" == true ]; then
+        extra_args=--exclude-all-symlinks
+    fi
     env \
       B2_APPLICATION_KEY_ID="$1" \
       B2_APPLICATION_KEY="$2" \
@@ -95,7 +102,7 @@ function sync_dir_to_b2 () {
       --replace-newer \
       --keep-days 365 \
       --exclude-regex "(.*\/\..*)|(.*\.DS_Store)|(.*\.Spotlight-V100)|(.*\.Trash.*)|(.*\/wip)|(.*\/WIP)" \
-      --exclude-all-symlinks \
+      $extra_args \
       "$3" "b2://$4"
 }
 
