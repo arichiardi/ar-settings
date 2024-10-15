@@ -19,6 +19,9 @@ export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
 echo-info "Reloading the GnuPG agent"
 gpg-connect-agent reloadagent /bye
 
+echo-info "Added identities"
+ssh-add -L
+
 echo-info "Clone ar-settings into $HOME/git"
 mkdir -p $HOME/git
 git clone git@github.com:arichiardi/ar-settings.git $HOME/git/ar-settings
