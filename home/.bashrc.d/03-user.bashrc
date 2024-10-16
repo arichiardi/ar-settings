@@ -11,11 +11,16 @@ export GIT_HOME="$HOME/git"
 # Custom load config
 export LD_LIBRARY_PATH="$HOME/.local/lib"
 
-#
-# On linux, .local/bin is included via /etc/profile.d (see ar-settings repo)
-#
+
 is_os darwin && export PATH="${HOMEBREW_PREFIX}/opt/coreutils/libexec/gnubin:\
 ${HOMEBREW_PREFIX}/opt/grep/libexec/gnubin:\
 ${HOMEBREW_PREFIX}/opt/python@3.13/libexec/bin:\
-${HOME}/.local/bin:\
 ${PATH}"
+
+# On linux, $HOME/.local/bin is included via /etc/profile.d but other systems just include it if
+# missing.
+#
+case ":${PATH}:" in
+    *:"${HOME}/.local/bin":*) ;;
+    *) export PATH="${HOME}/.local/bin:${PATH}" ;;
+esac
