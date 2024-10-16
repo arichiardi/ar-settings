@@ -42,12 +42,13 @@ for f in $(find . -type f -and -not -name '*.enc'); do
 
         case $exit_code in
             0) echo-info "File $local_f already up-to-date";;
-            1) echo-warn "File $local_f is outdated or missing - merging needed"; set +e; vimdiff "$local_f" "$f"; set -e;;
+            1) echo-warn "File $local_f is outdated or missing - merging"; set +e; vimdiff "$local_f" "$f"; set -e;;
             *) echo-fail "Unidentified $f diff exit code ($exit_code) - skipping";;
         esac
-   else
+    else
+        echo-info "File $local_f is missing - copying"
         cp -iv "$f" "$(readlink --no-newline --canonicalize-missing "$HOME/$f")"
-   fi
+    fi
 done
 
 echo-info "Making $HOME/.local/bin files executable"
@@ -58,7 +59,7 @@ for f in $(find . -type f -and -name '*.enc'); do
     dest_f="$HOME/$f"
 
     set +e
-    encrypted_f=$(readlink -f --no-newline --canonicalize-existing "$f")
+    encrypted_f=$(readlink -f --no-newline --canonicalize-existing "$dest_f")
     exit_code=$?
     set -e
     if [ $exit_code -eq 0 ] && [ ! $encrypted_f ]; then
@@ -72,6 +73,7 @@ for f in $(find . -type f -and -name '*.enc'); do
         shred -u -n 19 "$temp_f"
         set -e
     else
+        echo-info "File $dest_f is missing - decrypting"
         $secret_bin -r -s "$encrypted_f" -d "$(readlink --no-newline --canonicalize-missing ${dest_f%.enc})"
     fi
 done
