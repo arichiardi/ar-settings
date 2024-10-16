@@ -49,6 +49,7 @@ for f in $(find . -type f -and -not -name '*.enc'); do
         esac
     else
         echo-info "File $local_f is missing - copying"
+        mkdir -p $(dirname "$dest_f")
         cp -iv "$f" "$(readlink --no-newline --canonicalize-missing "$dest_f")"
     fi
 done
@@ -78,6 +79,7 @@ for f in $encrypted_files; do
         set -e
     else
         echo-info "File $dest_f is missing - decrypting"
+        mkdir -p $(dirname "$dest_f")
         $secret_bin -r -s "$encrypted_f" -d "$(readlink --no-newline --canonicalize-missing ${dest_f%.enc})"
     fi
 done
