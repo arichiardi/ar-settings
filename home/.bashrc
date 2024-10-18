@@ -1,4 +1,3 @@
-#
 # ~/.bashrc
 #
 
@@ -139,46 +138,8 @@ ex ()
   fi
 }
 
-# Combining
-#   https://wpyoga.dev/blog/2021/07/10/bashrc-directory#simple-implementation
-#   https://byparker.com/blog/2021/the-power-of-bashrc-d/
-#
-# Run benchmark with
-#   __bashrc_bench=1 . ~/.bashrc
+source "$HOME/.local/share/ar/helpers.sh"
 
-source_if_there() {
-  local file="$1"
-  if [ -f "$file" ]; then
-    source "$file"
-  fi
-}
-
-source_sub_with_bench() {
-  local superfile="$1"
-  local file="$2"
-  if [[ $__bashrc_bench ]]; then
-    oldtimeformat="$TIMEFORMAT"
-		TIMEFORMAT="$superfile $file: %R"
-		time . "$file"
-    TIMEFORMAT="$oldtimeformat"
-    unset oldtimeformat
-	else
-		. "$file"
-	fi
-}
-
-source_with_bench() {
-  local file="$1"
-  if [[ $__bashrc_bench ]]; then
-		oldtimeformat="$TIMEFORMAT"
-		TIMEFORMAT="$file: %R"
-		time . "$file"
-    TIMEFORMAT="$oldtimeformat"
-    unset oldtimeformat
-	else
-		. "$file"
-	fi
-}
 for f in "${HOME}/.bashrc.d"/[0-9][0-9]-*.bashrc; do
   if [ -r "$f" ]; then
     source_with_bench "$f"

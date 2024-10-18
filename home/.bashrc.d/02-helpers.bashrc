@@ -1,3 +1,6 @@
+# Unnecessary here as it is done in .bashrc
+# source "$HOME/.local/share/ar/helpers.sh"
+
 function detect_color_support {
     # Return a variable containing true if color is supported.
 
@@ -45,15 +48,4 @@ notify-after () {
         notify-send -c $BUILD_CMD -i emblem-important -t 1000 "$BUILD_DIR: $BUILD_CMD failed" "$(date)"
     fi
     return $RETCODE
-}
-
-# Nice approach taken from here: https://stackoverflow.com/a/29239609
-is_os () { [[ $OSTYPE == *$1* ]]; }
-is_nix () {
-    case "$OSTYPE" in
-        *linux*|*hurd*|*msys*|*cygwin*|*sua*|*interix*) sys="gnu";;
-        *bsd*|*darwin*) sys="bsd";;
-        *sunos*|*solaris*|*indiana*|*illumos*|*smartos*) sys="sun";;
-    esac
-    [[ "${sys}" == "$1" ]];
 }
