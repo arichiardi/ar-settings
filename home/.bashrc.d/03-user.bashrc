@@ -11,7 +11,6 @@ export GIT_HOME="$HOME/git"
 # Custom load config
 export LD_LIBRARY_PATH="$HOME/.local/lib"
 
-
 is_os darwin && export PATH="${HOMEBREW_PREFIX}/opt/coreutils/libexec/gnubin:\
 ${HOMEBREW_PREFIX}/opt/grep/libexec/gnubin:\
 ${HOMEBREW_PREFIX}/opt/python@3.13/libexec/bin:\

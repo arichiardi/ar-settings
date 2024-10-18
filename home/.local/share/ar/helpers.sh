@@ -1,7 +1,5 @@
 #!/bin/bash
 
-diff_tool=emacsclient-ediff-diff.sh
-
 light_green='\033[1;32m'
 light_red='\033[1;31m'
 light_yellow='\033[1;33m'
@@ -189,6 +187,47 @@ function merge_rclone_secrets () {
     fi
 }
 
+# Combining
+#   https://wpyoga.dev/blog/2021/07/10/bashrc-directory#simple-implementation
+#   https://byparker.com/blog/2021/the-power-of-bashrc-d/
+#
+# Run benchmark with
+#   __bashrc_bench=1 . ~/.bashrc
+
+source_if_there() {
+  local file="$1"
+  if [ -f "$file" ]; then
+    source "$file"
+  fi
+}
+
+source_sub_with_bench() {
+  local superfile="$1"
+  local file="$2"
+  if [[ $__bashrc_bench ]]; then
+    oldtimeformat="$TIMEFORMAT"
+		TIMEFORMAT="$superfile $file: %R"
+		time . "$file"
+    TIMEFORMAT="$oldtimeformat"
+    unset oldtimeformat
+	else
+		. "$file"
+	fi
+}
+
+source_with_bench() {
+  local file="$1"
+  if [[ $BENCHMARK_SOURCE ]]; then
+		oldtimeformat="$TIMEFORMAT"
+		TIMEFORMAT="$file: %R"
+		time . "$file"
+    TIMEFORMAT="$oldtimeformat"
+    unset oldtimeformat
+	else
+		. "$file"
+	fi
+}
+
 # Nice approach taken from here: https://stackoverflow.com/a/29239609
 is_os () { [[ $OSTYPE == *$1* ]]; }
 is_nix () {
@@ -198,4 +237,56 @@ is_nix () {
         *sunos*|*solaris*|*indiana*|*illumos*|*smartos*) sys="sun";;
     esac
     [[ "${sys}" == "$1" ]];
+}
+
+# Thank you flowblok!
+#
+# https://blog.flowblok.id.au/2013-02/shell-startup-scripts.html
+# https://heptapod.host/flowblok/shell-startup/-/blob/branch/default/.shell/env_functions?ref_type=heads
+
+# Usage: indirect_expand PATH -> $PATH
+indirect_expand () {
+    env |sed -n "s/^$1=//p"
+}
+
+# Usage: pathremove /path/to/bin [PATH]
+# Eg, to remove ~/bin from $PATH
+#     pathremove ~/bin PATH
+pathremove () {
+    local IFS=':'
+    local newpath
+    local dir
+    local var=${2:-PATH}
+    # Bash has ${!var}, but this is not portable.
+    for dir in `indirect_expand "$var"`; do
+        IFS=''
+        if [ "$dir" != "$1" ]; then
+            newpath=$newpath:$dir
+        fi
+    done
+    export $var=${newpath#:}
+}
+
+# Usage: pathprepend /path/to/bin [PATH]
+# Eg, to prepend ~/bin to $PATH
+#     pathprepend ~/bin PATH
+pathprepend () {
+    # if the path is already in the variable,
+    # remove it so we can move it to the front
+    pathremove "$1" "$2"
+    #[ -d "${1}" ] || return
+    local var="${2:-PATH}"
+    local value=`indirect_expand "$var"`
+    export ${var}="${1}${value:+:${value}}"
+}
+
+# Usage: pathappend /path/to/bin [PATH]
+# Eg, to append ~/bin to $PATH
+#     pathappend ~/bin PATH
+pathappend () {
+    pathremove "${1}" "${2}"
+    #[ -d "${1}" ] || return
+    local var=${2:-PATH}
+    local value=`indirect_expand "$var"`
+    export $var="${value:+${value}:}${1}"
 }
