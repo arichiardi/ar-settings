@@ -5,16 +5,16 @@ light_red='\033[1;31m'
 light_yellow='\033[1;33m'
 no_color='\033[0m'
 
-function echo-info  { printf "\r${light_green} %s${no_color}\n" "$*"; }
-function echo-warn  { printf "\r${light_yellow} %s${no_color}\n" "$*"; }
-function echo-skip  { printf "\r${light_yellow} %s${no_color}\n" "$*"; }
-function echo-ok    { printf "\r${light_green} %s${no_color}\n" "$*"; }
-function echo-fail  { printf "\r${light_red} %s${no_color}\n" "$*"; }
+function echo_info  { printf "\r${light_green} %s${no_color}\n" "$*"; }
+function echo_warn  { printf "\r${light_yellow} %s${no_color}\n" "$*"; }
+function echo_skip  { printf "\r${light_yellow} %s${no_color}\n" "$*"; }
+function echo_ok    { printf "\r${light_green} %s${no_color}\n" "$*"; }
+function echo_fail  { printf "\r${light_red} %s${no_color}\n" "$*"; }
 
-function installing  { echo-info "Installing $1..."; }
-function installnote { echo-info "   $1"; }
-function skipping    { echo-skip "   already installed; skipping."; }
-function success     { echo-ok   "   success!"; }
+function installing  { echo_info "Installing $1..."; }
+function installnote { echo_info "   $1"; }
+function skipping    { echo_skip "   already installed; skipping."; }
+function success     { echo_ok   "   success!"; }
 
 function pkg_install () {
     local packages=$1
@@ -46,9 +46,10 @@ function pkg_install () {
         if [[ ! $EUID -eq 0 ]] && [[ ! "$modifier" =~ "yay" ]]; then
             usesudo=sudo
 	fi
-        echo-info Installing package with: $usesudo $cmd $@
+        echo_info Installing package with: $usesudo $cmd $@
         $usesudo $cmd $@
     else
+        echo_info Installing package with: $cmd
         echo $cmd
     fi
 }
@@ -125,10 +126,10 @@ function merge_keepass_dbs () {
             if [ "$(sha256sum $dest_path)" != "$(sha256sum $source_path)" ]; then
                 keepassxc-cli merge --same-credentials "$dest_path" "$source_path"
             else
-                echo-info "Database $dest_path had not been changed, skipping..."
+                echo_info "Database $dest_path had not been changed, skipping..."
             fi
         else
-            echo-warn "Either destination ($dest_path) or source ($source_path) did not exist, skipping..."
+            echo_warn "Either destination ($dest_path) or source ($source_path) did not exist, skipping..."
         fi
     done
 }
@@ -143,7 +144,7 @@ function merge_b2_secrets () {
 
     tmp_dir=$(mktemp -d -t "b2-secrets-XXXXX")
     if [[ ! "$tmp_dir" || ! -d "$tmp_dir" ]]; then
-        echo-fail "Could not create temp dir"
+        echo_fail "Could not create temp dir"
     else
         trap "cleanup_after_error $tmp_dir" SIGINT SIGHUP SIGPIPE SIGQUIT SIGTERM
 
@@ -169,7 +170,7 @@ function merge_rclone_secrets () {
 
     tmp_dir=$(mktemp -d -t "rclone-secrets-XXXXX")
     if [[ ! "$tmp_dir" || ! -d "$tmp_dir" ]]; then
-        echo-fail "Could not create temp dir"
+        echo_fail "Could not create temp dir"
     else
         trap "cleanup_after_error $tmp_dir" SIGINT SIGHUP SIGPIPE SIGQUIT SIGTERM
 

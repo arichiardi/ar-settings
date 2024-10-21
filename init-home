@@ -17,14 +17,14 @@ temp_dir=$(mktemp -d -t "ar-init-home.XXXXXXXXXX")
 
 source ./home/.local/share/ar/helpers.sh
 
-echo-info "Creating directories"
+echo_info "Creating directories"
 mkdir -p $HOME/.local/bin
 mkdir -p $HOME/tmp
 mkdir -p $HOME/git
 
 pushd ./home > /dev/null
 
-echo-info "Diffing unencrypted files"
+echo_info "Diffing unencrypted files"
 for f in $(find . -type f -and -not -name '*.enc'); do
     dest_f="$HOME/$f"
 
@@ -39,25 +39,25 @@ for f in $(find . -type f -and -not -name '*.enc'); do
         set -e
 
         local_d=$(dirname "$local_f")
-        echo-info "Creating $local_d directory..."
+        echo_info "Creating $local_d directory..."
         mkdir -p "$local_d"
 
         case $exit_code in
-            0) echo-info "File $local_f already up-to-date";;
-            1) echo-warn "File $local_f is outdated or missing - merging"; set +e; vimdiff "$local_f" "$f"; set -e;;
-            *) echo-fail "Unidentified $f diff exit code ($exit_code) - skipping";;
+            0) echo_info "File $local_f already up-to-date";;
+            1) echo_warn "File $local_f is outdated or missing - merging"; set +e; vimdiff "$local_f" "$f"; set -e;;
+            *) echo_fail "Unidentified $f diff exit code ($exit_code) - skipping";;
         esac
     else
-        echo-info "File $local_f is missing - copying"
+        echo_info "File $local_f is missing - copying"
         mkdir -p $(dirname "$dest_f")
         cp -iv "$f" "$(readlink --no-newline --canonicalize-missing "$dest_f")"
     fi
 done
 
-echo-info "Making $HOME/.local/bin files executable"
+echo_info "Making $HOME/.local/bin files executable"
 find "$HOME/.local/bin" -type f -and -not -executable -exec chmod u+x {} ';'
 
-echo-info "Diffing encrypted files (excluding .bashrc.d over 90)"
+echo_info "Diffing encrypted files (excluding .bashrc.d over 90)"
 encrypted_files=$(find . -type f -and -name '*.enc' | awk -F'/|-' '$(NF-1) <= 90 {print $0}')
 
 for f in $encrypted_files; do
@@ -78,7 +78,7 @@ for f in $encrypted_files; do
         shred -u -n 19 "$temp_f"
         set -e
     else
-        echo-info "File $dest_f is missing - decrypting"
+        echo_info "File $dest_f is missing - decrypting"
         mkdir -p $(dirname "$dest_f")
         $secret_bin -r -s "$encrypted_f" -d "$(readlink --no-newline --canonicalize-missing ${dest_f%.enc})"
     fi
