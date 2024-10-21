@@ -1,0 +1,77 @@
+#!/bin/bash
+set -euo pipefail
+
+source "$HOME/.local/share/ar/helpers.sh"
+
+b2_args='--no-progress'
+b2_profile=
+b2_bucket=
+gpg_key=
+nuke_gpg_files=no
+source_dir=/data/alba/private/Backups
+verbose=no
+
+if [ "${1:-}" == "--nuke-gpg-files" ]; then
+  echo-warn "Nuking all the gpg files."
+  find $source_dir -name '*.gpg' -delete
+  verbose=yes
+else
+  while getopts "ndvp:b:g:" flag
+  do
+    case "${flag}" in
+      d) b2_args+=" --dryRun";;
+      p) b2_profile="$OPTARG";;
+      b) b2_bucket="$OPTARG";;
+      g) gpg_key="$OPTARG";;
+      v) verbose=yes;;
+      ?) echo "Usage: $(basename $0) [-q] [-d] [-v]"; exit 1;;
+    esac
+  done
+fi
+
+[ -z "$b2_bucket" ] && echo-fail "Bucket is required (--bucket)."; exit 2
+[ -z "$b2_profile" ] && echo-warn "Profile not found, relying on environment variables for authentication."
+[ -z "$gpg_key" ] && echo-warn "GPG not set, will try simmetric encryption."
+
+echo-info "Computing modified since last run."
+source_files=$(find $source_dir -type f -and \( -not -name '.*' -and -not -name '*.gpg' \))
+
+declare -a newer_files=()
+
+for f in $source_files; do
+  if [ "$f" -nt "$f.gpg" ]; then
+     echo "  $f"
+     newer_files+=($f)
+  else
+     if [ "$verbose" == "yes" ]; then
+       echo "  $f [UNMODIFIED]"
+     fi
+   fi
+done
+
+echo "=== Encrypt against $gpg_encrypt_key"
+if (( ${#newer_files[@]} == 0 )); then
+    echo-info "  Nothing to do"
+else
+  gpg_args='--batch --yes --multifile'
+  if [ "$verbose" == "yes" ]; then
+    gpg_args+=" --verbose"
+  fi
+  if [ -n "$gpg_key" ]; then
+    gpg_args+=" --recipient $gpg_key"
+  fi
+    
+  printf '%s\n' "${newer_files[@]}" | \
+    gpg $gpg_args --encrypt
+fi
+
+echo-info "Syncing to Backblaze."
+b2-wrapper sync \
+  $b2_args \
+  --profile "$b2_profile" \
+  --threads 10 \
+  --replace-newer \
+  --include-regex '.*\.gpg' \
+  --exclude-regex '.*' \
+  --exclude-all-symlinks \
+  "$source_dir" "b2://$b2_bucket"
