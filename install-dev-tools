@@ -51,7 +51,7 @@ else
   idea_dir=$(find $xdg_data_home_dir -type d -name 'idea*')
 
   if [ ! -d "$idea_dir" ]; then
-    echo-fail "Cannot retrieve idea local dir. This is likely a bug."
+    echo_fail "Cannot retrieve idea local dir. This is likely a bug."
   else
     ln -s "$idea_dir/bin/idea.sh" $bindir/idea.sh
     mkdir -p $xdg_data_home_dir/applications
@@ -71,7 +71,7 @@ fi
 
 # GOTO_ASDF
 
-echo-info "Installing asdf"
+echo_info "Installing asdf"
 pkg_install asdf-vm
 
 asdf plugin-add java
