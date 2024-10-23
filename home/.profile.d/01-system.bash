@@ -12,4 +12,6 @@ case ":${PATH}:" in
 esac
 
 pathprepend "$HOME/.local/lib" LD_LIBRARY_PATH
+
+pathprepend /usr/share/man MANPATH
 pathprepend "$HOME/.local/share/man" MANPATH
