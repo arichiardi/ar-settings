@@ -1,0 +1,40 @@
+#!/bin/bash
+#
+# This script executes a command and redirects sends a ntfy notification
+# of its stdout (no stderr, other bash magic will take care of that).
+#
+# It needs the following environment variables
+#  - NTFY_SERVER
+#  - NTFY_TOPIC
+#  - NTFY_ACCESS_TOKEN
+#  - NTFY_SCRIPT_NAME
+#
+# Returns the exit code of the original command
+
+set -eu
+
+tmp=$(mktemp -d -t wrap-ntfy-XXXXX)
+out_file=$tmp/out.log
+
+cleanup () {
+    rm -rf "$tmp"
+}
+
+trap cleanup EXIT SIGINT SIGHUP SIGPIPE SIGQUIT SIGTERM
+
+# Solution found here: https://stackoverflow.com/a/692407
+set +e
+"$@" > >(tee $out_file)
+exit_code=$?
+set -e
+
+curl_authz="Authorization: Bearer $NTFY_ACCESS_TOKEN"
+curl_endpoint=$NTFY_SERVER/$NTFY_TOPIC
+
+if [ $exit_code -eq 0 ]; then
+   curl -H "$curl_authz" -H prio:low -d "Script $NTFY_SCRIPT_NAME ran successfully" "$curl_endpoint"
+else
+   curl -H "$curl_authz" -H tags:warning -d `cat "$out_file"` "$curl_endpoint"
+fi
+
+exit $exit_code

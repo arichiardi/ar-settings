@@ -1,0 +1,71 @@
+#!/bin/bash
+#
+# Original script:
+#   Cronic v3 - cron job report wrapper
+#   Copyright 2007-2016 Chuck Houpt. No rights reserved, whatsoever.
+#   Public Domain CC0: http://creativecommons.org/publicdomain/zero/1.0/
+#
+# This script generalizes Chronic to wrap the result of any script,
+# without masking its stdout/stderr so that interactive scripts can
+# still function. It echos the nice and tidy message Cronic conjures up.
+#
+# If WRAP_RESULT_REDIRECT_STDERR is set to 1, the script will add '2>&1'
+# and merge stderr to stdout.
+#
+# Finally, it exits with the same exit code as the wrapped command.
+
+set -eu
+
+tmp=$(mktemp -d -t wrap-result-XXXXX)
+out=$tmp/out.log
+err=$tmp/err.log
+trace=$tmp/trace.log
+
+cleanup () {
+    rm -rf "$tmp"
+}
+
+trap cleanup EXIT SIGINT SIGHUP SIGPIPE SIGQUIT SIGTERM
+
+# Tee solution found here: https://stackoverflow.com/a/692407
+set +e
+if [ "${WRAP_RESULT_REDIRECT_STDERR-}" ]; then
+    "$@" > >(tee "$out") 2> >(tee "$out" >&1)
+else
+    "$@" > >(tee "$out") 2> >(tee "$trace" >&2)
+fi
+
+result=$?
+set -e
+
+pattern="^${PS4:0:1}\\+${PS4:1}"
+if [ -f $trace ]; then
+    if grep -aq "$pattern" $trace
+    then
+        ! grep -av "$pattern" $trace > $err
+    else
+        err=$trace
+    fi
+fi
+
+if [ $result -ne 0 -o -s "$err" ]
+    then
+    echo "Detected failure or error output for the command:"
+    echo "$@"
+    echo
+    echo "Exit code: $result"
+    echo
+    echo "STDERR:"
+    cat "$err"
+    echo
+    echo "STDOUT:"
+    cat "$out"
+    if [ $trace != $err ]
+    then
+        echo
+        echo "TRACE:"
+        cat "$trace"
+    fi
+fi
+
+exit $result
