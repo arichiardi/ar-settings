@@ -13,18 +13,8 @@
 
 set -eu
 
-tmp=$(mktemp -d -t wrap-ntfy-XXXXX)
-out_file=$tmp/out.log
-
-cleanup () {
-    rm -rf "$tmp"
-}
-
-trap cleanup EXIT SIGINT SIGHUP SIGPIPE SIGQUIT SIGTERM
-
-# Solution found here: https://stackoverflow.com/a/692407
 set +e
-"$@" > >(tee $out_file)
+output=$("$@" | tee /dev/tty)
 exit_code=$?
 set -e
 
@@ -34,7 +24,7 @@ curl_endpoint=$NTFY_SERVER/$NTFY_TOPIC
 if [ $exit_code -eq 0 ]; then
    curl -H "$curl_authz" -H prio:low -d "Script $NTFY_SCRIPT_NAME ran successfully" "$curl_endpoint"
 else
-   curl -H "$curl_authz" -H tags:warning -d `cat "$out_file"` "$curl_endpoint"
+   curl -H "$curl_authz" -H tags:warning -d "$output" "$curl_endpoint"
 fi
 
 exit $exit_code
