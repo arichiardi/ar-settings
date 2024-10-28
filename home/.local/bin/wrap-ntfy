@@ -13,8 +13,11 @@
 
 set -eu
 
+# https://stackoverflow.com/a/12451419
+exec 5>&1
+
 set +e
-output=$("$@" | tee /dev/tty)
+output=$("$@" | tee >(cat - >&5))
 exit_code=$?
 set -e
 
