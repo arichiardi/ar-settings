@@ -5,12 +5,7 @@ alias commit-ts='function commit-ts-fn { local datetime=$(date --iso-8601=second
 alias g='hub'
 alias gitalias="git config --get-regexp ^alias\." # from http://stackoverflow.com/questions/7066325/how-to-list-show-git-aliases
 
-# Java
-export MAVEN_OPTS="-Xmx2048m -Xms512m -XX:MaxPermSize=312M -XX:ReservedCodeCacheSize=128m -Dsun.lang.ClassLoader.allowArraySyntax=true -ea -Dfile.encoding=UTF-8"
-export MAVEN_JMX="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=6969 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false"
-
 # Maven
-alias mvn='notify-after mvn'
 alias mc='mvn clean'
 alias mci='mvn clean install'
 alias mcist='mvn clean install -DskipAllTests -T3 -Dmaven.test.skip=true'

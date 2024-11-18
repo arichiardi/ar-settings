@@ -28,24 +28,3 @@ function detect_color_support {
 }
 
 use_color=$(detect_color_support)
-
-# From http://blog.effy.cz/2014/07/maven-build-notifications.html
-notify-after () {
-    CMD=$1
-    shift
-
-    $CMD $@
-    RETCODE=$?
-    BUILD_DIR=${PWD##*/}
-    BUILD_CMD=`basename $CMD`
-    if [ $RETCODE -eq 0 ]
-    then
-        notify-send -c $BUILD_CMD -i emblem-default -t 1000 "$BUILD_DIR: $BUILD_CMD successful" "$(date)"
-    elif [ $RETCODE -eq 130 ]
-    then
-        notify-send -c $BUILD_CMD -i emblem-ohno -t 1000 "$BUILD_DIR: $BUILD_CMD canceled" "$(date)"
-    else
-        notify-send -c $BUILD_CMD -i emblem-important -t 1000 "$BUILD_DIR: $BUILD_CMD failed" "$(date)"
-    fi
-    return $RETCODE
-}
