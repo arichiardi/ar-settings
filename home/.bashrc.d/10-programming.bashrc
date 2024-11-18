@@ -30,3 +30,10 @@ alias emacs-ar-pack='cd $HOME/.emacs.d/.live-packs/ar-emacs-pack'
 alias docker-tcp='sudo systemctl stop docker; nohup sudo docker daemon -H tcp://localhost:4243 --raw-logs > /dev/null 2>&1 &'
 alias docker-rmia='docker rmi $(docker images -qf "dangling=true")'
 alias docker-gateway="docker network inspect bridge --format='{{(index .IPAM.Config 0).Gateway}}'"
+
+# https://github.com/akermu/emacs-libvterm
+if [[ "$INSIDE_EMACS" = 'vterm' ]] \
+    && [[ -n ${EMACS_VTERM_PATH} ]] \
+    && [[ -f ${EMACS_VTERM_PATH}/etc/emacs-vterm-bash.sh ]]; then
+	source ${EMACS_VTERM_PATH}/etc/emacs-vterm-bash.sh
+fi
