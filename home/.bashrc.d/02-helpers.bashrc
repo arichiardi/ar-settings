@@ -11,7 +11,7 @@ function detect_color_support {
     # instead of using /etc/DIR_COLORS.  Try to use the external file
     # first to take advantage of user additions.  Use internal bash
     # globbing instead of external grep binary.
-    local use_color=
+    local use_color=false
     local safe_term=${TERM//[^[:alnum:]]/?}   # sanitize TERM
     local match_lhs=""
     [[ -f ~/.dir_colors   ]] && match_lhs="${match_lhs}$(<~/.dir_colors)"
@@ -26,5 +26,3 @@ function detect_color_support {
     echo $use_color
     return 0
 }
-
-use_color=$(detect_color_support)
