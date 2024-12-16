@@ -2,14 +2,28 @@
 #
 # Go through all the (nested) media (jpeg, mp4, ...) files starting from the current dir and remove
 # the most common (unnecessary) prefixes from the file name.
+#
+# The first (optional) parameter will override the "find -iregex" expression.
+set -xeuo pipefail
 
-set -euo pipefail
+default_regex='.*\.(jpg|jpeg|png|tiff|mp4)'
 
-for f in $(find -regextype posix-extended -iregex '.*\.(jpg|jpeg|png|tiff|mp4)'); do
-    file_path=$(dirname $f)
-    file_name=$(basename $f)
-    new_file_name=$(echo $file_name | sed -E -e 's/(photo|PXL|signal)_//')
+extension_regex="${1:=$default_regex}"
+
+do_sanitize () {
+    local f=$1
+    local file_path=$(dirname "$f")
+    local file_name=$(basename "$f")
+    local new_file_name=$(echo "$file_name" \
+                              | sed -E -e 's/(photo|PXL|signal)_//' \
+                              | sed -E 's/[[:space:]]+/_/g')
     if [ -n "$f" ] && [ "$file_name" != "$new_file_name" ]; then
-       mv -vi $f $file_path/$new_file_name
+        mv -vi "$f" "$file_path/$new_file_name"
     fi
+}
+
+readarray -d '' files< <(find -print0 -type f -regextype posix-extended -iregex "$extension_regex")
+
+for f in "${files[@]}"; do
+    do_sanitize "$f"
 done
