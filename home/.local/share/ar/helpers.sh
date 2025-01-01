@@ -1,5 +1,8 @@
 #!/bin/bash
 
+ar_b2_default_exclude_regex='(.*\/\..*)|(.*\.DS_Store)|(.*\.Spotlight-V100)|(.*\.[Tt]rash.*)|(.*\/[wW][iI][pP])'
+ar_b2_default_file_retention_args='--replace-newer --keep-days 365'
+
 light_green='\033[1;32m'
 light_red='\033[1;31m'
 light_yellow='\033[1;33m'
@@ -86,23 +89,18 @@ function sync_dir_to_b2 () {
     # $2 B2_APPLICATION_KEY
     # $3 source dir
     # $4 target bucket or bucket path
-    # $5 exclude symlinks
-    local exclude_symlinks=${5:-true}
+    # $5 extra args                   # these will be appended to the b2 sync command
+    local default_extra_args="$ar_b2_default_file_retention_args --exclude-all-symlinks"
 
-    local extra_args=
-    if [ "$exclude_symlinks" == true ]; then
-        extra_args=--exclude-all-symlinks
-    fi
+    local extra_args="${5:-$default_extra_args}"
+
     env \
-      B2_APPLICATION_KEY_ID="$1" \
-      B2_APPLICATION_KEY="$2" \
-      b2-wrapper sync \
-      --threads 3 \
-      --replace-newer \
-      --keep-days 365 \
-      --exclude-regex "(.*\/\..*)|(.*\.DS_Store)|(.*\.Spotlight-V100)|(.*\.Trash.*)|(.*\/wip)|(.*\/WIP)" \
-      $extra_args \
-      "$3" "b2://$4"
+        B2_APPLICATION_KEY_ID="$1" \
+        B2_APPLICATION_KEY="$2" \
+        b2-wrapper sync \
+        --exclude-regex "$ar_b2_default_exclude_regex" \
+        $extra_args \
+        "$3" "b2://$4"
 }
 
 function merge_keepass_dbs () {
@@ -152,7 +150,8 @@ function merge_b2_secrets () {
         env B2_APPLICATION_KEY_ID="$1" B2_APPLICATION_KEY="$2" \
           b2-wrapper sync \
             --replace-newer \
-            --exclude-regex "(.*bin\/.*)|(vault\.enc)" \
+            --include-regex "(.*\.kdbx)" \
+            --exclude-regex "(.*)" \
             --exclude-all-symlinks \
             "b2://$source_bucket" "$tmp_dir"
 
