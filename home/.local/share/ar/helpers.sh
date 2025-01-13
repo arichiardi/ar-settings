@@ -167,7 +167,10 @@ function merge_rclone_secrets () {
     local rclone_remote_path=$1
     local target_dir=$2
 
+    set -x
     tmp_dir=$(mktemp -d -t "rclone-secrets-XXXXX")
+    set +x
+
     if [[ ! "$tmp_dir" || ! -d "$tmp_dir" ]]; then
         echo_fail "Could not create temp dir"
     else
@@ -177,7 +180,7 @@ function merge_rclone_secrets () {
         rclone copy \
           --no-check-dest \
           --no-update-modtime \
-          --exclude "(.*bin\/.*)|(vault\.enc)" \
+          --include "*.kdbx" \
           --max-size 10M \
           "$rclone_remote_path" "$tmp_dir"
 
