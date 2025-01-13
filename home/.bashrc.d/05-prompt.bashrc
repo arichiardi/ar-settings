@@ -29,21 +29,21 @@ function __do_ps1 () {
     local use_color="${AR_PROMPT_COLOR_DISABLED:-$AR_PROMPT_COLOR_SUPPORTED}"
 
     if [ "$use_color" = "true" ] && { [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; }; then
-        PS1_COLORED_HOST=$(context-color --prompt --background --context hostname)\h
+        PS1_HOST_COLOR=$(context-color --prompt --background --context hostname)
     else
-        PS1_COLORED_AT="$(context-color --prompt --context whoami)@"
+        PS1_AT_COLOR="$(context-color --prompt --context whoami)"
     fi
 
     if [ "$git_completion_disabled" == "false" ]; then
         if [ "$use_color" = "true" ] ; then
             export GIT_PS1_SHOWCOLORHINTS=1
-            __git_ps1 "${BOLD}\u${PS1_COLORED_AT}${NC}${PS1_COLORED_HOST}${NC} ${BLUE}\w${NC}" "\\$ "
+            __git_ps1 "${BOLD}\u${PS1_AT_COLOR}@${NC}${PS1_HOST_COLOR}\h${NC} ${BLUE}\w${NC}" "\\$ "
         else
             __git_ps1 "\u@\h \w" "\\$ "
         fi
     else
         if [ "$use_color" = "true" ] ; then
-            PS1="${BOLD}\u${PS1_COLORED_AT}${NC}${PS1_COLORED_HOST}${NC} ${BLUE}\w${NC} \\$ "
+            PS1="${BOLD}\u${PS1_AT_COLOR}@${NC}${PS1_HOST_COLOR}\h${NC} ${BLUE}\w${NC} \\$ "
         else
             PS1="\u@\h \w \\$ "
         fi
