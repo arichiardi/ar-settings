@@ -1,0 +1,23 @@
+#!/bin/bash
+
+set -ue
+
+# https://stackoverflow.com/a/12451419
+exec 5>&1
+
+set +e
+output=`check-connection`
+exit_code=$?
+set -e
+
+curl_authz="Authorization: Bearer $NTFY_ACCESS_TOKEN"
+curl_endpoint=$NTFY_SERVER/$NTFY_TOPIC
+
+if [ $exit_code -eq 0 ]; then
+   output=$(echo -e "$output" | grep ip_addr)
+   curl -H "$curl_authz" -H prio:min -H "Title: Connection is up" -d "$output" "$curl_endpoint"
+else
+   curl -H "$curl_authz" -H prio:high -H tags:triangular_flag_on_post -H "Title: Connection is down" -d "$output" "$curl_endpoint"
+fi
+
+exit $exit_code
