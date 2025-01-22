@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+# wg-netns port forwarding script
+#   https://github.com/dadevel/wg-netns?tab=readme-ov-file#port-forwarding-with-socat
+set -eu
+
+if [ $# -ne 3 ]; then
+    echo 'usage: netns-publish PUBLIC_PORT NETNS_NAME NETNS_ADDRESS:NETNS_PORT'
+    exit 1
+fi
+
+exec socat tcp-listen:"$1",reuseaddr,fork "exec:sudo ip netns exec $2 socat stdio 'tcp-connect:$3',nofork"
