@@ -25,10 +25,10 @@ tell application "iTerm2"
 end tell'
 '''
 
-cmd-left = 'focus left'
-cmd-down = 'focus down'
-cmd-up = 'focus up'
-cmd-right = 'focus right'
+cmd-left = 'focus --boundaries-action wrap-around-the-workspace left'
+cmd-down = 'focus --boundaries-action wrap-around-the-workspace down'
+cmd-up = 'focus --boundaries-action wrap-around-the-workspace up'
+cmd-right = 'focus --boundaries-action wrap-around-the-workspace right'
 
 cmd-shift-left = 'move left'
 cmd-shift-down = 'move down'
