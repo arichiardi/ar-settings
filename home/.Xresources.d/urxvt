@@ -8,8 +8,10 @@ URxvt*rewrapMode: never
 URxvt*geometry: 95x240+0+0
 URxvt*scrollBar: false
 URxvt*saveLines: 16384
-URxvt*font: xft:JetBrains Mono:style=g:antialias=false:size=12
-URxvt*boldFont: xft:JetBrains Mono:style=g:bold:antialias=false:size=12
+URxvt*font: xft:JetBrainsMono Nerd Font Mono:style=regular:antialias=true:size=12
+URxvt*boldFont: xft:JetBrainsMono Nerd Font Mono:style=g:bold:antialias=true:size=12
+URxvt*italicFont: xft:JetBrainsMono Nerd Font Mono:style=g:italic:antialias=true:size=12
+URxvt.boldItalicFont: xft:JetBrainsMono Nerd Font Mono:style=g:bolditalic:antialias=true:size=12
 URxvt*letterSpace: 0
 URxvt*lineSpace: -1
 URxvt*reverseVideo: off
