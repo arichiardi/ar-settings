@@ -1,0 +1,16 @@
+# Display resources
+set_from_resource $primary-display-id i3wm.primaryDisplayId
+set_from_resource $secondary-display-id i3wm.secondaryDisplayId
+set_from_resource $battery-low-icon i3wm.batteryLowIcon
+
+set $mode_display HDMI display (a)uto, (h)ome
+mode "$mode_display" {
+  bindsym a exec --no-startup-id "xrandr --auto; sleep 0.5; nitrogen --restore"
+  bindsym h exec --no-startup-id "$HOME/.screenlayout/setup-home.sh; sleep 0.5; nitrogen --restore"
+
+  bindsym Return mode "default"
+  bindsym Escape mode "default"
+}
+bindsym $mod+Mod1+d mode "$mode_display"
+
+exec --no-startup-id "$HOME/.screenlayout/setup-home.sh; sleep 0.5; nitrogen --restore"
