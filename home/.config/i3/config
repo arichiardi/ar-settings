@@ -4,16 +4,11 @@
 # Set mod key (Mod1=<Alt>, Mod4=<Super>)
 set $mod Mod4
 
-# Display management
-set_from_resource $primary-display-id i3wm.primaryDisplayId e-DP1
-set_from_resource $secondary-display-id i3wm.secondaryDisplayId DP-1
-set_from_resource $battery-low-icon i3wm.batteryLowIcon
-
 # set default desktop layout (default is tiling)
 # workspace_layout tabbed <stacking|tabbed>
 
 # Configure border style <normal|1pixel|pixel xx|none|pixel>
-new_window pixel 1
+new_window pixel 0
 new_float normal
 
 # Hide borders
@@ -25,7 +20,7 @@ bindsym $mod+y border pixel 1
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
-font xft:JetBrainsMono Nerd Font Mono 12
+font xft:JetBrainsMono NFM 12
 
 # Use Mouse+$mod to drag floating windows
 floating_modifier $mod
@@ -194,7 +189,6 @@ bindsym $mod+Ctrl+8 move container to workspace $ws8; workspace $ws8
 bindsym $mod+Ctrl+9 move container to workspace $ws9; workspace $ws9
 bindsym $mod+Ctrl+0 move container to workspace $ws10; workspace $ws10
 
-
 # Open applications on specific workspaces
 assign [class="Thunderbird"] $ws2
 # assign [class="(?i)Microsoft Teams"] $ws2
@@ -292,11 +286,11 @@ bindsym Mod4+Mod1+l exec --no-startup-id blurlock
 
 # Autostart applications
 exec --no-startup-id "nitrogen --restore; sleep 0.5; compton -b"
-exec --no-startup-id nm-applet
+exec --no-startup-id "killall nm-applet && dbus-launch nm-applet"
 exec --no-startup-id xfce4-power-manager
 exec --no-startup-id pamac-tray
 exec --no-startup-id blueman-applet
-exec --no-startup-id start_conky_kap
+exec --no-startup-id start_conky
 exec --no-startup-id xautolock -time 10 -locker blurlock
 # https://wiki.archlinux.org/title/Polkit
 exec --no-startup-id /usr/bin/lxpolkit
@@ -434,20 +428,6 @@ mode "$mode_gaps_outer" {
         bindsym Escape mode "default"
 }
 
-set $mode_display HDMI display (a)uto, (h)ome, (l)aptop only
-mode "$mode_display" {
-  bindsym a exec --no-startup-id "xrandr --auto; sleep 0.5; nitrogen --restore"
-  bindsym h exec --no-startup-id "$HOME/.screenlayout/setup-home.sh; sleep 0.5; nitrogen --restore"
-  bindsym l exec --no-startup-id "$HOME/.screenlayout/setup-laptop-only.sh; sleep 0.5; nitrogen --restore"
-
-  # back to normal: Enter or Escape
-  bindsym Return mode "default"
-  bindsym Escape mode "default"
-}
-
-# Declare here the shortcut to bring the display selection menu
-bindsym $mod+Mod1+d mode "$mode_display"
-
 # Bindings
 bindsym $mod+Mod1+e exec "emacsclient-daemon.sh -c"
 bindsym $mod+Mod1+h exec "pcmanfm ~"
@@ -466,9 +446,6 @@ bindsym XF86AudioMute exec --no-startup-id mute-mic # As opposed to XF86AudioMic
 
 # Battery
 exec --no-startup-id i3-battery-popup -n -m 'Battery level is getting low' -i $battery-low-icon
-
-# Display
-exec --no-startup-id "$HOME/.screenlayout/setup-home.sh; sleep 0.5; nitrogen --restore"
 
 # Wildcards are expanded:
 include ~/.config/i3/config.d/*
