@@ -1,0 +1,25 @@
+ca-bundle
+ca-certificates
+comgt
+curl
+diffutils
+# kmod-usb-serial-option # part of openwrt-ipq
+# kmod-usb-net-qmi-wwan    # part of openwrt-ipq
+libcurl4
+libnghttp3
+luci
+luci-app-https-dns-proxy
+luci-app-pbr
+luci-proto-qmi
+luci-proto-wireguard
+pbr
+picocom
+qmi-utils
+sms-tool
+uboot-envtools
+unzip
+uqmi
+usb-modeswitch
+usbutils
+wireguard-tools
+wpa-cli
