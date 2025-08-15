@@ -3,12 +3,15 @@ ca-certificates
 comgt
 curl
 diffutils
-# kmod-usb-serial-option # part of openwrt-ipq
+# kmod-usb-serial-option   # part of openwrt-ipq
 # kmod-usb-net-qmi-wwan    # part of openwrt-ipq
 libcurl4
 libnghttp3
 luci
+luci-app-3ginfo-lite       # https://github.com/4IceG/Modem-extras
+luci-app-atcommands        # https://github.com/4IceG/Modem-extras
 luci-app-https-dns-proxy
+luci-app-lite-watchdog     # https://github.com/4IceG/Modem-extras
 luci-app-pbr
 luci-proto-qmi
 luci-proto-wireguard
@@ -21,5 +24,6 @@ unzip
 uqmi
 usb-modeswitch
 usbutils
+wget-ssl
 wireguard-tools
 wpa-cli
