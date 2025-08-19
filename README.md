@@ -27,6 +27,23 @@ $ cat > ~/.emacs-live.el
 ^D
 ```
 
+### Hub OAuth Setup
+
+To set up GitHub Hub CLI with OAuth authentication:
+
+1. **Quick Setup**: Use the helper script:
+   ```shell
+   $ ./home/.local/bin/setup-hub-oauth --info  # Shows how to create GitHub token
+   $ ./home/.local/bin/setup-hub-oauth         # Interactive setup
+   ```
+
+2. **Manual Setup**: See the [detailed guide](docs/hub-oauth-setup.md) for step-by-step instructions.
+
+3. **Restore on New Machine**:
+   ```shell
+   $ ./home/.local/bin/secret --restore --src ./home/.config/hub.enc --dest ~/.config/hub
+   ```
+
 ### Secrets
 
 You should not know where we store the secrets but they are in this repo, as encrypted files.

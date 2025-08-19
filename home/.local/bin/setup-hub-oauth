@@ -1,0 +1,154 @@
+#!/usr/bin/env bash
+#
+# setup-hub-oauth
+#
+# Helper script to set up GitHub Hub CLI OAuth token configuration
+# This script helps create and encrypt hub configuration for ar-settings
+#
+set -euo pipefail
+
+script_path="${BASH_SOURCE[0]}"
+script_name=$(basename "$script_path")
+script_dir=$(dirname "$script_path")
+
+# Check if secret script exists
+secret_bin="$script_dir/secret"
+if [ ! -f "$secret_bin" ]; then
+    echo "Error: secret script not found at $secret_bin"
+    exit 1
+fi
+
+do_usage() {
+    echo
+    echo "Helper script to set up GitHub Hub CLI OAuth token configuration"
+    echo
+    echo "This script will:"
+    echo "1. Prompt for your GitHub username and OAuth token"
+    echo "2. Create a hub configuration file"
+    echo "3. Encrypt it using the secret script"
+    echo "4. Store it as home/.config/hub.enc in your ar-settings"
+    echo
+    echo "Usage:"
+    echo "$script_name [OPTIONS]"
+    echo
+    echo "Options:"
+    echo "  -h, --help     Show this help message"
+    echo "  -i, --info     Show information about creating GitHub tokens"
+    echo
+    echo "Before running this script, create a GitHub Personal Access Token:"
+    echo "1. Go to https://github.com/settings/tokens"
+    echo "2. Click 'Generate new token (classic)'"
+    echo "3. Select scopes: repo, public_repo, gist, user:email, read:org"
+    echo "4. Copy the generated token"
+    echo
+    exit 1
+}
+
+show_token_info() {
+    echo
+    echo "=== How to Create a GitHub Personal Access Token ==="
+    echo
+    echo "1. Navigate to GitHub Token Settings:"
+    echo "   https://github.com/settings/tokens"
+    echo
+    echo "2. Click 'Generate new token' → 'Generate new token (classic)'"
+    echo
+    echo "3. Fill in the form:"
+    echo "   - Note: 'Hub CLI for ar-settings' (or similar)"
+    echo "   - Expiration: Choose appropriate duration (90 days recommended)"
+    echo
+    echo "4. Select these scopes (permissions):"
+    echo "   ✓ repo              - Full control of private repositories"
+    echo "   ✓ public_repo       - Access to public repositories"
+    echo "   ✓ gist              - Create and edit gists" 
+    echo "   ✓ user:email        - Access user email addresses"
+    echo "   ✓ read:org          - Read org and team membership"
+    echo "   ✓ workflow          - Update GitHub Action workflows (optional)"
+    echo
+    echo "5. Click 'Generate token'"
+    echo
+    echo "6. IMPORTANT: Copy the token immediately - you won't see it again!"
+    echo
+    echo "7. Run this script again and paste the token when prompted"
+    echo
+    exit 0
+}
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -h|--help)
+            do_usage
+            ;;
+        -i|--info)
+            show_token_info
+            ;;
+        *)
+            echo "Unknown option: $1"
+            do_usage
+            ;;
+    esac
+done
+
+echo "=== GitHub Hub CLI OAuth Setup ==="
+echo
+echo "This script will help you configure GitHub Hub CLI with OAuth authentication."
+echo "The configuration will be encrypted and stored in your ar-settings repository."
+echo
+echo "If you need to create a GitHub token first, run: $script_name --info"
+echo
+
+# Get user input
+read -p "Enter your GitHub username: " github_username
+echo
+echo "Enter your GitHub Personal Access Token:"
+echo "(The token will not be displayed as you type)"
+read -s github_token
+echo
+
+# Validate inputs
+if [ -z "$github_username" ]; then
+    echo "Error: GitHub username cannot be empty"
+    exit 1
+fi
+
+if [ -z "$github_token" ]; then
+    echo "Error: GitHub token cannot be empty"
+    exit 1
+fi
+
+# Create temporary hub config file
+tmp_config=$(mktemp)
+trap "rm -f $tmp_config" EXIT
+
+cat > "$tmp_config" << EOF
+github.com:
+- user: $github_username
+  oauth_token: $github_token
+  protocol: https
+EOF
+
+echo "Created hub configuration..."
+
+# Determine the path to store the encrypted config
+settings_root=$(dirname "$script_dir")
+config_dir="$settings_root/.config"
+encrypted_config="$config_dir/hub.enc"
+
+# Create config directory if it doesn't exist
+mkdir -p "$config_dir"
+
+# Encrypt the configuration
+echo "Encrypting configuration..."
+"$secret_bin" --backup --src "$tmp_config" --dest "$encrypted_config"
+
+echo
+echo "✓ Hub OAuth configuration encrypted and saved to: $encrypted_config"
+echo
+echo "To use this configuration on a target machine:"
+echo "1. Copy your ar-settings to the machine"
+echo "2. Run: $secret_bin --restore --src $encrypted_config --dest ~/.config/hub"
+echo "3. Test with: hub api user"
+echo
+echo "The temporary configuration file has been securely deleted."
+echo "Setup complete!"
