@@ -1,7 +1,19 @@
 ca-bundle
 curl
 ddns-scripts
+dnsmasq-full             # remove dnsmasq https://docs.openwrt.melmac.ca/pbr/1.1.6-16/#Howtoinstalldnsmasq-full
+etherwake
+ipset
 libcurl4
+libnetfilter-conntrack3
+libnettle8
 libnghttp3
 libngtcp2
 luci-app-ddns
+luci-app-httpd
+luci-app-pbr
+luci-app-wol
+luci-proto-wireguard
+pbr
+tailscale
+wireguard-tools
