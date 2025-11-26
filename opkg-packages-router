@@ -1,3 +1,4 @@
+bind-dig
 ca-bundle
 curl
 ddns-scripts
@@ -12,8 +13,17 @@ libngtcp2
 luci-app-ddns
 luci-app-httpd
 luci-app-pbr
+luci-app-unbound
 luci-app-wol
 luci-proto-wireguard
+ntp-utils
+ntpd
 pbr
 tailscale
+unbound-anchor
+unbound-checkconf
+unbound-control
+unbound-control-setup
+unbound-daemon
+unbound-host
 wireguard-tools
