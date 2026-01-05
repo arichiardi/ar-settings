@@ -13,30 +13,33 @@
 [push]
     default = simple
 [core]
-    editor = emacsclient -a '' -nw
+    # editor = emacsclient -a '' -nw
     autocrlf = false
     excludesfile = ~/.config/git/ignore
 [init]
-  defaultBranch = main
+    defaultBranch = main
 [rerere]
     enabled = true
-[mergetool "meld"]
+[difftool "meld-custom"]
     cmd = $HOME/.local/bin/meld-merge-script \"$LOCAL\" \"$REMOTE\" \"$MERGED\" \"$BASE\"
     trustExitCode = true
-[mergetool "ediff"]
+[difftool "ediff-custom"]
     cmd = $HOME/.local/bin/ediff-merge-script \"$LOCAL\" \"$REMOTE\" \"$MERGED\" \"$BASE\"
     trustExitCode = true
+[difftool]
+    prompt = false
 [merge]
     conflictstyle = diff3
-    tool = meld
+    tool = meld-custom
 [rebase]
-    tool = meld
+    tool = meld-custom
     conflictstyle = diff3
     autosquash = true
 [branch]
     autosetuprebase = always
 [diff]
     compactionHeuristic = true
+    tool = meld-custom
 [diff "jpg"]
     binary = true
     textconv = hexdump -v -C
