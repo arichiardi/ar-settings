@@ -1,4 +1,6 @@
 # Reference: https://github.com/i3/i3/blob/next/etc/config
+#
+# Using Karabiner to map Colemak keys
 
 start-at-login = true
 
@@ -76,7 +78,7 @@ cmd-6 = 'workspace 6'
 cmd-7 = 'workspace 7'
 cmd-8 = 'workspace 8'
 cmd-9 = 'workspace 9'
-cmd-0 = 'workspace 10'
+cmd-0 = 'workspace 0'
 
 cmd-shift-1 = 'move-node-to-workspace 1'
 cmd-shift-2 = 'move-node-to-workspace 2'
@@ -99,7 +101,7 @@ cmd-alt-p = 'exec-and-forget open /Applications/KeePassXC.app'
 [exec]
 inherit-env-vars = true
 [exec.env-vars]
-PATH = '/opt/homebrew/bin:/opt/homebrew/sbin:/opt/homebrew/opt/asdf/libexec/bin:${HOME}/.asdf/shims:${HOME}/.local/bin:${PATH}'
+PATH = '${HOME}/.local/bin:${HOME}/.asdf/shims:/opt/homebrew/bin:/opt/homebrew/sbin:/opt/homebrew/opt/asdf/libexec/bin:${PATH}'
 
 [mode.resize.binding]
 right = 'resize width -50'
@@ -109,42 +111,6 @@ left = 'resize width +50'
 enter = 'mode main'
 esc = 'mode main'
 
-# Using Karabiner to map Colemak
-#
-# [key-mapping.key-notation-to-key-code]
-# q = 'q'
-# w = 'w'
-# f = 'e'
-# p = 'r'
-# g = 't'
-# j = 'y'
-# l = 'u'
-# u = 'i'
-# y = 'o'
-# semicolon = 'p'
-# leftSquareBracket = 'leftSquareBracket'
-# rightSquareBracket = 'rightSquareBracket'
-# backslash = 'backslash'
-#
-# a = 'a'
-# r = 's'
-# s = 'd'
-# t = 'f'
-# d = 'g'
-# h = 'h'
-# n = 'j'
-# e = 'k'
-# i = 'l'
-# o = 'semicolon'
-# quote = 'quote'
-#
-# z = 'z'
-# x = 'x'
-# c = 'c'
-# v = 'v'
-# b = 'b'
-# k = 'n'
-# m = 'm'
-# comma = 'comma'
-# period = 'period'
-# slash = 'slash'
+[[on-window-detected]]
+if.app-id = 'com.microsoft.teams2'
+run = 'layout tiling'
