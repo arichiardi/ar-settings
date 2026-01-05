@@ -42,10 +42,10 @@ fi
 
 source $(readlink -e "$script_dir/helpers.sh")
 
-echo-info "Restoring config files"
+echo "Restoring config files"
 cp -iv "$src_dir/gpg.conf" "$gpg_homedir"
 cp -iv "$src_dir/gpg-agent.conf" "$gpg_homedir"
 cp -iv "$src_dir/dirmngr.conf" "$gpg_homedir"
 
-echo-info "Restoring sshcontrol"
+echo "Restoring sshcontrol"
 $secret_bin --restore --src "$src_dir/sshcontrol.enc" --dest "$gpg_homedir/sshcontrol"
