@@ -24,6 +24,8 @@ mkdir -p $HOME/git
 
 pushd ./home > /dev/null
 
+diff_cmd="git difftool --no-index"
+
 echo_info "Diffing unencrypted files"
 for f in $(find . -type f -and -not -name '*.enc'); do
     dest_f="$HOME/$f"
@@ -44,7 +46,7 @@ for f in $(find . -type f -and -not -name '*.enc'); do
 
         case $exit_code in
             0) echo_info "File $local_f already up-to-date";;
-            1) echo_warn "File $local_f is outdated or missing - merging"; set +e; vimdiff "$local_f" "$f"; set -e;;
+            1) echo_warn "File $local_f is outdated or missing - merging"; set +e; $diff_cmd "$local_f" "$f"; set -e;;
             *) echo_fail "Unidentified $f diff exit code ($exit_code) - skipping";;
         esac
     else
@@ -73,7 +75,7 @@ for f in $encrypted_files; do
         set +e
         $secret_bin -r -s "$encrypted_f" -d "$temp_f"
         if [ $? -eq 0 ]; then
-            vimdiff "$dest_f" "$temp_f"
+            $diff_cmd "$dest_f" "$temp_f"
         fi
         shred -u -n 19 "$temp_f"
         set -e
