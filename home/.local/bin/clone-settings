@@ -6,7 +6,7 @@ script_dir=$(dirname "$script_path")
 
 source $(readlink -e "$script_dir/helpers.sh")
 
-echo-info "Setting up temporary SSH over GnuPG"
+echo "Setting up temporary SSH over GnuPG"
 # https://wiki.archlinux.org/index.php/GnuPG#SSH_agent
 export GPG_TTY=$(tty)
 gpg-connect-agent updatestartuptty /bye >/dev/null
@@ -16,12 +16,12 @@ export GNUPGCONFIG=${GNUPGHOME:-"$HOME/.gnupg/gpg-agent.conf"}
 unset SSH_AGENT_PID
 export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
 
-echo-info "Reloading the GnuPG agent"
+echo "Reloading the GnuPG agent"
 gpg-connect-agent reloadagent /bye
 
-echo-info "Added identities"
+echo "Added identities"
 ssh-add -L
 
-echo-info "Clone ar-settings into $HOME/git"
+echo "Clone ar-settings into $HOME/git"
 mkdir -p $HOME/git
 git clone git@github.com:arichiardi/ar-settings.git $HOME/git/ar-settings
