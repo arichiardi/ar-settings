@@ -7,6 +7,27 @@ provisioning a new machine.
 Slowly this is moving to a more modular approach where the distribution can
 either be Ubuntu or Manjaro.
 
+### Bootstrap
+
+#### Install yay
+
+sudo pacman -S --needed git base-devel && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si
+
+#### Use pinentry-tty
+
+yay -S pinentry
+
+echo 'pinentry-program /usr/bin/pinentry-tty' >> ~/.gnupg/gpg-agent.conf
+gpg-connect-agent reloadagent /bye
+
+#### Launch bootstrap
+
+Make the numbered files in bin executable and then run them in order
+
+find bin -type l -regex '.*[0-9]+.*' -exec chmod u+x {} ';'
+./bin/01
+./bin/02
+
 ### Emacs.d
 
 The `.emacs.d` folder can be cloned with:
