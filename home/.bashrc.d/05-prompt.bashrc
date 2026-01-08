@@ -21,6 +21,20 @@ export GIT_PS1_DESCRIBE_STYLE="describe"
 
 export AR_PROMPT_COLOR_SUPPORTED=$(detect_color_support)
 
+virtualenv_prompt() {
+    # If not in a virtualenv, print nothing
+    [[ "$VIRTUAL_ENV" == "" ]] && return
+
+    # Distinguish between the shell where the virtualenv was activated
+    # and its children
+    local venv_name="${VIRTUAL_ENV##*/}"
+    if typeset -f deactivate >/dev/null; then
+        echo "[${venv_name}] "
+    else
+        echo "<${venv_name}> "
+    fi
+}
+
 function __do_ps1 () {
     # AR_PROMPT_GIT_DISABLED
     local git_completion_disabled="${AR_PROMPT_GIT_DISABLED:-false}"
@@ -48,6 +62,8 @@ function __do_ps1 () {
             PS1="\u@\h \w \\$ "
         fi
     fi
+    # https://virtualenvwrapper.readthedocs.io/en/latest/tips.html#enhanced-bash-zsh-prompt
+    PS1='$(virtualenv_prompt)'"$PS1"
 }
 
 PROMPT_COMMAND="__do_ps1"
