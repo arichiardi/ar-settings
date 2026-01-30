@@ -47,7 +47,7 @@ cd .config
 git clone git@github.com:arichiardi/emacs.d.git emacs
 ```
 
-Then follow the instructions in the [README](https://raw.githubusercontent.com/arichiardi/emacs.d/master/README.md).
+Then follow the instructions in the [README](https://github.com/arichiardi/emacs.d/blob/master/README.md).
 ```
 
 ## Secrets
