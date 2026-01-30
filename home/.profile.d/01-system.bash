@@ -39,3 +39,9 @@ if `is_os darwin`; then
     pathappend "-L$PGSQL_ROOT/lib" LDFLAGS
     pathappend "-I$PGSQL_ROOT/include" CPPFLAGS
 fi
+
+# https://wiki.archlinux.org/title/Install_Arch_Linux_on_WSL
+if [[ $(grep -i Microsoft /proc/version) ]]; then
+    export GALLIUM_DRIVER=d3d12
+    export LIBVA_DRIVER_NAME=d3d12
+fi
