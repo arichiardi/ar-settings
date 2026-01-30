@@ -3,11 +3,13 @@
 ar_b2_default_exclude_regex='(.*\/\..*)|(.*\.DS_Store)|(.*\.Spotlight-V100)|(.*\.[Tt]rash.*)|(.*\/[wW][iI][pP])'
 ar_b2_default_file_retention_args='--replace-newer --keep-days 365'
 
+light_blue='\033[1;34m'
 light_green='\033[1;32m'
 light_red='\033[1;31m'
 light_yellow='\033[1;33m'
 no_color='\033[0m'
 
+function echo_debug { printf "\r${light_blue} %s${no_color}\n" "$*"; }
 function echo_info  { printf "\r${light_green} %s${no_color}\n" "$*"; }
 function echo_warn  { printf "\r${light_yellow} %s${no_color}\n" "$*"; }
 function echo_skip  { printf "\r${light_yellow} %s${no_color}\n" "$*"; }
@@ -55,6 +57,74 @@ function pkg_install () {
         echo_info Installing package with: $cmd
         echo $cmd
     fi
+}
+
+function init_normal_files () {
+    local files=("$@")
+    local diff_cmd="git difftool --no-index"
+
+    for f in "${files[@]}"; do
+	    echo $f
+        dest_f="$HOME/$f"
+
+        set +e
+        local_f=$(readlink --no-newline --canonicalize-existing "$dest_f")
+        exit_code=$?
+        set -e
+        if [ $exit_code -eq 0 ] && [ $local_f ]; then
+            set +e
+            (set -x; diff --new-file "$local_f" "$f" > /dev/null)
+            exit_code=$?
+            set -e
+
+            local_d=$(dirname "$local_f")
+            echo_info "Creating $local_d directory..."
+            mkdir -p "$local_d"
+
+            case $exit_code in
+                0) echo_info "File $local_f already up-to-date";;
+                1) echo_warn "File $local_f is outdated or missing - merging"; set +e; $diff_cmd "$local_f" "$f"; set -e;;
+                *) echo_fail "Unidentified $f diff exit code ($exit_code) - skipping";;
+            esac
+        else
+            echo_info "File $local_f is missing - copying"
+            mkdir -p $(dirname "$dest_f")
+            cp -iv "$f" "$(readlink --no-newline --canonicalize-missing "$dest_f")"
+        fi
+    done
+}
+
+function init_encrypted_files () {
+    local files=("$@")
+    local diff_cmd="git difftool --no-index"
+
+    for f in "${encrypted_files[@]}"; do
+        dest_f="$HOME/${f%.enc}"
+
+        set +e
+        existing_dest_f=$(readlink -f --no-newline --canonicalize-existing "$dest_f")
+        exit_code=$?
+        set -e
+        
+        if [ $exit_code -eq 0 ] && [ -f "$existing_dest_f" ]; then
+            temp_f=$(readlink -f --no-newline --canonicalize-missing "$temp_dir/${f%.enc}")
+            mkdir -p $(dirname "$temp_f")
+
+            set +e
+            $secret_bin -r -s "$f" -d "$temp_f"
+            if [ $? -eq 0 ]; then
+                $diff_cmd "$existing_dest_f" "$temp_f"
+            fi
+            shred -u -n 19 "$temp_f"
+            set -e
+        else
+            echo_info "File $dest_f is missing - decrypting"
+            mkdir -p $(dirname "$dest_f")
+            set +e
+            $secret_bin -r -s "$f" -d "$dest_f"
+            set -e
+        fi
+    done
 }
 
 # The following replaces "readlink -f" behavior for macOS

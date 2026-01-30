@@ -23,16 +23,15 @@ mkdir -p $HOME/.local/bin
 mkdir -p $HOME/tmp
 mkdir -p $HOME/git
 
-find_prefix="find . \( -path ./.bashrc.d -o -path ./.profile.d \) -prune -o \("
-find_suffix="-not -type d -not -name '.bashrc' -not -name '.bash_profile' -not -name '.bash_aliases' -not -name '.profile' \)"
-    
-find_files_cmd="$find_prefix -not -name *.enc -not -name *.gpg ${find_suffix} -print0"
+diff_cmd="git difftool --no-index"
 
 files=()
 while IFS= read -r -d '' file; do
     files+=("$file")
 done < <(
-    eval "$find_files_cmd"
+    find . -maxdepth 1 \( -name .profile \) -not -name '*.enc' -not -name '*.gpg' -type f -print0
+
+    find .profile.d -not -name '*.enc' -not -name '*.gpg' -type f -print0
 )
 
 echo_debug "The files are:"
@@ -45,13 +44,11 @@ init_normal_files "${files[@]}"
 echo_info "Making $HOME/.local/bin files executable"
 find "$HOME/.local/bin" -type f -and -not -executable -exec chmod u+x {} ';'
 
-find_encrypted_cmd="$find_prefix \( -name *.enc -or -name *.gpg \) ${find_suffix} -print0"
-
 encrypted_files=()
 while IFS= read -r -d '' file; do
     encrypted_files+=("$file")
 done < <(
-    eval "$find_encrypted_cmd"
+    find .profile.d \( -name '*.enc' -o -name '*.gpg' \) -type f -print0
 )
 
 echo_debug "Encrypted files are:"

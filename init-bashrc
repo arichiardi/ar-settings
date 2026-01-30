@@ -15,24 +15,25 @@ set -euo pipefail
 secret_bin=$(pwd)/home/.local/bin/secret
 temp_dir=$(mktemp -d -t "ar-init-home.XXXXXXXXXX")
 
-pushd ./home > /dev/null
-source .local/share/ar/helpers.sh
+source ./home/.local/share/ar/helpers.sh
 
 echo_info "Creating directories"
 mkdir -p $HOME/.local/bin
 mkdir -p $HOME/tmp
 mkdir -p $HOME/git
 
-find_prefix="find . \( -path ./.bashrc.d -o -path ./.profile.d \) -prune -o \("
-find_suffix="-not -type d -not -name '.bashrc' -not -name '.bash_profile' -not -name '.bash_aliases' -not -name '.profile' \)"
-    
-find_files_cmd="$find_prefix -not -name *.enc -not -name *.gpg ${find_suffix} -print0"
+pushd ./home > /dev/null
+
+diff_cmd="git difftool --no-index"
 
 files=()
 while IFS= read -r -d '' file; do
     files+=("$file")
 done < <(
-    eval "$find_files_cmd"
+    # Find the main config files, EXCLUDING .enc and .gpg files
+    find . -maxdepth 1 \( -name .bashrc -o -name .bash_profile -o -name .bash_aliases \) -not -name '*.enc' -not -name '*.gpg' -type f -print0
+    # Find ALL files (EXCLUDING .enc and .gpg) within the .bashrc.d directory and its subdirectories
+    find .bashrc.d -not -name '*.enc' -not -name '*.gpg' -type f -print0
 )
 
 echo_debug "The files are:"
@@ -45,13 +46,11 @@ init_normal_files "${files[@]}"
 echo_info "Making $HOME/.local/bin files executable"
 find "$HOME/.local/bin" -type f -and -not -executable -exec chmod u+x {} ';'
 
-find_encrypted_cmd="$find_prefix \( -name *.enc -or -name *.gpg \) ${find_suffix} -print0"
-
 encrypted_files=()
 while IFS= read -r -d '' file; do
     encrypted_files+=("$file")
 done < <(
-    eval "$find_encrypted_cmd"
+    find .bashrc.d \( -name '*.enc' -o -name '*.gpg' \) -type f -print0
 )
 
 echo_debug "Encrypted files are:"
