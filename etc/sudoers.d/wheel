@@ -1,0 +1,5 @@
+Cmnd_Alias VPN_EXEC = /usr/bin/ip netns exec vpn *
+Cmnd_Alias POWER = /sbin/shutdown, /sbin/halt, /sbin/reboot, /sbin/restart
+
+%wheel ALL=(ALL:ALL) ALL
+%wheel ALL=(root) NOPASSWD: VPN_EXEC, POWER
