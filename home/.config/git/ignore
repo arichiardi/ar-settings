@@ -1,9 +1,85 @@
-*.elc
+#
+# This file is a global .gitignore file for all your repositories.
+# It is managed centrally at REPOSITORY_LOCATION should you want to
+# propose additions.
+#
+# This is a centrally managed file. Any changes made to this file will be
+# removed automatically.
+#
+# While this file does set defaults, you can override these settings in your
+# repository's .gitignore file using the `!` negation pattern. For example,
+# to allow a test pem file you can add `!test.pem` to your repository's
+# .gitignore file.
+#
+
+# IDE specific Directories
+**/.idea
+**/.vscode
+**/.project
+**/.settings
+**/.metadata
+**/.recommenders
+
+# IDE specific Files
+*.iws
+*.iml
+*.suo
+*.ntvs*
+*.njsproj
+*.sw?
+
+# Logs and Backups
+*.log
+*.bak
+*.swp
+*.swo
+*.tmp
+*.temp
+crash.log
+crash.*.log
+
+# Files with Secrets
+.env
+*.pem
+*.pfx
+*.key
+*.crt
+*.cert
+
+# Python Environments
+**/.venv
+**/env
+**/venv
+**/ENV
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Terraform
+**/.terraform
+*.tfstate
+*.tfstate.*
+.terraformrc
+terraform.rc
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# LLM tools
+.agent-shell
+
+# Emacs
 *-autoloads.el
-*.info
-dir
-gtags.files
-GPATH
-GRTAGS
-GTAGS
-transient/history.el
+*.elc
+transient/
