@@ -14,8 +14,7 @@ alias mcisst='mvn clean install -DskipTests -DskipITests -DskipAllTests -Dskip.c
 # Clojure
 alias l='lein'
 alias b='boot'
-alias clj-repl='function do_repl { clojure -J-Dclojure.server.repl="{:port ${1:-5555} :accept clojure.core.server/repl}" -M:rebel:zprint; }; do_repl'
-alias cljs-node-repl='function do_repl { clojure -J-Dclojure.server.repl="{:port ${1:-5555} :accept cljs.server.node/repl}" -R:cljs-canary -M:rebel-cljs -m cljs.main -re node -r; }; do_repl'
+alias clj-repl='function do_repl { clojure -J-Dclojure.server.repl="{:port ${1:-5555} :accept clojure.core.server/repl}" -M:home/rebel:home/zprint; }; do_repl'
 
 # Emacs
 alias vi="emacsclient-daemon.sh -nw"
@@ -23,13 +22,19 @@ alias e="emacsclient-daemon.sh -nw"
 alias em="emacsclient-daemon.sh -c"
 alias ed="emacsclient-dired.sh"
 alias emacs-resurrect='kill -CONT $(pgrep emacs | xargs)'
-alias emacs-packs='cd $HOME/.emacs.d/packs'
-alias emacs-ar-pack='cd $HOME/.emacs.d/.live-packs/ar-emacs-pack'
+alias emacs-packs='cd $HOME/.config/emacs/packs'
 
 # Docker
 alias docker-tcp='sudo systemctl stop docker; nohup sudo docker daemon -H tcp://localhost:4243 --raw-logs > /dev/null 2>&1 &'
 alias docker-rmia='docker rmi $(docker images -qf "dangling=true")'
 alias docker-gateway="docker network inspect bridge --format='{{(index .IPAM.Config 0).Gateway}}'"
+
+# Misc
+if `is_os linux`; then
+    alias o="xdg-open"
+elif `is_os darwin`; then
+    alias o="open"
+fi
 
 # https://github.com/akermu/emacs-libvterm
 if [[ "$INSIDE_EMACS" = 'vterm' ]] \
@@ -37,3 +42,18 @@ if [[ "$INSIDE_EMACS" = 'vterm' ]] \
     && [[ -f ${EMACS_VTERM_PATH}/etc/emacs-vterm-bash.sh ]]; then
 	source ${EMACS_VTERM_PATH}/etc/emacs-vterm-bash.sh
 fi
+
+# Direnv
+if command -v direnv >/dev/null 2>&1; then
+  eval "$(direnv hook bash)"
+fi
+
+# MCP
+alias mcp-venv='source $HOME/.local/share/venv/mcp/bin/activate'
+
+# Goose
+if command -v goose >/dev/null 2>&1; then
+  eval "$(goose completion bash)"
+fi
+alias goose='source $HOME/.local/share/venv/mcp/bin/activate && goose'
+
