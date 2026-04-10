@@ -39,7 +39,7 @@ crash.log
 crash.*.log
 
 # Files with Secrets
-.env
+*.env
 *.pem
 *.pfx
 *.key
