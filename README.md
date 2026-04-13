@@ -55,6 +55,19 @@ find bin -type l -regex '.*[0-9]+.*' -exec chmod u+x {} ';'
 ./bin/02-...
 ```
 
+### Initialization
+
+One bootstrapped, you can remove `tmp/ar-settings` and start working off of the main `git/ar-settings` dir.
+
+The following scripts are going to initialize your distro.
+
+```shell
+cd ~/git/ar-settings
+
+cd initialize
+./bin/01-...
+```
+
 ### Emacs.d
 
 The `.emacs.d` folder can be cloned with:
