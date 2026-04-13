@@ -48,7 +48,7 @@ git clone https://github.com/arichiardi/ar-settings.git
 Make the numbered files in bin executable and then run them in order
 
 ```shell
-cd bootstrap
+cd ar-settings/bootstrap
 
 find bin -type l -regex '.*[0-9]+.*' -exec chmod u+x {} ';'
 ./bin/01-...
