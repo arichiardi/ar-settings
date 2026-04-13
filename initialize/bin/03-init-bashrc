@@ -12,16 +12,22 @@ set -euo pipefail
 #
 # see the brilliant answer here: https://stackoverflow.com/a/45538151
 
-secret_bin=$(pwd)/home/.local/bin/secret
+script_path="$(readlink -f "${BASH_SOURCE[0]}")"
+script_dir="$(dirname "$script_path")"
+repo_root="$(git -C "$script_dir" rev-parse --show-toplevel)"
+
+secret_bin=$repo_root/home/.local/bin/secret
+
 temp_dir=$(mktemp -d -t "ar-init-home.XXXXXXXXXX")
 
-pushd ./home > /dev/null
-source .local/share/ar/helpers.sh
+source $repo_root/home/.local/share/ar/helpers.sh
 
 echo_info "Creating directories"
 mkdir -p $HOME/.local/bin
 mkdir -p $HOME/tmp
 mkdir -p $HOME/git
+
+pushd ./home > /dev/null
 
 diff_cmd="git difftool --no-index"
 
@@ -29,9 +35,10 @@ files=()
 while IFS= read -r -d '' file; do
     files+=("$file")
 done < <(
-    find . -maxdepth 1 \( -name .profile \) -not -name '*.enc' -not -name '*.gpg' -type f -print0
-
-    find .profile.d -not -name '*.enc' -not -name '*.gpg' -type f -print0
+    # Find the main config files, EXCLUDING .enc and .gpg files
+    find . -maxdepth 1 \( -name .bashrc -o -name .bash_profile -o -name .bash_aliases \) -not -name '*.enc' -not -name '*.gpg' -type f -print0
+    # Find ALL files (EXCLUDING .enc and .gpg) within the .bashrc.d directory and its subdirectories
+    find .bashrc.d -not -name '*.enc' -not -name '*.gpg' -type f -print0
 )
 
 echo_debug "The files are:"
@@ -48,7 +55,7 @@ encrypted_files=()
 while IFS= read -r -d '' file; do
     encrypted_files+=("$file")
 done < <(
-    find .profile.d \( -name '*.enc' -o -name '*.gpg' \) -type f -print0
+    find .bashrc.d \( -name '*.enc' -o -name '*.gpg' \) -type f -print0
 )
 
 echo_debug "Encrypted files are:"
