@@ -9,21 +9,36 @@ either be Ubuntu or Manjaro.
 
 ## Bootstrap
 
+### Prerequisites
+
+#### Packages
+
+#### Packages
+
+For `Arch Linux`, not many dependencies are need as the bootstrap scripts will install the rest:
+
+```shell
+yay -Sy pinentry
+```
+
+The other (optional) program you want is [yay](https://github.com/Jguer/yay):
+
+```shell
+sudo pacman -S --needed git gnupg base-devel && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si
+```
+
+#### Commands
+
+```shell
+echo 'pinentry-program /usr/bin/pinentry-tty' >> ~/.gnupg/gpg-agent.conf
+gpg-connect-agent reloadagent /bye
+```
+
+### Running
+
 ```shell
 mkdir tmp
 git clone https://github.com/arichiardi/ar-settings.git
-```
-
-#### Install yay
-
-`sudo pacman -S --needed git gnupg base-devel && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si`
-
-#### Use pinentry-tty
-```shell
-yay -S pinentry
-
-echo 'pinentry-program /usr/bin/pinentry-tty' >> ~/.gnupg/gpg-agent.conf
-gpg-connect-agent reloadagent /bye
 ```
 
 #### Launch bootstrap scripts
