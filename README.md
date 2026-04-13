@@ -73,7 +73,7 @@ cd initialize
 The `.emacs.d` folder can be cloned with:
 
 ``` shell
-cd .config
+cd ~/.config
 git clone git@github.com:arichiardi/emacs.d.git emacs
 ```
 
