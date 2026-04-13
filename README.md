@@ -30,10 +30,10 @@ sudo pacman -S --needed git gnupg base-devel && git clone https://aur.archlinux.
 #### Commands
 
 ```shell
-mkdir ~/.gnupg
+mkdir ~/.gnupg && chmod 700 ~/.gnupg
 
 echo 'pinentry-program /usr/bin/pinentry-tty' >> ~/.gnupg/gpg-agent.conf
-gpg-connect-agent reloadagent /bye
+gpgconf --kill gpg-agent
 ```
 
 ### Running
