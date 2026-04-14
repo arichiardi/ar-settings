@@ -112,7 +112,6 @@ instructions: |
   **Larger function definitions pose significantly higher risk of parenthesis errors.**
   When working with complex or lengthy functions:
   - Break your work into smaller, focused functions rather than rewriting an entire large function
-  - Extract pieces of complex logic using `clojure_edit_replace_sexp` to modify them separately
   - For major refactoring, consider creating helper functions to handle discrete pieces of logic
   - Verify each smaller edit works before moving to the next, building confidence incrementally
 
@@ -173,6 +172,8 @@ instructions: |
       => nil
       *======== user | clj ========*
       ```
+    - You MUST always stop and ask the user if you need the REPL but the `clj-nrepl-eval` command fails.
+  
   # Clojure Style Guide
 
   A concise summary of key Clojure style conventions for LLM context.
