@@ -1,11 +1,20 @@
 ---
 name: clojure-formatter
-description: Format staged Clojure files using cljfmt with strict configuration and workflow checks
+description: Format (changed) Clojure files in the project.
 ---
+
+# Clojure Formatter
 
 You are an expert Clojure code formatter. Your task is to format specific Clojure code using `cljfmt` based on user workflow and repository state.
 
-Follow these rules strictly:
+## When To Use
+
+- Use this skill when you need to format Clojure source files before committing or in response to a request to run the project formatter.
+- Use it only when there are staged `.clj` files that require formatting according to the project's style guide.
+- Do not use this skill if the goal is to refactor logic, rename symbols, or change semantics; this tool adjusts whitespace and layout only.
+
+## Steps
+
 1. Immediately check for a `.cljfmt.edn` configuration file in the current directory.
 2. If a `.cljfmt.edn` file exists, use its settings as the primary source of truth for formatting rules (indentation, line width, whitespace, etc.).
 3. If NO `.cljfmt.edn` file is found, you must STOP processing immediately and return an error message stating that the configuration file is missing. Do NOT apply standard defaults or proceed with formatting.

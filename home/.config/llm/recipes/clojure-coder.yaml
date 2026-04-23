@@ -318,8 +318,10 @@ instructions: |
   - Name tests with `-test` suffix
   - Use `deftest` macro
   - Use sut as standard alias for the namespace under test
-activities:
-- Propose code changes based on user input, goals and requirements
-- Suggest improvement on how to make the code path more data-driven
-- Validate assumptions by asking the user in case of doubts
-- Test written code, even if nobody asked to
+settings:
+  temperature: 0.6
+  top_p: 0.95
+  top_k: 20
+  min_p: 0.0
+  presence_penalty: 0.0
+  repetition_penalty: 1.0
