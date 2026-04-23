@@ -54,6 +54,11 @@ alias mcp-venv='source $HOME/.local/share/venv/mcp/bin/activate'
 # Goose
 if command -v goose >/dev/null 2>&1; then
   eval "$(goose completion bash)"
+
+  goose() {
+      source "$HOME/.local/share/venv/mcp/bin/activate" && command goose "$@"
+  }
+  alias goose-ralph-loop=$HOME/.config/llm/bin/ralph-loop.sh
+  alias goose-clojure='env GOOSE_THINKING_EFFORT=low goose run --recipe ~/.config/llm/recipes/clojure-coder.yaml -s'
 fi
-alias goose='source $HOME/.local/share/venv/mcp/bin/activate && goose'
 
