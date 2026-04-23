@@ -14,3 +14,8 @@ ${C}${B}y/Return${NC}:   Copy selection to primary buffer, Return: quit afterwar
 ${C}${B}Y${NC}:          Copy selected lines to primary buffer or cursor line and quit
 ${C}${B}q/Escape${NC}:   Quit keyboard selection mode"
 }
+
+# Emacs eat integration
+# https://codeberg.org/akib/emacs-eat
+
+[ -n "$EAT_SHELL_INTEGRATION_DIR" ] && source "$EAT_SHELL_INTEGRATION_DIR/bash"
