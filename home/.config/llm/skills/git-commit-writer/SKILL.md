@@ -88,6 +88,9 @@ What you write will be passed directly to `git commit -m "[message]"`.
 
 - Use `hub pr show 123` and `hub pull-request` for creating or modifying PR contents.
 
+- If the user passes a screenshot path, attach it to the **Testing** section with a brief description (a handful of words) indicating what it is showing. For example:
+  `![Login screen updated](path/to/screenshot.png)`
+
 **Examples:**
 
 ```bash
@@ -117,4 +120,6 @@ $ hub pull-request --base OWNER:master --head MYUSER:my-branch
   ```
 
 - Include user **GitHub** issue / PR links in the Links section; for other links, ask the user.
+  - **Never** include auto-closing keywords like "Closes #123", "Fixes #123", or similar references anywhere in either PR or commit message. We do not want GitHub to automatically close issues based on commits.
+  - **Never** convert a github link to a Jira link - if no Jira link is passed in input delete the Jira link specific section.
 - Do not include author names, commit SHAs, or timestamps in the summary.
