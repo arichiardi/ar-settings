@@ -37,6 +37,7 @@
 *.temp
 crash.log
 crash.*.log
+nohup.out
 
 # Files with Secrets
 *.env
@@ -78,6 +79,11 @@ $RECYCLE.BIN/
 
 # LLM tools
 .agent-shell
+.goose
+.goosehints
+.playwright-cli/
+.pi
+skills-lock.json
 
 # Emacs
 *-autoloads.el
