@@ -34,16 +34,6 @@ interface SkillRequestParams {
 
 /**
  * Map skill names to their request parameters.
- *
- * Example (translated from your Clojure config):
- *
- * (:temperature 0.6
- *  :top_p 0.95
- *  :top_k 20
- *  :min_p 0.0
- *  :presence_penalty 0.0
- *  :repetition_penalty 1.0
- *  :chat_template_kwargs (:enable_thinking t :preserve_thinking t))
  */
 const SKILL_REQUEST_PARAMS: Record<string, SkillRequestParams> = {
   "one-shot": {
@@ -65,6 +55,31 @@ const SKILL_REQUEST_PARAMS: Record<string, SkillRequestParams> = {
     chat_template_kwargs: {
       enable_thinking: true,
       preserve_thinking: true,
+    }
+  },
+
+  "clojure-formatter": {
+    temperature: 0.7,
+    top_p: 0.80,
+    top_k: 20,
+    min_p: 0.0,
+    presence_penalty: 1.5,
+    repetition_penalty: 1.0,
+    chat_template_kwargs: {
+      enable_thinking: false,
+    }
+  },
+
+  "git-commit-writer": {
+    temperature: 0.7,
+    top_p: 0.80,
+    top_k: 20,
+    min_p: 0.0,
+    presence_penalty: 1.5,
+    repetition_penalty: 1.0,
+    chat_template_kwargs: {
+      enable_thinking: true,
+      preserve_thinking: false,
     }
   },
 };
