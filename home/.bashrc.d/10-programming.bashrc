@@ -43,22 +43,65 @@ if [[ "$INSIDE_EMACS" = 'vterm' ]] \
 	source ${EMACS_VTERM_PATH}/etc/emacs-vterm-bash.sh
 fi
 
-# Direnv
+# direnv
 if command -v direnv >/dev/null 2>&1; then
   eval "$(direnv hook bash)"
 fi
 
-# MCP
+# mcp
 alias mcp-venv='source $HOME/.local/share/venv/mcp/bin/activate'
+
+# agent-safehouse
+if command -v safehouse >/dev/null 2>&1; then
+  # Safehouse environment passthrough list
+  SAFEHOUSE_ENV_PASS="ALTERNATE_EDITOR,\
+EDITOR,\
+VISUAL,\
+GIT_HOME,\
+DISABLE_TELEMETRY,\
+VIBE_HOME,\
+GOOSE_PROVIDER,\
+GOOSE_MODEL,\
+GOOSE_RECIPE_PATH,\
+CONTEXT_FILE_NAMES,\
+PI_ACP_ENABLE_EMBEDDED_CONTEXT,\
+PI_CODING_AGENT_DIR,\
+PI_TELEMETRY,\
+RALPH_WORKER_PROVIDER,\
+RALPH_WORKER_MODEL,\
+RALPH_REVIEWER_PROVIDER,\
+RALPH_REVIEWER_MODEL,\
+RALPH_MAX_ITERATIONS,\
+RALPH_RECIPE_DIR,\
+ASDF_DATA_DIR,\
+MC_REPO_DIR,\
+LOCAL_SERVER_HOST,\
+SEARXNG_URL"
+  
+  SAFEHOUSE_AGENT_POLICY="$HOME/.config/agent-safehouse/agent-policy.sb"
+
+  safehouse() {
+      command safehouse --enable=playwright-chrome --env-pass=$SAFEHOUSE_ENV_PASS "$@"
+  }
+fi
 
 # Goose
 if command -v goose >/dev/null 2>&1; then
-  eval "$(goose completion bash)"
+  # Commenting out as very very slow
+  # eval "$(goose completion bash)"
 
-  goose() {
-      source "$HOME/.local/share/venv/mcp/bin/activate" && command goose "$@"
+  do_goose() {
+    source "$HOME/.local/share/venv/mcp/bin/activate" && \
+        safehouse --append-profile $SAFEHOUSE_AGENT_POLICY goose "$@"
   }
   alias goose-ralph-loop=$HOME/.config/llm/bin/ralph-loop.sh
-  alias goose-clojure='env GOOSE_THINKING_EFFORT=low goose run --recipe ~/.config/llm/recipes/clojure-coder.yaml -s'
 fi
 
+# pi
+if command -v pi >/dev/null 2>&1; then
+  do_pi () {
+    source "$HOME/.local/share/venv/mcp/bin/activate" && \
+        safehouse --append-profile $SAFEHOUSE_AGENT_POLICY pi "$@"
+  }
+  alias pi=do_pi
+fi

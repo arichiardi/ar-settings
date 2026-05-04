@@ -1,6 +1,3 @@
-# Unnecessary here as it is done in .bashrc
-# source "$HOME/.local/share/ar/helpers.sh"
-
 function detect_color_support {
     # Return a variable containing true if color is supported.
 

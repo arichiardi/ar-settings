@@ -3,24 +3,24 @@ if `is_os darwin`; then
 fi
 
 if `is_os darwin`; then
-     pathprepend "${homebrew_dir}/opt/coreutils/libexec/gnubin" PATH
-     pathprepend "${homebrew_dir}/opt/grep/libexec/gnubin" PATH
-     pathprepend "${homebrew_dir}/opt/python@3/libexec/bin" PATH
-     pathprepend "${homebrew_dir}/opt/findutils/libexec/gnubin" PATH
-     pathprepend "${homebrew_dir}/opt/postgresql@17/bin" PATH
-     pathprepend "${homebrew_dir}/opt/qt@6/bin" PATH
+     PATH="${homebrew_dir}/opt/coreutils/libexec/gnubin":$PATH
+     PATH="${homebrew_dir}/opt/grep/libexec/gnubin":$PATH
+     PATH="${homebrew_dir}/opt/python@3/libexec/bin":$PATH
+     PATH="${homebrew_dir}/opt/findutils/libexec/gnubin":$PATH
+     PATH="${homebrew_dir}/opt/postgresql@17/bin":$PATH
+     PATH="${homebrew_dir}/opt/qt@6/bin":$PATH
 fi
 
 # $HOME/.local/bin could be already included via /etc/profile.d
 case ":${PATH}:" in
     *:"${HOME}/.local/bin":*) ;;
-    *) pathprepend "${HOME}/.local/bin" PATH ;;
+    *) PATH="${HOME}/.local/bin":$PATH ;;
 esac
 
-pathprepend "$HOME/.local/lib" LD_LIBRARY_PATH
+LD_LIBRARY_PATH="$HOME/.local/lib":$LD_LIBRARY_PATH
 
-pathprepend /usr/share/man MANPATH
-pathprepend "$HOME/.local/share/man" MANPATH
+MANPATH=/usr/share/man:$MANPATH
+MANPATH="$HOME/.local/share/man":$MANPATH
 
 if `is_os darwin`; then
     # all libraries and includes
@@ -45,6 +45,6 @@ if `is_os darwin`; then
     export INSTALLATION_ROOT=/Applications/pgModeler.app
     export PGMODELER_SOURCE=$HOME/git/pgmodeler
 
-    pathappend "$QT_ROOT/lib/pkgconfig" PKG_CONFIG_PATH
-    pathprepend "$QT_ROOT/bin" PATH
+    PKG_CONFIG_PATH=$PKG_CONFIG_PATH:"$QT_ROOT/lib/pkgconfig"
+    PATH="$QT_ROOT/bin":$PATH
 fi
