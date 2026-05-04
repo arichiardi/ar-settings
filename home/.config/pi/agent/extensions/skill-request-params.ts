@@ -52,11 +52,29 @@ interface SkillRequestEntry {
  * Optional "default" entry: fallback params applied when no skill is detected.
  * Omit it entirely to apply no custom params when no skill matches.
  */
+type SkillParams = {
+  temperature: number;
+  top_p: number;
+  top_k: number;
+  min_p: number;
+  presence_penalty: number;
+  repetition_penalty: number;
+  chat_template_kwargs: ChatTemplateKwargs;
+};
+
 const SKILL_REQUEST_PARAMS: Record<string, SkillRequestEntry> = {
   "default": {
     params: {
       temperature: 0.7,
-      top_p: 0.9,
+      top_p: 0.80,
+      top_k: 20,
+      min_p: 0.0,
+      presence_penalty: 1.5,
+      repetition_penalty: 1.0,
+      chat_template_kwargs: {
+        enable_thinking: true,
+        preserve_thinking: false,
+      },
     },
   },
 
@@ -71,9 +89,23 @@ const SKILL_REQUEST_PARAMS: Record<string, SkillRequestEntry> = {
       chat_template_kwargs: {
         enable_thinking: true,
         preserve_thinking: true,
-      }
+      },
     },
     aliases: ["clojure-coder", "babashka-script-master"],
+  },
+
+  "one-shot": {
+    params: {
+      temperature: 0.6,
+      top_p: 0.95,
+      top_k: 20,
+      min_p: 0.0,
+      presence_penalty: 0.0,
+      repetition_penalty: 1.0,
+      chat_template_kwargs: {
+        enable_thinking: false,
+      },
+    },
   },
 
   "clojure-formatter": {
@@ -86,7 +118,7 @@ const SKILL_REQUEST_PARAMS: Record<string, SkillRequestEntry> = {
       repetition_penalty: 1.0,
       chat_template_kwargs: {
         enable_thinking: false,
-      }
+      },
     },
   },
 
@@ -101,7 +133,7 @@ const SKILL_REQUEST_PARAMS: Record<string, SkillRequestEntry> = {
       chat_template_kwargs: {
         enable_thinking: true,
         preserve_thinking: false,
-      }
+      },
     },
   },
 };
@@ -203,9 +235,8 @@ export default function (pi: ExtensionAPI) {
   let skillPathToName: Map<string, string> = new Map();
 
   const DEBUG_LOG = "/tmp/skill-request-params-debug.log";
-  const DEBUG = true;
+  const DEBUG = false;
   function log(msg: string) {
-    console.log(`[skill-request-params] ${msg}`);
     if (DEBUG) {
       fs.appendFileSync(DEBUG_LOG, `${new Date().toISOString()} ${msg}\n`);
     }
@@ -240,10 +271,13 @@ export default function (pi: ExtensionAPI) {
         }
       }
     }
+    log(`before_agent_start: skillPathToName has ${skillPathToName.size} entries`);
 
     // Check for explicit skill invocation in expanded prompt
     // (pi expands /skill:name into <skill name="..."> before this event fires)
     const explicitSkill = parseSkillBlock(event.prompt);
+    log(`before_agent_start: parseSkillBlock returned ${explicitSkill ?? "null"}`);
+    log(`before_agent_start: prompt preview: ${event.prompt.substring(0, 300)}`);
     if (explicitSkill && PARAMS_LOOKUP[explicitSkill]) {
       activeSkill = explicitSkill;
       manualOverride = true;
