@@ -9,25 +9,18 @@ Search the web using the SearXNG API. The base URL is stored in the `SEARXNG_URL
 
 ## Usage
 
-### Basic search (top 5 results)
-```bash
-curl -s "$SEARXNG_URL/search?q=$(printf '%s' 'YOUR QUERY' | jq -Rs @uri)&format=json&categories=general" | jq -r '.results[:5] | .[] | "• \(.title)\n  \(.url)\n  \(.content)\n"'
-```
-
-### Broader search (top 10 results with snippets)
-```bash
-curl -s "$SEARXNG_URL/search?q=$(printf '%s' 'YOUR QUERY' | jq -Rs @uri)&format=json&categories=general&engines=google,bing,duckduckgo" | jq -r '.results[:10] | .[] | "• \(.title)\n  \(.url)\n  \(.snippet)\n"'
-```
+### Basic search
+curl -s "$SEARXNG_URL/search?q=$(printf '%s' "YOUR QUERY" | jq -Rs @uri)&format=json&categories=general"
 
 ### Search specific categories
 Replace `general` with one of: `it`, `science`, `news`, `images`, `videos`, `music`, `files`.
 
-```bash
-curl -s "$SEARXNG_URL/search?q=$(printf '%s' 'YOUR QUERY' | jq -Rs @uri)&format=json&categories=news" | jq -r '.results[:5] | .[] | "• \(.title)\n  \(.url)\n  \(.content)\n"'
-```
+curl -s "$SEARXNG_URL/search?q=$(printf '%s' "YOUR QUERY" | jq -Rs @uri)&format=json&categories=news"
 
 ## Notes
-- Always URL-encode the query using `jq -Rs @uri` to handle special characters safely.
-- Results are returned as JSON with fields: `title`, `url`, `content` (full snippet), and sometimes `engine` or `score`.
-- If `SEARXNG_URL` is not set, the search will fail — ask the user to configure it.
-
+- `jq -Rs @uri` is used **only** for safe URL-encoding. The output is raw JSON.
+- Response contains a top-level `results` array. Each item includes `title`, `url`, `content` (snippet), and optionally `engine`/`score`.
+- Parse the JSON directly in your LLM context; no post-processing is needed.
+- Some engines might fail, but the other results are still valid and should be considered.
+- ⚠️ **Mandatory**: SearXNG only returns metadata and short content snippets. If you need the full page content or deeper information, **YOU MUST use a web scraper or fetch tool** to retrieve the complete page from the returned `url` fields.
+- If `SEARXNG_URL` is unset, the command will fail. Ask the user to export it first.

@@ -15,7 +15,7 @@ You are an expert in creating git commit messages and pull request descriptions.
 **Example:**
 
 - ❌ **Incorrect**: Using a web search tool to find the title of `https://github.com/org/repo/pull/123`.
-- ✅ **Correct**: Executing `gh pr view 123 --json title,body` or `hub issue show 123`. Alternatively, but less preferably, the `github` tool can be used to fetch details for `org/repo#123`.
+- ✅ **Correct**: Executing `gh pr view 123 --json title,body`. Alternatively, but less preferably, the `github` tool can be used to fetch details for `org/repo#123`.
 
 ## Commit Messages
 
@@ -111,7 +111,7 @@ $ hub pull-request --base OWNER:master --head MYUSER:my-branch
 
 - Use GitHub-flavored markdown syntax.
 - Add "_🤖 AI-generated summary 🤖_" disclaimer at the end.
-- For PRs with multiple commits, include a summary section:
+- For PRs with multiple commits, include a summary section as part of the solution:
 
   ```markdown
   **Summary of changes**
@@ -120,6 +120,13 @@ $ hub pull-request --base OWNER:master --head MYUSER:my-branch
   ```
 
 - Include user **GitHub** issue / PR links in the Links section; for other links, ask the user.
+  - The link section MUST be a Markdown list. For example:
+    ```
+    ## Links
+
+    - https://github.com/project/issues/123
+    - https://github.com/project/issues/456
+    ```
   - **Never** include auto-closing keywords like "Closes #123", "Fixes #123", or similar references anywhere in either PR or commit message. We do not want GitHub to automatically close issues based on commits.
   - **Never** convert a github link to a Jira link - if no Jira link is passed in input delete the Jira link specific section.
 - Do not include author names, commit SHAs, or timestamps in the summary.
