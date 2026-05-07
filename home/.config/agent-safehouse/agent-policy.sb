@@ -1,0 +1,257 @@
+(version 1)
+
+;; ============================================================
+;; Agent Sandbox Profile
+;; Modeled on Agent Safehouse (eugene1g/agent-safehouse)
+;; ============================================================
+
+;;
+;; 00-base — deny-by-default baseline + HOME helper
+;;
+
+(define HOME_DIR "/Users/arichi801@cable.comcast.com")
+(define (home-subpath rel) (subpath (string-append HOME_DIR rel)))
+(define (home-literal rel) (literal (string-append HOME_DIR rel)))
+(define (home-prefix rel) (prefix (string-append HOME_DIR rel)))
+
+(deny default)
+
+;;
+;; 10-system-runtime
+;;
+
+(allow process-exec)
+(allow process-fork)
+(allow process-info* (target same-sandbox))
+(allow signal (target same-sandbox))
+(allow pseudo-tty)
+(allow sysctl-read)
+;; https://github.com/oracle/graal/issues/12974
+(allow ipc-posix-sem)
+
+(allow file-read*
+    (subpath "/usr")
+    (subpath "/bin")
+    (subpath "/sbin")
+    (subpath "/opt")
+    (subpath "/System/Library")
+    (subpath "/Library/Apple")
+    (subpath "/Library/Frameworks")
+    (subpath "/Library/Fonts")
+    (literal "/private")
+    (literal "/private/var")
+    (subpath "/private/var/db/timezone")
+    (literal "/private/var/select/sh")
+    (literal "/private/var/select/developer_dir")
+    (literal "/private/etc/hosts")
+    (literal "/private/etc/resolv.conf")
+    (literal "/private/etc/services")
+    (literal "/private/etc/protocols")
+    (literal "/private/etc/shells")
+    (subpath "/private/etc/ssl")
+    (literal "/private/etc/localtime")
+    (literal "/etc")
+    (literal "/var")
+    (home-prefix "/Library/Preferences/.GlobalPreferences")
+    (home-prefix "/Library/Preferences/com.apple.GlobalPreferences")
+    (home-subpath "/Library/Preferences/ByHost")
+)
+
+(allow file-read-metadata
+    (literal "/")
+    (literal "/home")
+    (literal "/private/etc")
+    (subpath "/dev")
+)
+
+(allow file-read* file-write*
+    (subpath "/tmp")
+    (subpath "/private/tmp")
+    (subpath "/var/folders")
+    (subpath "/private/var/folders")
+)
+
+(allow file-read* file-write*
+    (subpath "/dev/fd")
+    (subpath "/dev/tty")
+    (subpath "/dev/null")
+    (subpath "/dev/zero")
+    (subpath "/dev/random")
+    (subpath "/dev/urandom")
+)
+
+(deny file-read* file-write*
+    (regex #"^/private/tmp/com\.apple\.launchd\.[^/]+/Listeners$")
+    (regex #"^/tmp/com\.apple\.launchd\.[^/]+/Listeners$")
+)
+
+;;
+;; 20-network
+;;
+
+(allow network*)
+
+;;
+;; 25-gpg
+;;
+
+(allow file-read*
+    (home-subpath "/.gnupg")
+)
+
+;; Write access only to operational files (lock files, trust db, random seed)
+(allow file-write*
+    (home-literal "/.gnupg/trustdb.gpg")
+    (home-literal "/.gnupg/trustdb.gpg.lock")
+    (home-literal "/.gnupg/pubring.kbx.lock")
+    (home-literal "/.gnupg/pubring.gpg.lock")
+    (home-literal "/.gnupg/random_seed")
+    (regex #"\.gnupg/\.#lk")
+)
+
+(deny file-read* file-write*
+    (home-subpath "/.gnupg/private-keys-v1.d")
+)
+
+;;
+;; 30-user-dotfiles — user config files
+;;
+
+(allow file-read*
+    (home-literal "/.CFUserTextEncoding")
+    (home-literal "/.config")
+    (home-literal "/.cache")
+    (home-literal "/.gitconfig")
+    (home-subpath "/.local")
+    
+)
+
+(allow file-read-metadata
+    (home-literal "/.config")
+    (home-literal "/.cache")
+    (home-literal "/.local")
+    (home-literal "/.local/share")
+)
+
+;;
+;; 40-ssh
+;;
+
+;; SSH config (read-only, no private keys)
+;; Allow non-sensitive SSH metadata that agents need for git/remote operations.
+(allow file-read*
+    (home-literal "/.ssh")
+    (home-literal "/.ssh/known_hosts")                              ;; Host verification for GitHub/remote connections.
+    (home-literal "/.ssh/config")                                   ;; Custom host definitions used by git-ssh and scp.
+    (home-subpath "/.ssh/config.d")                                 ;; Include-based SSH config fragments.
+    (home-literal "/.ssh/allowed_signers")                          ;; SSH signature verification (git commit signing).
+    (literal "/private/etc/ssh/ssh_config")                         ;; System SSH client config read during ssh/git-ssh connections.
+    (subpath "/private/etc/ssh/ssh_config.d")                       ;; SSH config.d drop-in directory read by modern ssh clients.
+    (literal "/private/etc/ssh/crypto.conf")                        ;; System-wide SSH crypto policy (ciphers, MACs, KEX algorithms).
+    (subpath "/private/etc/ssh/crypto")                             ;; SSH crypto config subdirectory (e.g. apple.conf).
+)
+
+(allow file-write*
+    (home-literal "/.ssh/known_hosts")     ;; Persist host keys on first connection.
+    (home-literal "/.ssh/known_hosts.old") ;; Rotated during host key updates.
+)
+
+(allow file-read-metadata
+    (home-literal "/.ssh/agent")
+)
+
+;; gpg-agent SSH socket for signature requests
+(allow network-outbound
+    (remote unix-socket (path-regex #"/private/tmp/.gpg-.*/S\\.gpg-agent")))
+
+;;
+;; 50-toolchains
+;;
+
+;; node
+(allow file-read*
+    (home-literal "/.npmrc")
+    (home-literal "/.yarnrc.yml")
+)
+    
+;; asdf version manager
+(allow file-read*
+    (home-subpath "/.asdf")
+)
+
+;; Python virtual environments
+(allow file-read* file-write*
+    (home-subpath "/.local/share/venv")
+)
+
+;; Homebrew
+(allow file-read*
+    (subpath "/opt/homebrew")
+    (subpath "/usr/local")
+)
+
+;; Clojure
+(allow file-read* file-write*
+  (home-subpath "/.babashka")
+  (home-subpath "/.clojure")
+  (home-subpath "/.deps.clj")
+  (home-subpath "/.gitlibs")
+)
+    
+;;
+;; 60-workspace — project directories (read/write)
+;;
+
+(allow file-read* file-write*
+    (home-subpath "/git")
+    (home-subpath "/tmp"))
+
+(allow file-read-metadata
+   (home-subpath "/Library"))
+
+;;
+;; 80-binaries
+;;
+
+(allow file-read* file-write*
+    (home-prefix  "/.local/bin/aadawscli")
+    (home-prefix  "/.local/bin/clj-nrepl-eval")
+    (home-subpath "/.local/bin/clj-paren-repair")
+    (home-prefix  "/.local/bin/cljfmt"))
+
+;;
+;; 85-apps
+;;
+(allow file-read* file-write*
+    (home-prefix  "/Library/Application Support/bruno"))
+
+;;
+;; 88-llm
+;;
+
+(allow file-read* file-write*
+    (home-subpath "/.config/pi")
+    (home-subpath "/.config/goose"))
+
+;;
+;; 90-explicit-denials — sensitive paths
+;;
+
+(deny file-read* file-write*
+    (home-subpath "/.aws")
+    (home-subpath "/.azure")
+    (home-subpath "/.gcp")
+    (home-subpath "/.kube")
+    (home-subpath "/.docker")
+    (home-literal "/.env")
+    (home-literal "/.env.local")
+    (home-literal "/.env.development")
+    (home-literal "/.env.production")
+    (home-subpath "/Library/Application Support/Google")
+    (home-subpath "/Library/Application Support/Mozilla")
+    (home-subpath "/Library/Application Support/chromium")
+    (home-subpath "/Library/Keychains")
+    (home-subpath "/Desktop")
+    (home-subpath "/Documents")
+    (home-subpath "/Downloads")
+)
