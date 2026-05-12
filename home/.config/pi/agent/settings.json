@@ -1,0 +1,16 @@
+{
+  "lastChangelogVersion": "0.74.0",
+  "defaultProvider": "vllm-local",
+  "defaultModel": "Qwen3.X-27B",
+  "defaultThinkingLevel": "off",
+  "hideThinkingBlock": true,
+  "compaction": {
+    "enabled": true,
+    "reserveTokens": 65536,
+    "keepRecentTokens": 100000
+  },
+  "enabledModels": [
+    "Qwen3*",
+    "claude-sonnet-4.*"
+  ]
+}

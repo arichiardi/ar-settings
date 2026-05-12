@@ -1,0 +1,33 @@
+{
+  "providers": {
+    "vllm-local": {
+      "baseUrl": "http://192.168.52.252:12434/v1",
+      "api": "openai-completions",
+      "apiKey": "none",
+      "compat": {
+        "supportsDeveloperRole": false,
+        "supportsReasoningEffort": true,
+        "maxTokensField": "max_tokens"
+      },
+      "models": [
+        {
+          "id": "Qwen3.X-27B",
+          "name": "qwen3.X-27B-dense",
+          "reasoning": true,
+          "input": ["text", "image"],
+          "contextWindow": 260000,
+          "maxTokens": 50000,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0
+          },
+          "compat": {
+            "thinkingFormat": "qwen"
+          }
+        }
+      ]
+    }
+  }
+}
