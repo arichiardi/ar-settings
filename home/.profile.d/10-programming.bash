@@ -37,11 +37,3 @@ export PI_ACP_ENABLE_EMBEDDED_CONTEXT=true
 export PI_CODING_AGENT_DIR=$HOME/.config/pi/agent
 export PI_CODING_AGENT_SESSION_DIR=$HOME/.pi/agent/sessions
 export PI_TELEMETRY=no
-
-# Ralph Loop
-export RALPH_WORKER_PROVIDER=github_copilot      # Provider for work phase (prompts if not set)
-export RALPH_WORKER_MODEL=claude-sonnet-4.5      # Model for work phase (prompts if not set)
-export RALPH_REVIEWER_PROVIDER=custom_local_vllm # Provider for review phase (prompts if not set)
-export RALPH_REVIEWER_MODEL=Qwen3.5-27B          # Model for review phase (prompts if not set)
-export RALPH_MAX_ITERATIONS=10                   # Max iterations (default: 10)
-export RALPH_RECIPE_DIR=$GOOSE_RECIPE_PATH       # Recipe directory (default: ~/.config/goose/recipes)
