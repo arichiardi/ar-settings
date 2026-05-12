@@ -51,63 +51,34 @@ fi
 # mcp
 alias mcp-venv='source $HOME/.local/share/venv/mcp/bin/activate'
 
-# agent-safehouse
-if command -v safehouse >/dev/null 2>&1; then
-  # Safehouse environment passthrough list
-  SAFEHOUSE_ENV_PASS="ALTERNATE_EDITOR,\
-EDITOR,\
-VISUAL,\
-GIT_HOME,\
-DISABLE_TELEMETRY,\
-VIBE_HOME,\
-GOOSE_PROVIDER,\
-GOOSE_MODEL,\
-GOOSE_RECIPE_PATH,\
-CONTEXT_FILE_NAMES,\
-PI_ACP_ENABLE_EMBEDDED_CONTEXT,\
-PI_CODING_AGENT_DIR,\
-PI_TELEMETRY,\
-RALPH_WORKER_PROVIDER,\
-RALPH_WORKER_MODEL,\
-RALPH_REVIEWER_PROVIDER,\
-RALPH_REVIEWER_MODEL,\
-RALPH_MAX_ITERATIONS,\
-RALPH_RECIPE_DIR,\
-ASDF_DATA_DIR,\
-MC_REPO_DIR,\
-LOCAL_SERVER_HOST,\
-SEARXNG_URL,\
-MCP_SEARCH_URL,\
-PGHOST,\
-PGPORT,\
-PGDATABASE,\
-PGPASSWORD,\
-PGUSER"
-  
-  SAFEHOUSE_AGENT_POLICY="$HOME/.config/agent-safehouse/agent-policy.sb"
-
-  safehouse() {
-      command safehouse --enable=playwright-chrome --env-pass=$SAFEHOUSE_ENV_PASS "$@"
-  }
-fi
-
-# Goose
+# goose (block)
 if command -v goose >/dev/null 2>&1; then
-  # Commenting out as very very slow
-  # eval "$(goose completion bash)"
-
-  do_goose() {
-    source "$HOME/.local/share/venv/mcp/bin/activate" && \
-        safehouse --append-profile $SAFEHOUSE_AGENT_POLICY goose "$@"
-  }
-  alias goose-ralph-loop=$HOME/.config/llm/bin/ralph-loop.sh
+    if is_os darwin; then
+        goose_wrapper() {
+            init_wrapper
+            safehouse --append-profile "$SAFEHOUSE_AGENT_POLICY" goose "$@"
+        }
+    elif is_os linux; then
+        goose_wrapper() {
+            init_wrapper
+            bwrap_run goose "$@"
+        }
+    fi
+    alias goose=goose_wrapper
 fi
 
-# pi
+# pi wrapper
 if command -v pi >/dev/null 2>&1; then
-  do_pi () {
-    source "$HOME/.local/share/venv/mcp/bin/activate" && \
-        safehouse --append-profile $SAFEHOUSE_AGENT_POLICY pi "$@"
-  }
-  alias pi=do_pi
+    if is_os darwin; then
+        pi_wrapper() {
+            init_wrapper
+            safehouse --append-profile "$SAFEHOUSE_AGENT_POLICY" pi "$@"
+        }
+    elif is_os linux; then
+        pi_wrapper() {
+            init_wrapper
+            bwrap_run pi "$@"
+        }
+    fi
+    alias pi=pi_wrapper
 fi
