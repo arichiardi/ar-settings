@@ -95,7 +95,7 @@ cmd-shift-c = 'reload-config'
 
 cmd-alt-r = 'mode resize'
 
-cmd-alt-e = 'exec-and-forget emacsclient-daemon.sh -c'
+cmd-alt-e = 'exec-and-forget emacsclient-daemon -c'
 cmd-alt-p = 'exec-and-forget open /Applications/KeePassXC.app'
 
 [exec]

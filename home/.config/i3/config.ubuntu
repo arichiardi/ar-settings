@@ -337,7 +337,7 @@ exec --no-startup-id rfkill block bluetooth
 exec --no-startup-id ~/bin/battery-notifier.sh
 
 # Bindings
-bindsym $mod+Mod1+e exec emacsclient-daemon.sh -c
+bindsym $mod+Mod1+e exec emacsclient-daemon -c
 bindsym $mod+Mod1+h exec "gentoo -1 ~/Downloads -2 ~"
 bindsym $mod+Mod1+v exec "gentoo -1 /tmp/vault -2 ~"
 bindsym $mod+Mod1+p exec "keepassxc"

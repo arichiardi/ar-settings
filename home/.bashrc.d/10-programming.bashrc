@@ -17,10 +17,10 @@ alias b='boot'
 alias clj-repl='function do_repl { clojure -J-Dclojure.server.repl="{:port ${1:-5555} :accept clojure.core.server/repl}" -M:home/rebel:home/zprint; }; do_repl'
 
 # Emacs
-alias vi="emacsclient-daemon.sh -nw"
-alias e="emacsclient-daemon.sh -nw"
-alias em="emacsclient-daemon.sh -c"
-alias ed="emacsclient-dired.sh"
+alias vi="emacsclient-daemon -nw"
+alias e="emacsclient-daemon -nw"
+alias em="emacsclient-daemon -c"
+alias ed="emacsclient-dired"
 alias emacs-resurrect='kill -CONT $(pgrep emacs | xargs)'
 alias emacs-packs='cd $HOME/.config/emacs/packs'
 

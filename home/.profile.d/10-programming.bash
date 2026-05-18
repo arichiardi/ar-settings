@@ -1,7 +1,7 @@
 # Emacs
 ALTERNATE_EDITOR=""
-EDITOR="emacsclient-daemon.sh -nw"
-VISUAL="emacsclient-daemon.sh -r"
+EDITOR="emacsclient-daemon -nw"
+VISUAL="emacsclient-daemon -r"
 EA_EDITOR=$VISUAL
 
 # XML
