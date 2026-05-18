@@ -7,4 +7,4 @@ set -euo pipefail
 
 dired_dir=${1:-$(pwd)}
 
-emacsclient-daemon.sh -nw --eval '(dired '\""$dired_dir"\"')'
+emacsclient-daemon -nw --eval '(dired '\""$dired_dir"\"')'

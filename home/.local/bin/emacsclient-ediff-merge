@@ -7,7 +7,7 @@ if [ ! ${#} -ge 3 ]; then
     exit 1
 fi
 
-_EMACSCLIENT=emacsclient-daemon.sh # using custom wrapper
+_EMACSCLIENT=emacsclient-daemon # using custom wrapper
 _BASENAME=$(which basename)
 _CP=$(which cp)
 _EGREP=$(which egrep)

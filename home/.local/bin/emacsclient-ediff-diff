@@ -14,4 +14,4 @@ _BASENAME=$(which basename)
 _FILE1=${1}
 _FILE2=${2}
 
-emacsclient-daemon.sh -nw --eval "(ediff-merge-files \"${_FILE1}\" \"${_FILE2}\")"
+emacsclient-daemon -nw --eval "(ediff-merge-files \"${_FILE1}\" \"${_FILE2}\")"

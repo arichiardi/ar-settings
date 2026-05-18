@@ -429,7 +429,7 @@ mode "$mode_gaps_outer" {
 }
 
 # Bindings
-bindsym $mod+Mod1+e exec "emacsclient-daemon.sh -c"
+bindsym $mod+Mod1+e exec "emacsclient-daemon -c"
 bindsym $mod+Mod1+h exec "pcmanfm ~"
 bindsym $mod+Mod1+v exec "pcmanfm /var/lib/vault/mnt/"
 bindsym $mod+Mod1+p exec "keepassxc"
