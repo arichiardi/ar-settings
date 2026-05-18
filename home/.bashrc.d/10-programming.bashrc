@@ -56,12 +56,12 @@ alias mcp-venv='source $HOME/.local/share/venv/mcp/bin/activate'
 if command -v goose >/dev/null 2>&1; then
     if is_os darwin; then
         goose_wrapper() {
-            init_wrapper
+            init_agent_environment
             safehouse --append-profile "$SAFEHOUSE_AGENT_POLICY" goose "$@"
         }
     elif is_os linux; then
         goose_wrapper() {
-            init_wrapper
+            init_agent_environment
             bwrap_run goose "$@"
         }
     fi
@@ -72,12 +72,12 @@ fi
 if command -v pi >/dev/null 2>&1; then
     if is_os darwin; then
         pi_wrapper() {
-            init_wrapper
+            init_agent_environment
             safehouse --append-profile "$SAFEHOUSE_AGENT_POLICY" pi "$@"
         }
     elif is_os linux; then
         pi_wrapper() {
-            init_wrapper
+            init_agent_environment
             bwrap_run pi "$@"
         }
     fi
