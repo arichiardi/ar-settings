@@ -1,4 +1,3 @@
-alias o='xdg-open'
 alias cd..='cd ..'
 alias ln='ln -i'
 alias ll='ls -alF'

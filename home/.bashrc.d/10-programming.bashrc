@@ -21,6 +21,7 @@ alias vi="emacsclient-daemon -nw"
 alias e="emacsclient-daemon -nw"
 alias em="emacsclient-daemon -c"
 alias ed="emacsclient-dired"
+alias emacsclient='emacsclient-daemon -r'
 alias emacs-resurrect='kill -CONT $(pgrep emacs | xargs)'
 alias emacs-packs='cd $HOME/.config/emacs/packs'
 
