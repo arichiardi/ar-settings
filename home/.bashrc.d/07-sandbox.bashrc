@@ -41,7 +41,7 @@ DIR_RW_WHITELIST=(
 )
 
 # helper: activate venv
-init_wrapper() {
+init_agent_environment() {
     local venv_path="$HOME/.local/share/venv/mcp/bin/activate"
     if [[ -f "$venv_path" ]]; then
         # shellcheck source=/dev/null
@@ -53,11 +53,13 @@ init_wrapper() {
 
 # agent‑safehouse
 if command -v safehouse >/dev/null 2>&1; then
-    SAFEHOUSE_ENV_PASS="$(IFS=,; echo "${ENV_WHITELIST[*]}")"
-    SAFEHOUSE_AGENT_POLICY="$HOME/.config/agent-safehouse/agent-policy.sb"
+    safehouse_agent_policy="$HOME/.config/agent-safehouse/agent-policy.sb"
+    safehouse_env_pass="$(IFS=,; echo "${ENV_WHITELIST[*]}")"
 
     safehouse() {
-        command safehouse --enable=playwright-chrome --env-pass="$SAFEHOUSE_ENV_PASS" "$@"
+        command safehouse --enable=playwright-chrome \
+                --append-profile="$safehouse_agent_policy" \
+                --env-pass="$safehouse_env_pass" "$@"
     }
 fi
 
