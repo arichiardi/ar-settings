@@ -1,14 +1,14 @@
 # Emacs
-export ALTERNATE_EDITOR=""
-export EDITOR="emacsclient-daemon.sh -nw"
-export VISUAL="emacsclient-daemon.sh -c"
-export EA_EDITOR="emacsclient-daemon.sh -c"
+ALTERNATE_EDITOR=""
+EDITOR="emacsclient-daemon.sh -nw"
+VISUAL="emacsclient-daemon.sh -r"
+EA_EDITOR=$VISUAL
 
 # XML
-export XMLLINT_INDENT="  "
+XMLLINT_INDENT="  "
 
 # Gtags & ctags
-export GTAGSLABEL=universal-ctags
+GTAGSLABEL=universal-ctags
 
 # Git
 GIT_HOME="$HOME/git"
@@ -22,18 +22,18 @@ fi
 DISABLE_TELEMETRY=1
 
 # Mistral Vibe
-export VIBE_HOME="$HOME/.config/vibe"
+VIBE_HOME="$HOME/.config/vibe"
 
 # Goose (by block)
-export GOOSE_PROVIDER=vllm-local
-export GOOSE_MODEL=Qwen3.X-27B
-export GOOSE_RECIPE_PATH=$HOME/.config/llm/recipes
-export CONTEXT_FILE_NAMES='[".goosehints", "AGENTS.md"]'
+GOOSE_PROVIDER=vllm-local
+GOOSE_MODEL=Qwen3.X-27B
+GOOSE_RECIPE_PATH=$HOME/.config/llm/recipes
+CONTEXT_FILE_NAMES='[".goosehints", "AGENTS.md"]'
 
 # pi and pi-acp
-export PI_ACP_ENABLE_EMBEDDED_CONTEXT=true
+PI_ACP_ENABLE_EMBEDDED_CONTEXT=true
 # https://github.com/badlogic/pi-mono/issues/2390
 # export PI_CONFIG_DIR=$HOME/.config/pi
-export PI_CODING_AGENT_DIR=$HOME/.config/pi/agent
-export PI_CODING_AGENT_SESSION_DIR=$HOME/.pi/agent/sessions
-export PI_TELEMETRY=no
+PI_CODING_AGENT_DIR=$HOME/.config/pi/agent
+PI_CODING_AGENT_SESSION_DIR=$HOME/.pi/agent/sessions
+PI_TELEMETRY=no
