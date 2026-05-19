@@ -4,7 +4,6 @@ ENV_WHITELIST=(
     ASDF_DATA_DIR
     CONTEXT_FILE_NAMES
     DISABLE_TELEMETRY
-    EDITOR
     GIT_HOME
     GOOSE_MODEL
     GOOSE_PROVIDER
@@ -25,7 +24,6 @@ ENV_WHITELIST=(
     PI_TELEMETRY
     SEARXNG_URL
     USER
-    VISUAL
 )
 
 DIR_RW_WHITELIST=(
@@ -54,12 +52,16 @@ init_agent_environment() {
 # agent‑safehouse
 if command -v safehouse >/dev/null 2>&1; then
     safehouse_agent_policy="$HOME/.config/agent-safehouse/agent-policy.sb"
-    safehouse_env_pass="$(IFS=,; echo "${ENV_WHITELIST[*]}")"
 
-    safehouse() {
-        command safehouse --enable=playwright-chrome \
-                --append-profile="$safehouse_agent_policy" \
-                --env-pass="$safehouse_env_pass" "$@"
+    safehouse_run() {
+        local safehouse_env_pass="$(IFS=,; echo "${ENV_WHITELIST[*]}")"
+
+        echo_info "Sandbox env: $safehouse_env_pass"
+
+        safehouse --enable=playwright-chrome \
+                  --append-profile="$safehouse_agent_policy" \
+                  --env-pass="$safehouse_env_pass" \
+                  "$@"
     }
 fi
 
@@ -104,7 +106,7 @@ if command -v bwrap >/dev/null 2>&1; then
         done
 
         if (( ${#added_env[@]} > 0 )); then
-            echo_info "Safe env: ${added_env[@]}"
+            echo_info "Sandbox env: ${added_env[@]}"
         fi
 
         local cmd=$1; shift
