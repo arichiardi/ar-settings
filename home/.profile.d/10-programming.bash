@@ -1,39 +1,45 @@
 # Emacs
-ALTERNATE_EDITOR=""
-EDITOR="emacsclient-daemon -nw"
-VISUAL="emacsclient-daemon -r"
-EA_EDITOR=$VISUAL
+export ALTERNATE_EDITOR=""
+export EDITOR="emacsclient-daemon -nw"
+export VISUAL="emacsclient-daemon -r"
+export EA_EDITOR=$VISUAL
 
 # XML
-XMLLINT_INDENT="  "
+export XMLLINT_INDENT="  "
 
 # Gtags & ctags
-GTAGSLABEL=universal-ctags
+export GTAGSLABEL=universal-ctags
 
 # Git
-GIT_HOME="$HOME/git"
+export GIT_HOME="$HOME/git"
 
 # JetBrains
 if `is_os darwin`; then
-  PATH=$PATH:"$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
+  export PATH=$PATH:"$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
 fi
 
+# OpenSpec
+export OPENSPEC_TELEMETRY=0
+
 # vercel-labs skills
-DISABLE_TELEMETRY=1
+export DISABLE_TELEMETRY=1
 
 # Mistral Vibe
-VIBE_HOME="$HOME/.config/vibe"
+export VIBE_HOME="$HOME/.config/vibe"
 
 # Goose (by block)
-GOOSE_PROVIDER=vllm-local
-GOOSE_MODEL=Qwen3.X-27B
-GOOSE_RECIPE_PATH=$HOME/.config/llm/recipes
-CONTEXT_FILE_NAMES='[".goosehints", "AGENTS.md"]'
+export GOOSE_PROVIDER=vllm-local
+export GOOSE_MODEL=Qwen3.X-27B
+export GOOSE_RECIPE_PATH=$HOME/.config/llm/recipes
+export CONTEXT_FILE_NAMES='[".goosehints", "AGENTS.md"]'
 
 # pi and pi-acp
-PI_ACP_ENABLE_EMBEDDED_CONTEXT=true
+export PI_ACP_ENABLE_EMBEDDED_CONTEXT=true
 # https://github.com/badlogic/pi-mono/issues/2390
 # export PI_CONFIG_DIR=$HOME/.config/pi
-PI_CODING_AGENT_DIR=$HOME/.config/pi/agent
-PI_CODING_AGENT_SESSION_DIR=$HOME/.pi/agent/sessions
-PI_TELEMETRY=no
+export PI_CODING_AGENT_DIR=$HOME/.config/pi/agent
+export PI_CODING_AGENT_SESSION_DIR=$HOME/.pi/agent/sessions
+export PI_TELEMETRY=no
+
+# agent-safehouse
+export SAFEHOUSE_TRUST_WORKDIR_CONFIG=no
