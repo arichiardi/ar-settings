@@ -1,0 +1,2 @@
+# Start autocutsel
+autocutsel -fork & 
