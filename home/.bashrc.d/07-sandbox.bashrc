@@ -5,6 +5,7 @@ ENV_WHITELIST=(
     CONTEXT_FILE_NAMES
     DISABLE_TELEMETRY
     GIT_HOME
+    GIT_TERMINAL_PROMPT
     GPG_TTY
     GOOSE_MODEL
     GOOSE_PROVIDER
@@ -47,7 +48,10 @@ _HIDDEN_PATHS=(
     "$HOME/.gnupg/secring.gpg"
 )
 
-# Sockets that need RW access for agent communication
+# Sockets that need RW access for agent communication.
+# On GnuPG 2.1+, sockets live in /run/user/UID/gnupg/ (XDG runtime dir).
+# The /run/user/$(id -u) bind-mount already covers them, but we keep
+# explicit rebinds here for systems that still use ~/.gnupg/ as socketdir.
 _SENSITIVE_SOCKETS=(
     "$HOME/.gnupg/S.gpg-agent"
     "$HOME/.gnupg/S.gpg-agent.browser"
@@ -129,6 +133,10 @@ if command -v bwrap >/dev/null 2>&1; then
     )
 
     bwrap_run() {
+        # Disable git password prompts inside the sandbox — no credential
+        # helper is available, so HTTPS URLs would hang waiting for input.
+        GIT_TERMINAL_PROMPT=${GIT_TERMINAL_PROMPT:-0}
+
         local bwrap_args=( "${_BWRAP_ARGS[@]}" )
 
         for dir in "${DIR_RW_WHITELIST[@]}"; do
