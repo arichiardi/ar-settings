@@ -30,11 +30,13 @@ ENV_WHITELIST=(
 DIR_RW_WHITELIST=(
     "$HOME/.babashka"
     "$HOME/.clojure"
+    "$HOME/.config/emacs"
     "$HOME/.config/goose"
     "$HOME/.config/pi"
     "$HOME/.deps.clj"
     "$HOME/.gitlibs"
     "$HOME/.local/bin"
+    "$HOME/.pi"
     "$HOME/git"
     "$HOME/tmp"
 )
