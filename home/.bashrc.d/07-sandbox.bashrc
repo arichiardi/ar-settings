@@ -5,6 +5,7 @@ ENV_WHITELIST=(
     CONTEXT_FILE_NAMES
     DISABLE_TELEMETRY
     GIT_HOME
+    GPG_TTY
     GOOSE_MODEL
     GOOSE_PROVIDER
     GOOSE_RECIPE_PATH
@@ -38,6 +39,28 @@ DIR_RW_WHITELIST=(
     "$HOME/tmp"
 )
 
+# Paths to completely hide (tmpfs for dirs, /dev/null for files)
+_HIDDEN_PATHS=(
+    "$HOME/.gnupg/secring.gpg"
+)
+
+# Sockets that need RW access for agent communication
+_SENSITIVE_SOCKETS=(
+    "$HOME/.gnupg/S.gpg-agent"
+    "$HOME/.gnupg/S.gpg-agent.browser"
+    "$HOME/.gnupg/S.gpg-agent.extra"
+    "$HOME/.gnupg/S.gpg-agent.ssh"
+)
+
+# .gnupg special handling: tmpfs overlay (writable for lock files),
+# then re-bind public/needed items RO on top. Private keys stay hidden.
+_GNUPG_REBIND_RO=(
+    "$HOME/.gnupg/pubring.kbx"
+    "$HOME/.gnupg/trustdb.gpg"
+    "$HOME/.gnupg/gpg.conf"
+    "$HOME/.gnupg/private-keys-v1.d"
+)
+
 # helper: activate venv
 init_agent_environment() {
     local venv_path="$HOME/.local/share/venv/mcp/bin/activate"
@@ -68,17 +91,21 @@ fi
 # Bubblewrap availability
 if command -v bwrap >/dev/null 2>&1; then
     _BWRAP_ARGS=(
-        --unshare-all
+        --unshare-uts
+        --unshare-cgroup
         --share-net
-        --dir "/run/user/$(id -u)"
+        --bind "/run/user/$(id -u)" "/run/user/$(id -u)"  # includes gnupg sockets (RW for socket comm)
         --tmpfs /tmp                 # private /tmp (tmpfs)
-        --dev /dev                   # expose /dev
+        --dev-bind /dev /dev         # full /dev (includes /dev/tty, /dev/pts/*)
         --proc /proc                 # expose /proc
         --ro-bind /usr /usr          # host /usr read‑only
         --ro-bind /bin /bin          # host /bin read‑only (for distro that still separates it)
         --ro-bind /lib /lib          # host /lib read‑only
         --ro-bind /lib64 /lib64      # host /lib64 read‑only (on amd64)
         --ro-bind "$HOME" "$HOME"    # read-only $HOME
+        --ro-bind /etc/ssl /etc/ssl  # OpenSSL config + CA certs
+        --ro-bind /usr/share/ca-certificates /usr/share/ca-certificates
+        --ro-bind /etc/ca-certificates       /etc/ca-certificates
         --dir /var                   # empty /var inside the sandbox
         --symlink ../tmp var/tmp     # var/tmp → /tmp
         --ro-bind /etc/resolv.conf /etc/resolv.conf
@@ -93,6 +120,35 @@ if command -v bwrap >/dev/null 2>&1; then
                 bwrap_args+=( --bind "$dir" "$dir" )
             else
                 echo_warn "Bind skipped: $dir does not exist"
+            fi
+        done
+
+        # .gnupg: tmpfs overlay (writable for lock files, hides private keys)
+        _gnupg_setup=false
+        if [[ -d "$HOME/.gnupg" ]]; then
+            bwrap_args+=( --tmpfs "$HOME/.gnupg" )
+            _gnupg_setup=true
+
+            # Re-bind public/needed items RO on top of the tmpfs
+            for path in "${_GNUPG_REBIND_RO[@]}"; do
+                if [[ -e "$path" ]]; then
+                    bwrap_args+=( --ro-bind "$path" "$path" )
+                fi
+            done
+
+            # Sockets get RW bind on top
+            for socket in "${_SENSITIVE_SOCKETS[@]}"; do
+                if [[ -e "$socket" ]]; then
+                    bwrap_args+=( --bind "$socket" "$socket" )
+                fi
+            done
+        fi
+
+        for path in "${_HIDDEN_PATHS[@]}"; do
+            if [[ -d "$path" ]]; then
+                bwrap_args+=( --tmpfs "$path" )
+            elif [[ -f "$path" ]]; then
+                bwrap_args+=( --ro-bind /dev/null "$path" )
             fi
         done
 
@@ -111,6 +167,13 @@ if command -v bwrap >/dev/null 2>&1; then
 
         local cmd=$1; shift
 
-        bwrap "${bwrap_args[@]}" "${env_opts[@]}" -- "$cmd" "$@"
+        if $_gnupg_setup; then
+            bwrap "${bwrap_args[@]}" "${env_opts[@]}" -- /bin/bash -c '
+                chmod 700 "$HOME/.gnupg"
+                exec "$@"
+            ' _ "$cmd" "$@"
+        else
+            bwrap "${bwrap_args[@]}" "${env_opts[@]}" -- "$cmd" "$@"
+        fi
     }
 fi
