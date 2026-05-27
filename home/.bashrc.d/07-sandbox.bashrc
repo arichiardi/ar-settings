@@ -24,6 +24,7 @@ ENV_WHITELIST=(
     PI_CODING_AGENT_DIR
     PI_TELEMETRY
     SEARXNG_URL
+    SSH_AUTH_SOCK
     USER
 )
 
@@ -61,6 +62,16 @@ _GNUPG_REBIND_RO=(
     "$HOME/.gnupg/trustdb.gpg"
     "$HOME/.gnupg/gpg.conf"
     "$HOME/.gnupg/private-keys-v1.d"
+)
+
+# .ssh special handling: tmpfs overlay (writable for known_hosts),
+# then re-bind public/needed items RO on top. Private keys stay hidden.
+_SSH_REBIND_RO=(
+    "$HOME/.ssh/config"
+    "$HOME/.ssh/authorized_keys"
+)
+_SSH_REBIND_RW=(
+    "$HOME/.ssh/known_hosts"
 )
 
 # helper: activate venv
@@ -112,8 +123,11 @@ if command -v bwrap >/dev/null 2>&1; then
         --symlink ../tmp var/tmp     # var/tmp → /tmp
         --ro-bind /etc/resolv.conf /etc/resolv.conf
         --die-with-parent            # die when the calling script exits
+        --dir /etc                   # needed before bind-mounting passwd/group into it
+        --bind-data 11 /etc/passwd   # synthetic passwd (no host file exposure)
+        --bind-data 12 /etc/group    # synthetic group
     )
-    
+
     bwrap_run() {
         local bwrap_args=( "${_BWRAP_ARGS[@]}" )
 
@@ -146,6 +160,36 @@ if command -v bwrap >/dev/null 2>&1; then
             done
         fi
 
+        # .ssh: tmpfs overlay (writable for known_hosts, hides private keys)
+        # Any file not explicitly re-bound is hidden — covers all key naming
+        # conventions (id_*, *_ed25519, *_rsa, *_ecdsa, etc.)
+        _ssh_setup=false
+        if [[ -d "$HOME/.ssh" ]]; then
+            bwrap_args+=( --tmpfs "$HOME/.ssh" )
+            _ssh_setup=true
+
+            # Re-bind public/needed items RO on top of the tmpfs
+            for path in "${_SSH_REBIND_RO[@]}"; do
+                if [[ -e "$path" ]]; then
+                    bwrap_args+=( --ro-bind "$path" "$path" )
+                fi
+            done
+
+            # Re-bind items that need RW access (e.g., known_hosts for new host entries)
+            for path in "${_SSH_REBIND_RW[@]}"; do
+                if [[ -e "$path" ]]; then
+                    bwrap_args+=( --bind "$path" "$path" )
+                fi
+            done
+
+            # Re-bind public keys (*.pub) RO — safe to expose, needed for ssh -i
+            for pubkey in "$HOME/.ssh"/*.pub; do
+                if [[ -f "$pubkey" ]]; then
+                    bwrap_args+=( --ro-bind "$pubkey" "$pubkey" )
+                fi
+            done
+        fi
+
         for path in "${_HIDDEN_PATHS[@]}"; do
             if [[ -d "$path" ]]; then
                 bwrap_args+=( --tmpfs "$path" )
@@ -169,13 +213,39 @@ if command -v bwrap >/dev/null 2>&1; then
 
         local cmd=$1; shift
 
-        if $_gnupg_setup; then
+        # Synthetic passwd/group — built from env (no /etc/passwd on host)
+        _pw="root:x:0:0:root:/root:/bin/bash
+${USER}:x:${UID}:${UID}::${HOME}:${SHELL:-/bin/bash}
+nobody:x:65534:65534:nobody:/home:/usr/bin/nologin"
+        _gr="root:x:0:
+${USER}:x:${UID}:
+nobody:x:65534:"
+
+        if $_gnupg_setup && $_ssh_setup; then
+            bwrap "${bwrap_args[@]}" "${env_opts[@]}" -- /bin/bash -c '
+                chmod 700 "$HOME/.gnupg" "$HOME/.ssh"
+                exec "$@"
+            ' _ "$cmd" "$@" \
+                11< <(printf '%s\n' "$_pw") \
+                12< <(printf '%s\n' "$_gr")
+        elif $_gnupg_setup; then
             bwrap "${bwrap_args[@]}" "${env_opts[@]}" -- /bin/bash -c '
                 chmod 700 "$HOME/.gnupg"
                 exec "$@"
-            ' _ "$cmd" "$@"
+            ' _ "$cmd" "$@" \
+                11< <(printf '%s\n' "$_pw") \
+                12< <(printf '%s\n' "$_gr")
+        elif $_ssh_setup; then
+            bwrap "${bwrap_args[@]}" "${env_opts[@]}" -- /bin/bash -c '
+                chmod 700 "$HOME/.ssh"
+                exec "$@"
+            ' _ "$cmd" "$@" \
+                11< <(printf '%s\n' "$_pw") \
+                12< <(printf '%s\n' "$_gr")
         else
-            bwrap "${bwrap_args[@]}" "${env_opts[@]}" -- "$cmd" "$@"
+            bwrap "${bwrap_args[@]}" "${env_opts[@]}" -- "$cmd" "$@" \
+                11< <(printf '%s\n' "$_pw") \
+                12< <(printf '%s\n' "$_gr")
         fi
     }
 fi
