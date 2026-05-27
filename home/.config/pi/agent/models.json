@@ -4,6 +4,12 @@
       "baseUrl": "http://192.168.52.252:12434/v1",
       "api": "openai-completions",
       "apiKey": "none",
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cacheRead": 0,
+        "cacheWrite": 0
+      },
       "compat": {
         "supportsDeveloperRole": false,
         "supportsReasoningEffort": true,
@@ -16,17 +22,33 @@
           "reasoning": true,
           "input": ["text", "image"],
           "contextWindow": 260000,
-          "maxTokens": 50000,
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cacheRead": 0,
-            "cacheWrite": 0
-          },
+          "maxTokens": 128000,
           "compat": {
             "thinkingFormat": "qwen"
           }
         }
+      ]
+    },
+    "llamacpp-local": {
+      "baseUrl": "http://192.168.52.252:10434/v1",
+      "api": "openai-completions",
+      "apiKey": "none",
+      "compat": {
+        "supportsDeveloperRole": false,
+        "supportsReasoningEffort": true,
+        "maxTokensField": "max_tokens"
+      },
+      "models": [
+        {
+          "id": "Qwen3.X-27B",
+          "input": ["text", "image"],
+          "contextWindow": 260000,
+          "maxTokens": 128000,
+          "compat": {
+            "thinkingFormat": "qwen"
+          }
+        },
+        { "id": "Qwen3.5-122B-A10B" }
       ]
     }
   }
