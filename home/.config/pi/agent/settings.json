@@ -1,13 +1,13 @@
 {
-  "lastChangelogVersion": "0.74.0",
-  "defaultProvider": "vllm-local",
+  "lastChangelogVersion": "0.75.5",
+  "defaultProvider": "llamacpp-local",
   "defaultModel": "Qwen3.X-27B",
   "defaultThinkingLevel": "off",
-  "hideThinkingBlock": true,
+  "hideThinkingBlock": false,
   "compaction": {
     "enabled": true,
-    "reserveTokens": 65536,
-    "keepRecentTokens": 100000
+    "reserveTokens": 131072,
+    "keepRecentTokens": 65536
   },
   "enabledModels": [
     "Qwen3*",
