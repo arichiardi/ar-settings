@@ -7,8 +7,11 @@ local config = {}
 -- terminfo with the following cmd:
 -- config.term = 'wezterm'
 
-config.font = wezterm.font 'Delugia Mono'
-config.font_size = 11 
+config.font = wezterm.font_with_fallback {
+  {family = 'JetBrainsMono Nerd Font Mono'},
+  "Noto Color Emoji"
+}
+config.font_size = 12
 
 config.initial_cols = 100
 config.initial_rows = 30
@@ -56,7 +59,6 @@ config.keys = {
     { key = "M", mods = "CTRL|SHIFT", action = wezterm.action.DisableDefaultAssignment },
     { key = "R", mods = "CTRL|SHIFT", action = wezterm.action.DisableDefaultAssignment },
     { key = "U", mods = "CTRL|SHIFT", action = wezterm.action.DisableDefaultAssignment },
-    { key = "Tab", mods = "CTRL", action = wezterm.action.DisableDefaultAssignment },
 
     -- WezTerm fully supports the Kitty keyboard protocol, but `Ctrl -` currently
     -- doesn't emit a CSI-u sequence as expected. Manually send the correct
@@ -66,6 +68,12 @@ config.keys = {
     -- These are conventional macOS keymaps
     { key = 'f', mods = 'CMD|CTRL', action = wezterm.action.DisableDefaultAssignment },
     { key = 'h', mods = 'CMD', action = wezterm.action.DisableDefaultAssignment },
+
+    -- Turn off the default CMD-m Hide action, allowing CMD-m to
+    -- be potentially recognized and handled by the tab
+    { key = 'm', mods = 'CMD', action = wezterm.action.DisableDefaultAssignment },
+
+    { key = "Tab", mods = "CTRL", action = wezterm.action.DisableDefaultAssignment },
 }
 
 config.colors = {
