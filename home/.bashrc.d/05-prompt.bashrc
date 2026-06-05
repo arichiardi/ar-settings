@@ -19,7 +19,7 @@ export GIT_PS1_SHOWSTASHSTATE=1
 export GIT_PS1_SHOWDIRTYSTATE=1
 export GIT_PS1_DESCRIBE_STYLE="describe"
 
-export AR_PROMPT_COLOR_SUPPORTED=$(detect_color_support)
+_ar_color_support=$(detect_color_support)
 
 virtualenv_prompt() {
     # If not in a virtualenv, print nothing
@@ -40,7 +40,11 @@ function __do_ps1 () {
     local git_completion_disabled="${AR_PROMPT_GIT_DISABLED:-false}"
 
     # AR_PROMPT_COLOR_DISABLED
-    local use_color="${AR_PROMPT_COLOR_DISABLED:-$AR_PROMPT_COLOR_SUPPORTED}"
+    if [[ "${AR_PROMPT_COLOR_DISABLED:-false}" == "true" ]]; then
+        use_color=false
+    else
+        use_color=${_ar_color_support:-false}
+    fi
 
     if [ "$use_color" = "true" ] && { [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; }; then
         PS1_HOST_COLOR=$(context-color --prompt --background --context hostname)
