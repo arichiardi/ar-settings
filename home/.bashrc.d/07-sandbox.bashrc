@@ -36,6 +36,7 @@ ENV_WHITELIST=(
 )
 
 DIR_RW_WHITELIST=(
+    "$HOME/.agents"
     "$HOME/.babashka"
     "$HOME/.clojure"
     "$HOME/.config/emacs"
@@ -52,6 +53,7 @@ DIR_RW_WHITELIST=(
 # Paths to completely hide (tmpfs for dirs, /dev/null for files)
 _HIDDEN_PATHS=(
     "$HOME/.gnupg/secring.gpg"
+    "$HOME/.config/gh/hosts.yml"
 )
 
 # Sockets that need RW access for agent communication.
