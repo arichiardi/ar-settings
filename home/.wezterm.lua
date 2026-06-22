@@ -60,11 +60,6 @@ config.keys = {
     { key = "R", mods = "CTRL|SHIFT", action = wezterm.action.DisableDefaultAssignment },
     { key = "U", mods = "CTRL|SHIFT", action = wezterm.action.DisableDefaultAssignment },
 
-    -- WezTerm fully supports the Kitty keyboard protocol, but `Ctrl -` currently
-    -- doesn't emit a CSI-u sequence as expected. Manually send the correct
-    -- escape code so it behaves consistently across terminals.
-    { key = "-", mods = "CTRL", action = wezterm.action.SendString("\x1b[45;5u") },
-
     -- These are conventional macOS keymaps
     { key = 'f', mods = 'CMD|CTRL', action = wezterm.action.DisableDefaultAssignment },
     { key = 'h', mods = 'CMD', action = wezterm.action.DisableDefaultAssignment },
@@ -74,6 +69,11 @@ config.keys = {
     { key = 'm', mods = 'CMD', action = wezterm.action.DisableDefaultAssignment },
 
     { key = "Tab", mods = "CTRL", action = wezterm.action.DisableDefaultAssignment },
+
+    -- Workaround for WezTerm bug: DEL sends \x08 (backspace) instead of \x1b[3~
+    -- when enable_kitty_keyboard = true. Re-sending via SendKey fixes the encoding.
+    -- https://github.com/wezterm/wezterm/issues/4129
+    { key = 'Delete', mods = '', action = wezterm.action.SendKey { key = 'Delete' } },
 }
 
 config.colors = {
