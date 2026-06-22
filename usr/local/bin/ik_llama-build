@@ -1,0 +1,39 @@
+set -e
+
+if out=$(git rev-list --count HEAD); then
+    # git is broken on WSL so we need to strip extra newlines
+    build_number=$(printf '%s' "$out" | tr -d '\n')
+fi
+
+if out=$(git rev-parse --short HEAD); then
+    build_commit=$(printf '%s' "$out" | tr -d '\n')
+fi
+
+pkgname=ik_llama
+
+cmake -B build \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_INSTALL_PREFIX=/opt/$pkgname \
+      -DBUILD_SHARED_LIBS=ON \
+      -DLLAMA_CURL=ON \
+      -DLLAMA_BUILD_SERVER=ON \
+      -DLLAMA_BUILD_TESTS=OFF \
+      -DLLAMA_BUILD_EXAMPLES=ON \
+      -DGGML_ALL_WARNINGS=OFF \
+      -DGGML_ALL_WARNINGS_3RD_PARTY=OFF \
+      -DGGML_BUILD_EXAMPLES=OFF \
+      -DGGML_BUILD_TESTS=OFF \
+      -DGGML_LTO=ON \
+      -DGGML_RPC=ON \
+      -DGGML_CUDA=ON \
+      -DGGML_RPC=ON \
+      -DCMAKE_CUDA_ARCHITECTURES="80;86;87" \
+      -DGGML_CUDA_FA_ALL_QUANTS=ON \
+      -DLLAMA_BUILD_NUMBER="$build_number" \
+      -DLLAMA_BUILD_COMMIT="$build_commit" \
+      -DGGML_NATIVE=ON \
+      -Wno-dev
+
+cmake --build build --config Release
+
+cmake --install build

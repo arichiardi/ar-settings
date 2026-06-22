@@ -1,0 +1,28 @@
+# Use CMAKE_BUILD_PARALLEL_LEVEL for parallelism
+
+cmake -B build \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_INSTALL_PREFIX='/opt/llama.cpp' \
+      -DBUILD_SHARED_LIBS=ON \
+      -DLLAMA_BUILD_COMMON=ON \
+      -DLLAMA_BUILD_TESTS=OFF \
+      -DLLAMA_BUILD_EXAMPLES=OFF \
+      -DLLAMA_BUILD_SERVER=ON \
+      -DLLAMA_USE_SYSTEM_GGML=OFF \
+      -DGGML_ALL_WARNINGS=OFF \
+      -DGGML_ALL_WARNINGS_3RD_PARTY=OFF \
+      -DGGML_BUILD_EXAMPLES=OFF \
+      -DGGML_BUILD_TESTS=OFF \
+      -DGGML_LTO=ON \
+      -DGGML_RPC=ON \
+      -DGGML_CUDA=ON \
+      -DCMAKE_CUDA_ARCHITECTURES="80;86;87" \
+      -DLLAMA_BUILD_COMMIT="$(git rev-parse --short HEAD)" \
+      -DGGML_NATIVE=ON \
+      -Wno-dev
+
+# from https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=llama.cpp-cuda
+
+cmake --build build --config Release
+
+cmake --install build
