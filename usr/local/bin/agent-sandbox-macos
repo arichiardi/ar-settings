@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# agent-sandbox-macos - run a command inside a macOS sandbox.
+# Requires safehouse.
+#
+# Env vars:
+#   SANDBOX_AGENT_ENV_WHITELIST  - space-delimited list of env var names passed into the sandbox.
+#   SANDBOX_AGENT_DIR_RW_WHITELIST - space-delimited list of host directories allowed RW access.
+#
+set -euo pipefail
+
+# Read from environment, default to empty.
+SANDBOX_AGENT_ENV_WHITELIST="${SANDBOX_AGENT_ENV_WHITELIST:-}"
+SANDBOX_AGENT_DIR_RW_WHITELIST="${SANDBOX_AGENT_DIR_RW_WHITELIST:-}"
+
+echo_info() { echo "ℹ️  $*"; }
+echo_warn() { echo "⚠️ $*" >&2; }
+echo_error() { echo "❌ $*" >&2; }
+
+if ! command -v safehouse >/dev/null 2>&1; then
+    echo_error "safehouse not found. Install it with 'brew install eugene1g/safehouse/agent-safehouse'"
+    exit 1
+fi
+
+init_agent_environment() {
+    local venv_path="$HOME/.local/share/venv/mcp/bin/activate"
+    if [[ -f "$venv_path" ]]; then
+        . "$venv_path" || echo_warn "failed to source $venv_path"
+    else
+        echo_warn "virtual-env activation script not found at $venv_path"
+    fi
+}
+
+safehouse_run() {
+    echo_info "Sandbox env: $SANDBOX_AGENT_ENV_WHITELIST"
+    local safehouse_env_pass="$(echo $SANDBOX_AGENT_ENV_WHITELIST | tr ' ' ',')"
+    safehouse --enable=playwright-chrome \
+              --append-profile="$HOME/.config/agent-safehouse/agent-policy.sb" \
+              --env-pass="$safehouse_env_pass" \
+              "$@"
+}
+
+init_agent_environment
+safehouse_run "$@"

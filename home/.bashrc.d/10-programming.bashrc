@@ -52,34 +52,20 @@ fi
 # mcp
 alias mcp-venv='source $HOME/.local/share/venv/mcp/bin/activate'
 
-# goose (block)
+# goose
 if command -v goose >/dev/null 2>&1; then
     if is_os darwin; then
-        goose_wrapper() {
-            init_agent_environment
-            safehouse_run goose "$@"
-        }
+        alias goose='agent-sandbox-macos goose'
     elif is_os linux; then
-        goose_wrapper() {
-            init_agent_environment
-            bwrap_run goose "$@"
-        }
+        alias goose='agent-sandbox-linux goose'
     fi
-    alias goose=goose_wrapper
 fi
 
-# pi wrapper
+# pi
 if command -v pi >/dev/null 2>&1; then
     if is_os darwin; then
-        pi_wrapper() {
-            init_agent_environment
-            safehouse_run pi "$@"
-        }
+        alias pi='agent-sandbox-macos pi'
     elif is_os linux; then
-        pi_wrapper() {
-            init_agent_environment
-            bwrap_run pi "$@"
-        }
+        alias pi='agent-sandbox-linux pi'
     fi
-    alias pi=pi_wrapper
 fi
