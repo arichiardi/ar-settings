@@ -1,0 +1,52 @@
+_sandbox_agent_env_whitelist=(
+    ALTERNATE_EDITOR
+    ASDF_DATA_DIR
+    CONTEXT_FILE_NAMES
+    DISABLE_TELEMETRY
+    GIT_HOME
+    GIT_TERMINAL_PROMPT
+    GPG_TTY
+    GOOSE_MODEL
+    GOOSE_PROVIDER
+    GOOSE_RECIPE_PATH
+    HOME
+    LANG
+    LOCAL_VLLM_HOST
+    LOCAL_VLLM_PORT
+    LOCAL_LLAMACPP_HOST
+    LOCAL_LLAMACPP_PORT
+    LOCAL_IKLLAMA_HOST
+    LOCAL_IKLLAMA_PORT
+    LOCAL_SERVER_HOST
+    MCP_SEARCH_URL
+    MC_REPO_DIR
+    PATH
+    PGDATABASE
+    PGHOST
+    PGPASSWORD
+    PGPORT
+    PGUSER
+    PI_ACP_ENABLE_EMBEDDED_CONTEXT
+    PI_CODING_AGENT_DIR
+    PI_TELEMETRY
+    SEARXNG_URL
+    SSH_AUTH_SOCK
+    USER
+)
+export SANDBOX_AGENT_ENV_WHITELIST="${_sandbox_agent_env_whitelist[*]}"
+
+_sandbox_agent_dir_rw_whitelist=(
+    "$HOME/.agents"
+    "$HOME/.babashka"
+    "$HOME/.clojure"
+    "$HOME/.config/emacs"
+    "$HOME/.config/goose"
+    "$HOME/.config/pi"
+    "$HOME/.deps.clj"
+    "$HOME/.gitlibs"
+    "$HOME/.local/bin"
+    "$HOME/.pi"
+    "$HOME/git"
+    "$HOME/tmp"
+)
+export SANDBOX_AGENT_DIR_RW_WHITELIST="${_sandbox_agent_dir_rw_whitelist[*]}"
