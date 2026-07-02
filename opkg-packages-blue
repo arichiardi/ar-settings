@@ -1,8 +1,12 @@
 # GL.iNet GL-MT3000
 curl
-dnsmasq-full
 dnsmasq
+dnsmasq-full
+ethtool
+ip6tables
+iptables
 luci-app-pbr
 luci-proto-wireguard
 pbr
+tailscale
 wireguard-tools
