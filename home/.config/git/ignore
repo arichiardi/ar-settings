@@ -83,9 +83,11 @@ $RECYCLE.BIN/
 .goosehints
 .playwright-cli/
 .pi
+.pi-subagents/
 skills-lock.json
 
 # Emacs
 *-autoloads.el
 *.elc
+*-loaddefs.el
 transient/
