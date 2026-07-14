@@ -1,57 +1,73 @@
 #!/bin/bash
 #
-# Emacs is started as daemon in /etc/systemd/user
+# Opens a file in Emacs using emacsclient, starting the daemon if needed.
 #
-# See https://bugs.launchpad.net/elementaryos/+bug/1355274
+# emacsclient -a "" auto-starts the daemon if not running, inheriting
+# the calling process's window server session — no need for `open -a Emacs`.
 #
-# It accepts the same parameters as emacs, adding -c if no -c or -nw is
-# supplied (effectively defaulting to the graphical version of emacs).
-set -uo pipefail
+# Usage: emacsclient-daemon [emacsclient options] [file...]
+set -o pipefail
+
+# log files — set up first so all errors are captured from the start
+if [[ -n "${EMACS_LOG_DIR:-}" ]]; then
+    emacs_log_out="${EMACS_LOG_DIR}/out.log"
+    emacs_log_err="${EMACS_LOG_DIR}/err.log"
+else
+    emacs_log_dir=$(mktemp -d -t emacs.XXXXXX 2>/tmp/emacsclient-daemon-bootstrap.err || echo /tmp)
+    emacs_log_out="${emacs_log_dir}/out.log"
+    emacs_log_err="${emacs_log_dir}/err.log"
+fi
+
+exec 1>> "$emacs_log_out"
+exec 2>> "$emacs_log_err"
+
+echo "--- start $(date) ---"
+echo "script_args=$*"
 
 source $HOME/.local/share/ar/helpers.sh
 
-emacs_bin=$(which emacs)
 emacsclient_bin=$(which emacsclient)
 
-if `is_os linux`; then
-    emacs_icon=$HOME/.icons/emacs.svg
-else
-    emacs_icon=/System/Volumes/Data/opt/homebrew/Cellar/emacs-plus@30/30.1/Emacs.app/Contents/Resources/Emacs.icns
-fi
+# -a "" tells emacsclient to start the daemon itself if no server is running
+emacs_params=(-a "")
 
-notification_title="Emacs Server"
-notification_msg="Starting, please wait."
+script_args="$*"
+if [[ ! "$script_args" =~ "-nw" ]] && [[ ! "$script_args" =~ "-c" ]] && [[ ! "$script_args" =~ "-f" ]]; then
+    emacs_params=(-c "${emacs_params[@]}")
+fi
 
 is_running=false
 if `is_os linux`; then
     running_count=$(pgrep --exact --count emacs)
-    is_running=`test "$running_count" -gt 0 && echo true`
+    is_running=`test "$running_count" -gt 0 && echo true || echo false`
 elif `is_os darwin`; then
     running_count=$(pgrep -x Emacs | uniq | wc -l)
-    is_running=`test "$running_count" -gt 0 && echo true`
+    is_running=`test "$running_count" -gt 0 && echo true || echo false`
 fi
 
-if [ ! $is_running ]; then
+if [[ "$is_running" == "false" ]]; then
     if `is_os linux`; then
-        notify-send -i "$emacs_icon" -u normal -h "int:transient:1" "$notification_title" "$notification_msg"
+        emacs_icon=$HOME/.icons/emacs.svg
+        notify-send -i "$emacs_icon" -u normal -h "int:transient:1" "Emacs Server" "Starting, please wait."
     elif `is_os darwin`; then
-        if `which -s terminal-notifier`; then
-            terminal-notifier -message "$notification_msg" -title "$notification_title" -sender "org.gnu.Emacs"
+        if command -v terminal-notifier &>/dev/null; then
+            terminal-notifier -message "Starting, please wait." -title "Emacs Server" -sender "org.gnu.Emacs"
         else
-            osascript -e display notification "$notification_msg" with title "$notification_title"
+            osascript -e display notification "Starting, please wait." with title "Emacs Server"
         fi
     fi
 fi
 
-emacs_params="-a emacs"
-
-if [[ ! ( ! "$emacs_params" =~ "-c" && ! "$emacs_params" =~ "-nw" ) ]]; then
-    emacs_param="-c $emacs_param"
-fi
+echo "is_running=$is_running"
+echo "script_args=$script_args"
+echo "emacs_params=${emacs_params[*]}"
 
 if `is_os darwin`; then
     # Forcing profile sourcing because it does not seem to happen on macos
+    # temporarily disable -u to tolerate unbound vars in .profile
     source $HOME/.profile
 fi
 
-$emacsclient_bin $emacs_params "$@"
+set -x
+
+$emacsclient_bin "${emacs_params[@]}" "$@"
