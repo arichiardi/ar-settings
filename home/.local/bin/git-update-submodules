@@ -19,6 +19,13 @@ fi
 echo "Working in: $APP_PATH"
 cd $APP_PATH
 
+# Load .envrc via direnv if present
+if [[ -f .envrc ]]; then
+  if command -v direnv > /dev/null 2>&1; then
+    eval "$(direnv export bash 2>/dev/null)" || true
+  fi
+fi
+
 git checkout $BRANCH && git pull --ff origin $BRANCH
 
 git submodule sync
