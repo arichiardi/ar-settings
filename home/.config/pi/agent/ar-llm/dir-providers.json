@@ -1,0 +1,23 @@
+{
+  "rules": [
+    {
+      "dirs": [
+        "~/git",
+        "~/.config"
+      ],
+      "allowedProviders": [
+        "openrouter"
+      ]
+    },
+    {
+      "dirs": [
+        "~/git/managing-construction",
+        "~/.profile.d",
+        "~/.bashrc.d"
+      ],
+      "allowedProviders": [
+        "github-copilot"
+      ]
+    }
+  ]
+}
