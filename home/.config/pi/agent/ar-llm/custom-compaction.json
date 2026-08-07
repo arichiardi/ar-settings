@@ -1,0 +1,31 @@
+{
+  "defaultPrompt": {
+    "system": "You are a conversation summarizer. Create a comprehensive summary that captures all information needed to continue the work effectively.",
+    "user": "Summarize this conversation with clear sections covering:\n\n1. Main goals and objectives discussed\n2. Key decisions made and their rationale\n3. Important code changes, file modifications, or technical details\n4. Current state of any ongoing work\n5. Any blockers, issues, or open questions\n6. Next steps that were planned or suggested\n\nBe thorough but concise. This summary will replace the ENTIRE conversation history.\n\nFormat as structured markdown with clear sections.\n{previous_summary}<conversation>\n{conversation}\n</conversation>",
+    "includePreviousSummary": true
+  },
+  "providers": {
+    "github-copilot": {
+      "model": "gpt-5.6-luna"
+    },
+    "openrouter": {
+      "model": "google/gemma-4-26b-a4b-it:free"
+    },
+    "alba-local": {
+      "model": "Qwen3.6-27B",
+      "request-params": {
+        "providers": {
+          "alba-local": {
+            "default": {
+              "maxTokens": 32758,
+              "temperature": 0.6,
+              "chat_template_kwargs": {
+                "enable_thinking": false
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
