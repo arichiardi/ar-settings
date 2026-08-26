@@ -1,6 +1,6 @@
 {
   "providers": {
-    "vllm-local": {
+    "alba-local": {
       "default": {
         "temperature": 0.7,
         "top_p": 0.80,
@@ -11,7 +11,9 @@
         "chat_template_kwargs": {
           "enable_thinking": true,
           "preserve_thinking": true
-        }
+        },
+        "thinking_token_budget": 1024,
+        "thinking_budget_tokens": 1024
       },
       "skills": {
         "coder": {
@@ -25,7 +27,9 @@
             "chat_template_kwargs": {
               "enable_thinking": true,
               "preserve_thinking": true
-            }
+            },
+            "thinking_token_budget": 2048,
+            "thinking_budget_tokens": 2048
           },
           "aliases": ["clojure-coder", "babashka-script-master"]
         },
@@ -39,7 +43,9 @@
             "repetition_penalty": 1.0,
             "chat_template_kwargs": {
               "enable_thinking": false
-            }
+            },
+            "thinking_token_budget": 1024,
+            "thinking_budget_tokens": 1024
           }
         },
         "clojure-formatter": {
@@ -52,7 +58,9 @@
             "repetition_penalty": 1.0,
             "chat_template_kwargs": {
               "enable_thinking": false
-            }
+            },
+            "thinking_token_budget": 1024,
+            "thinking_budget_tokens": 1024
           }
         },
         "git-commit-writer": {
@@ -66,40 +74,9 @@
             "chat_template_kwargs": {
               "enable_thinking": true,
               "preserve_thinking": false
-            }
-          }
-        }
-      },
-      "models": {
-        "Qwen3.X-27B": {}
-      }
-    },
-    "llamacpp-local": {
-      "default": {
-        "temperature": 0.7,
-        "top_p": 0.80,
-        "top_k": 20,
-        "min_p": 0.0,
-        "presence_penalty": 1.5,
-        "repetition_penalty": 1.0,
-        "chat_template_kwargs": {
-          "enable_thinking": true,
-          "preserve_thinking": true
-        }
-      },
-      "skills": {
-        "git-commit-writer": {
-          "params": {
-            "temperature": 1.0,
-            "top_p": 0.80,
-            "top_k": 20,
-            "min_p": 0.0,
-            "presence_penalty": 1.5,
-            "repetition_penalty": 1.0,
-            "chat_template_kwargs": {
-              "enable_thinking": true,
-              "preserve_thinking": false
-            }
+            },
+            "thinking_token_budget": 1024,
+            "thinking_budget_tokens": 1024
           }
         }
       }
