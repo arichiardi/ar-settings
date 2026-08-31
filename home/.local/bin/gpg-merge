@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+#
+# gpg-merge — GPG-aware git merge driver (Option A: ciphertext on disk).
+#
+# Contract (see `gitattributes(5)`, "Merge drivers"):
+#   git calls:  gpg-merge %O %A %B
+#     %O  merge base (a temp file git creates; read-only)
+#     %A  "ours"     the working-tree file (git READS THIS BACK as the result)
+#     %B  "theirs"   a temp file git creates; read-only
+#
+#   exit 0  -> merge succeeded; git uses the new contents of %A
+#   exit 1  -> conflict;        %A holds the 3-way merge with <<<<<<< markers
+#   exit >1 -> error
+#
+# The three stage blobs are RSA-encrypted GPG. We decrypt each to plaintext,
+# run git's real 3-way text merge, then re-encrypt the result back into %A.
+# On conflict the markers live INSIDE the ciphertext file; Emacs epa-file
+# decrypts it transparently so you see and edit the markers in plain text.
+#
+# Config: the GPG recipient/key is read from the GIT_GPGMERGE_KEY env var:
+#   export GIT_GPGMERGE_KEY=1964BF7DA5E3557518C007C92045F6872B42B3A4
+
+set -euo pipefail
+
+base=$1
+ours=$2
+theirs=$3
+
+# --- resolve the GPG recipient/key to encrypt the result to ---------------
+recipient="${GIT_GPGMERGE_KEY:-}"
+if [ -z "$recipient" ]; then
+    echo "gpg-merge: GIT_GPGMERGE_KEY is not set" >&2
+    exit 129
+fi
+
+# --- decrypt the three sides ----------------------------------------------
+work=$(mktemp -d)
+trap 'rm -rf "$work"' EXIT
+
+gpg --no-tty -q --batch --decrypt "$base"   > "$work/base"   2>/dev/null
+gpg --no-tty -q --batch --decrypt "$ours"   > "$work/ours"   2>/dev/null
+gpg --no-tty -q --batch --decrypt "$theirs" > "$work/theirs" 2>/dev/null
+
+# --- real 3-way merge on plaintext ----------------------------------------
+set +e
+git merge-file -L ours -L base -L theirs --diff3 \
+    "$work/ours" "$work/base" "$work/theirs"
+rc=$?
+set -e
+
+# --- re-encrypt the merged result back into %A (ciphertext on disk) --------
+gpg --no-tty -q --batch --yes --trust-model always \
+    --encrypt -r "$recipient" \
+    --output "$ours" "$work/ours"
+
+# git merge-file: 0 = clean, 1 = conflicts, >1 = error
+if [ "$rc" -eq 0 ]; then
+    exit 0
+elif [ "$rc" -eq 1 ]; then
+    exit 1
+else
+    echo "gpg-merge: git merge-file failed (rc=$rc)" >&2
+    exit 129
+fi

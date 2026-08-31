@@ -1,5 +1,3 @@
-[gpg]
-    program = gpg2
 [commit]
     gpgSign = true
 [color]
@@ -13,39 +11,40 @@
 [push]
     default = simple
 [core]
-    # editor = emacsclient -a '' -nw
+    editor = emacsclient -a '' -nw
     autocrlf = false
     excludesfile = ~/.config/git/ignore
 [init]
     defaultBranch = main
 [rerere]
     enabled = true
-[difftool "meld-custom"]
+[mergetool "meld"]
     cmd = $HOME/.local/bin/meld-merge-script \"$LOCAL\" \"$REMOTE\" \"$MERGED\" \"$BASE\"
     trustExitCode = true
-[difftool "ediff-custom"]
-    cmd = $HOME/.local/bin/ediff-merge-script \"$LOCAL\" \"$REMOTE\" \"$MERGED\" \"$BASE\"
+[mergetool "ediff"]
+    cmd = $HOME/.local/bin/emacsclient-ediff-merge.sh \"$LOCAL\" \"$REMOTE\" \"$MERGED\" \"$BASE\"
     trustExitCode = true
-[difftool]
-    prompt = false
 [merge]
     conflictstyle = diff3
-    tool = meld-custom
+    tool = ediff
+[merge "gpg"]
+    driver = gpg-merge %O %A %B
 [rebase]
-    tool = meld-custom
+    tool = ediff
     conflictstyle = diff3
     autosquash = true
 [branch]
     autosetuprebase = always
 [diff]
     compactionHeuristic = true
-    tool = meld-custom
 [diff "jpg"]
     binary = true
     textconv = hexdump -v -C
 [diff "jpeg"]
     binary = true
     textconv = hexdump -v -C
+[diff "gpg"]
+    textconv = gpg --no-tty -q --decrypt
 [alias]
     apr = "apply --reject"
     co = "checkout"
