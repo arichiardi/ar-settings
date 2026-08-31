@@ -10,6 +10,9 @@
     rebase = true
 [push]
     default = simple
+    # Read the important new feature documentation
+    # https://git-scm.com/docs/git-push#Documentation/git-push.txt---no-force-if-includes
+    useForceIfIncludes = true
 [core]
     editor = emacsclient -a '' -nw
     autocrlf = false
