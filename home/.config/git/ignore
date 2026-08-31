@@ -91,3 +91,6 @@ skills-lock.json
 *.elc
 *-loaddefs.el
 transient/
+*.texi
+*.info
+dir
