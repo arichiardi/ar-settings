@@ -35,6 +35,12 @@ _sandbox_agent_env_whitelist=(
 )
 export SANDBOX_AGENT_ENV_WHITELIST="${_sandbox_agent_env_whitelist[*]}"
 
+_sandbox_agent_dir_ro_whitelist=()
+
+[[ -n "${ASDF_DATA_DIR:-}" ]] && _sandbox_agent_dir_ro_whitelist+=("$ASDF_DATA_DIR")
+
+export SANDBOX_AGENT_DIR_RO_WHITELIST="${_sandbox_agent_dir_ro_whitelist[*]}"
+
 _sandbox_agent_dir_rw_whitelist=(
     "$HOME/.agents"
     "$HOME/.babashka"
