@@ -50,7 +50,9 @@ if command -v direnv >/dev/null 2>&1; then
 fi
 
 # mcp
-alias mcp-venv='source $HOME/.local/share/venv/mcp/bin/activate'
+if [ -f "$HOME/.local/share/venv/mcp/bin/activate" ]; then
+    alias mcp-venv='source $HOME/.local/share/venv/mcp/bin/activate'
+fi
 
 # goose
 if command -v goose >/dev/null 2>&1; then
