@@ -1,16 +1,85 @@
 {
-  "lastChangelogVersion": "0.75.5",
-  "defaultProvider": "llamacpp-local",
-  "defaultModel": "Qwen3.X-27B",
-  "defaultThinkingLevel": "off",
-  "hideThinkingBlock": false,
+  "lastChangelogVersion": "0.84.4",
+  "defaultProvider": "github-copilot",
+  "defaultModel": "gpt-5.6-luna",
+  "defaultThinkingLevel": "low",
+  "hideThinkingBlock": true,
   "compaction": {
     "enabled": true,
-    "reserveTokens": 131072,
-    "keepRecentTokens": 65536
+    "reserveTokens": 98304,
+    "keepRecentTokens": 32768
   },
   "enabledModels": [
-    "Qwen3*",
-    "claude-sonnet-4.*"
-  ]
+    "qwen3.*",
+    "qwen/qwen3.*-122b*",
+    "qwen/qwen3.*-27b*",
+    "qwen/qwen3.8*",
+    "claude-sonnet-*",
+    "claude-opus-*",
+    "google/gemma-4*",
+    "gpt*",
+    "mai-code-1.1*",
+    "poolside/laguna-*",
+    "kimi-k3",
+    "nemotron*"
+  ],
+  "packages": [
+    "npm:pi-subagents",
+    "npm:pi-intercom",
+    "npm:@ar-llm/pi-custom-compaction",
+    "npm:pi-prompt-template-model",
+    "npm:pi-rewind",
+    "npm:@ar-llm/pi-dir-providers",
+    "npm:@ar-llm/pi-plan-mode",
+    "npm:@ar-llm/pi-skill-request-params"
+  ],
+  "subagents": {
+    "agentOverridesByProvider": {
+      "github-copilot": {
+        "oracle": {
+          "model": "github-copilot/gpt-5.6-terra",
+          "thinking": "high"
+        },
+        "planner": {
+          "model": "github-copilot/gpt-5.6-sol",
+          "thinking": "medium"
+        },
+        "reviewer": {
+          "model": "github-copilot/gpt-5.6-luna"
+        },
+        "worker": {
+          "model": "github-copilot/gpt-5.6-luna"
+        },
+        "explorer": {
+          "model": "github-copilot/mai-code-1.1-flash"
+        },
+        "scout": {
+          "model": "github-copilot/mai-code-1.1-flash"
+        }
+      },
+      "openrouter": {
+        "oracle": {
+          "model": "tencent/hy4-preview",
+          "thinking": "high"
+        },
+        "planner": {
+          "model": "tencent/hy4-preview",
+          "thinking": "medium"
+        },
+        "reviewer": {
+          "model": "inception/mercury-2.5-preview"
+        },
+        "worker": {
+          "model": "qwen/qwen3.8-flash"
+        },
+        "explorer": {
+          "model": "poolside/laguna-s-2.1:free"
+        },
+        "scout": {
+          "model": "poolside/laguna-s-2.1:free"
+        }
+      }
+    }
+  },
+  "theme": "dark"
 }
