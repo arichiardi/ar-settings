@@ -11,12 +11,11 @@ _sandbox_agent_env_whitelist=(
     GOOSE_RECIPE_PATH
     HOME
     LANG
-    LOCAL_VLLM_HOST
-    LOCAL_VLLM_PORT
-    LOCAL_LLAMACPP_HOST
-    LOCAL_LLAMACPP_PORT
-    LOCAL_IKLLAMA_HOST
-    LOCAL_IKLLAMA_PORT
+    LOCAL_LLM_VLLM_HOST
+    LOCAL_LLM_VLLM_PORT
+    LOCAL_LLM_LLAMACPP_HOST
+    LOCAL_LLM_LLAMACPP_PORT
+    LOCAL_LLM_LLAMACPP_API_URL
     LOCAL_SERVER_HOST
     MCP_SEARCH_URL
     MC_REPO_DIR
@@ -30,12 +29,19 @@ _sandbox_agent_env_whitelist=(
     PI_CODING_AGENT_DIR
     PI_TELEMETRY
     SEARXNG_URL
+    SKILL_PICS_VISION_TRIAGE_URL
+    SKILL_PICS_VISION_TRIAGE_MODEL
     SSH_AUTH_SOCK
     USER
 )
 export SANDBOX_AGENT_ENV_WHITELIST="${_sandbox_agent_env_whitelist[*]}"
 
-_sandbox_agent_dir_ro_whitelist=()
+_sandbox_agent_dir_ro_whitelist=(
+    "/etc/caddy"
+    "/etc/conf.d"
+    "/data/alba/media"
+    "/data/alba/private"
+)
 
 [[ -n "${ASDF_DATA_DIR:-}" ]] && _sandbox_agent_dir_ro_whitelist+=("$ASDF_DATA_DIR")
 
@@ -54,5 +60,6 @@ _sandbox_agent_dir_rw_whitelist=(
     "$HOME/.pi"
     "$HOME/git"
     "$HOME/tmp"
+    "/opt/llm/llama"
 )
 export SANDBOX_AGENT_DIR_RW_WHITELIST="${_sandbox_agent_dir_rw_whitelist[*]}"
