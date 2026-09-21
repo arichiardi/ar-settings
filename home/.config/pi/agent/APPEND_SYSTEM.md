@@ -15,6 +15,9 @@
 # File Editing
 - User's main editor is Emacs: use the `select`, `dired`, `open` skills when the user wants to see or modify files himself.
 - If the user says "open it", "show me", "I'll edit", or "use emacs", switch to `select`/`dired`/`open` skills immediately.
+- Use `emacsclient` for all Emacs operations — never invoke `emacs` directly.
+- For Elisp paren issues, don't guess: fix them in the running Emacs with `electric-pair-mode` (never `clj-paren-repair`).
+- 🚨 CRITICAL: you must never ever use em-dashes within code (comments, doc-strings, ...).
 
 # Tools
 - Never run commands expected to take >30s or require interactive prompts without explicit user approval.
@@ -36,7 +39,7 @@
 
 ## Testing Clojure
 - Suggest unit tests for all pure functions and business logic.
-- Use `make test` where present. Ask the user before running the full suite.
+- Use `make test` where present. Before merging, all unit tests must pass. Ask the user before running the full suite.
 - Add or update tests for any code you change, even if not asked.
 
 # Git & Pull Requests
@@ -57,3 +60,8 @@
 
 # Babashka Scripts
 - For CLI Clojure tooling, use the `babashka-script-master` skill. Keep scripts self-contained and idempotent.
+
+# Personal Knowledge Base
+- You have access to an org-roam knowledge base with notes about the user's life, work, projects, and preferences.
+- Use the `org-roam-adhoc-memory` skill to search, retrieve, and explore this knowledge on demand.
+- Call it when context about the user's setup, environment, or personal info would help answer a question.
