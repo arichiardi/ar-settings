@@ -37,10 +37,9 @@ _sandbox_agent_env_whitelist=(
 export SANDBOX_AGENT_ENV_WHITELIST="${_sandbox_agent_env_whitelist[*]}"
 
 _sandbox_agent_dir_ro_whitelist=(
+    "$HOME/.tool-versions"
     "/etc/caddy"
     "/etc/conf.d"
-    "/data/alba/media"
-    "/data/alba/private"
 )
 
 [[ -n "${ASDF_DATA_DIR:-}" ]] && _sandbox_agent_dir_ro_whitelist+=("$ASDF_DATA_DIR")
