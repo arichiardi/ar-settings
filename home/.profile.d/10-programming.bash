@@ -46,7 +46,6 @@ export SAFEHOUSE_TRUST_WORKDIR_CONFIG=no
 
 # pnpm
 if command -v pnpm >/dev/null 2>&1; then
-    export PNPM_HOME="$HOME/.local/share/pnpm/bin"
-    # pnpm link wants PNPM_HOME itself (not $PNPM_HOME/bin) in PATH.
+    export PNPM_HOME="$HOME/.local/share/pnpm"
     export PATH="$PNPM_HOME:$PATH"
 fi
