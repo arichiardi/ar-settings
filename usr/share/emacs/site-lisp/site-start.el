@@ -1,13 +1,23 @@
+;; -*- lexical-binding: t; -*-
+(require 'cl-lib)
+
 (add-to-list 'default-frame-alist '(font . "JetBrainsMono Nerd Font Mono-12"))
 
 (set-fontset-font "fontset-default"
                   'emoji
                   (font-spec :family "Noto Color Emoji"))
 
-;; Emacs 31 loads site-start.el BEFORE early-init.el, so early-init's
-;; `(undecorated . t)' is prepended afterwards and wins.  Override it via
-;; a hook that runs after the user config but still before
-;; `frame-notice-user-settings' applies the alist to the initial frame.
+;; Show WM decorations on Linux.
+;;
+;; Emacs 31.1 loads site-start.el BEFORE early-init.el.  So editing
+;; default-frame-alist here does not work: early-init.el runs afterwards
+;; and re-adds `(undecorated . t)' at the front of the alist, and the
+;; first match wins.
+;;
+;; Override after all user config instead.  `after-init-hook' runs after
+;; early-init.el/init.el but still before frame-notice-user-settings
+;; applies default-frame-alist to the initial frame; later frames pick
+;; the value up from the alist.  Append (t) so our hook runs last.
 ;; (when (>= emacs-major-version 31)
 ;;   (add-hook 'after-init-hook
 ;;             (lambda ()
