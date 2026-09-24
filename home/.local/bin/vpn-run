@@ -9,11 +9,14 @@ if [[ $(wg-netns list) =~ "vpn" ]]; then
       bash -c \
       "run_as_user=${SUDO_USER:-$(id -un)}; \
        run_as_uid=$(id -u $run_as_user); \
-         echo \$run_as_user;
          runuser -l \$run_as_user --login --command \
-         \"env DISPLAY=unix/:0 \
-             PULSE_SERVER=/run/user/\$run_as_uid/pulse/native \
-             PULSE_COOKIE=/home/\$run_as_user/.config/pulse/cookie \
+         \"env DISPLAY=${DISPLAY:=unix/:0} \
+               PULSE_SERVER=/run/user/\$run_as_uid/pulse/native \
+               PULSE_COOKIE=/home/\$run_as_user/.config/pulse/cookie \
+               XDG_SESSION_CLASS=\$XDG_SESSION_CLASS \
+               XDG_RUNTIME_DIR=/run/user/\$run_as_uid \
+               XDG_DATA_DIRS=${XDG_DATA_DIRS} \
+               USER=\$run_as_user \
              $*\""
 else
     notify-send "VPN Not Connected" \
