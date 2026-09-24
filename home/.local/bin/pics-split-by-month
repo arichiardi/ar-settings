@@ -13,28 +13,28 @@
 set -euo pipefail
 
 for f in $(find -maxdepth 1 -regextype posix-extended -iregex '.*\.(jpg|jpeg|tiff|mp4)'); do
-    file_name=$(basename $f)
-    new_file_name=$(echo $file_name | sed -E -e 's/(photo|PXL|signal)_//')
+    file_name=$(basename "$f")
+    new_file_name=$(echo "$file_name" | sed -E -e 's/(photo|PXL|signal)_//')
     if [ -n "$f" ]; then
-        tag_value=$(exiftool -DateTimeOriginal $f)
+        tag_value=$(exiftool -DateTimeOriginal "$f")
         if [ -n "$tag_value" ]; then
-            datepath="$(echo -ne $tag_value | awk '{print $4}' | awk -F: '{print $1,$2}' | sed s/\ /-/)"
+            datepath="$(echo -ne "$tag_value" | awk '{print $4}' | awk -F: '{print $1,$2}' | sed s/\ /-/)"
             if [ -n "$datepath" ]; then # if empty will leave it as it is
                 if ! [ -e "$datepath" ]; then
                     mkdir -pv "$datepath"
                 fi
-                mv -vi $f "$datepath/$new_file_name"
+                mv -vi "$f" "$datepath/$new_file_name"
             fi
         else
-            tag_value=$(exiftool -CreateDate $f)
+            tag_value=$(exiftool -CreateDate "$f")
             # echo -en "No -DateTimeOriginal found, trying -FileModifyDate\n"
             if [ -n "$tag_value" ]; then
                 datepath="$(echo -ne $tag_value | cut -d : -f 2,3 | cut -d ' ' -f 2 | sed s/[\:]/\-/g)"
-                if [ -N "$datepath" ]; then # if empty will leave it as it is
+                if [ -n "$datepath" ]; then
                     if ! [ -e "$datepath" ]; then
                         mkdir -pv "$datepath"
                     fi
-                    mv -vi $f "$datepath/$new_file_name"
+                    mv -vi "$f" "$datepath/$new_file_name"
                 fi
             else
                 echo "$f does not contain either -DateTimeOriginal or -CreateDate, skipping...";
