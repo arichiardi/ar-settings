@@ -4,12 +4,13 @@
 # Env vars:
 #   SANDBOX_AGENT_ENV_WHITELIST  - space-delimited list of env var names passed into the sandbox.
 #   SANDBOX_AGENT_DIR_RW_WHITELIST - space-delimited list of host directories bind-mounted RW.
-#
+#   SANDBOX_AGENT_DIR_RO_WHITELIST - space-delimited list of host directories bind-mounted RO.
 set -euo pipefail
 
 # Read from environment, default to empty.
 SANDBOX_AGENT_ENV_WHITELIST="${SANDBOX_AGENT_ENV_WHITELIST:-}"
 SANDBOX_AGENT_DIR_RW_WHITELIST="${SANDBOX_AGENT_DIR_RW_WHITELIST:-}"
+SANDBOX_AGENT_DIR_RO_WHITELIST="${SANDBOX_AGENT_DIR_RO_WHITELIST:-}"
 
 echo_info() { echo "ℹ️ $*"; }
 echo_warn() { echo "⚠️ $*" >&2; }
@@ -59,6 +60,14 @@ for dir in $SANDBOX_AGENT_DIR_RW_WHITELIST; do
         bwrap_args+=( --bind "$dir" "$dir" )
     else
         echo_warn "Bind skipped: $dir does not exist"
+    fi
+done
+
+for dir in $SANDBOX_AGENT_DIR_RO_WHITELIST; do
+    if [[ -d "$dir" ]]; then
+        bwrap_args+=( --ro-bind "$dir" "$dir" )
+    else
+        echo_warn "RO bind skipped: $dir does not exist"
     fi
 done
 
