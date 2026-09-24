@@ -29,8 +29,6 @@ _sandbox_agent_env_whitelist=(
     PI_CODING_AGENT_DIR
     PI_TELEMETRY
     SEARXNG_URL
-    SKILL_PICS_VISION_TRIAGE_URL
-    SKILL_PICS_VISION_TRIAGE_MODEL
     SSH_AUTH_SOCK
     USER
 )
@@ -38,8 +36,6 @@ export SANDBOX_AGENT_ENV_WHITELIST="${_sandbox_agent_env_whitelist[*]}"
 
 _sandbox_agent_dir_ro_whitelist=(
     "$HOME/.tool-versions"
-    "/etc/caddy"
-    "/etc/conf.d"
 )
 
 [[ -n "${ASDF_DATA_DIR:-}" ]] && _sandbox_agent_dir_ro_whitelist+=("$ASDF_DATA_DIR")
@@ -59,6 +55,5 @@ _sandbox_agent_dir_rw_whitelist=(
     "$HOME/.pi"
     "$HOME/git"
     "$HOME/tmp"
-    "/opt/llm/llama"
 )
 export SANDBOX_AGENT_DIR_RW_WHITELIST="${_sandbox_agent_dir_rw_whitelist[*]}"
