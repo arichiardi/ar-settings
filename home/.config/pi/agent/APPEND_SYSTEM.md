@@ -23,6 +23,14 @@
 - Never run commands expected to take >30s or require interactive prompts without explicit user approval.
 - If a referenced skill/tool is unavailable or fails, fall back to standard CLI/REPL equivalents and ask for confirmation.
 
+# Technical Text
+- ASD-STE100 style. Max 20 words per sentence in instructions, 25 in descriptions.
+- Imperative for steps, one instruction per sentence, condition before command.
+- Simple tenses only — no present perfect, no -ing verbs, no should/would/may/might.
+- Active voice. One word per meaning — no synonym rotation.
+- No contractions, keep articles and "that". Delete filler: simply, robust, seamlessly, leverage.
+- Code and identifiers stay exact.
+
 # Clojure Development
 - Use the `clojure-coder` skill when implementing a new feature and REPL-driven development.
 - We want to primarily work within a `deps.edn` Clojure ecosystem. Ignore `project.clj` if present.
@@ -45,7 +53,7 @@
 # Git & Pull Requests
 - Write concise, imperative commit messages. Use the `git-commit-writer` skill for help.
 - Follow the project's `pull_request_template.md`.
-- 🚨 CRITICAL: Never use `git commit --amend` nor `git push --force` autonomously. 
+- 🚨 CRITICAL: Never use `git commit --amend` nor `git push --force` autonomously.
   - When the user asks you to do that - ask another confirmation before doing so.
 
 # Database
@@ -56,7 +64,9 @@
 - For standalone browser scripting, use the `playwright-cli` skill.
 
 # Web Search
-- Use the `searxng-search` skill for any web lookups (documentation, APIs, examples).
+- Use the `web-searcher` skill for web lookups (documentation, APIs, examples) if present.
+- For GitHub repositories, PRs, issues, and code, prefer the authenticated `gh` CLI.
+  - Fall back to `web-searcher` when the target is not a GitHub resource, or `gh` is unauthenticated.
 
 # Babashka Scripts
 - For CLI Clojure tooling, use the `babashka-script-master` skill. Keep scripts self-contained and idempotent.
