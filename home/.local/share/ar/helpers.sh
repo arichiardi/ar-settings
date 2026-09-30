@@ -21,41 +21,83 @@ function installnote { echo_info "   $1"; }
 function skipping    { echo_skip "   already installed; skipping."; }
 function success     { echo_ok   "   success!"; }
 
-function pkg_install () {
-    local packages=$1
-
-    local distro;
-    local cmd;
-    local usesudo=
+# Detects the package manager for this distro and sets:
+#   pkg_mgr          - the manager binary (pacman, yay, apk, apt-get)
+#   pkg_install_args - the arguments that make it install (e.g. "-S --noconfirm")
+#   pkg_modifier     - "-yay" when yay is present on arch, else empty
+function pkg_detect () {
+    local distro
 
     declare -A pkgmgr
     pkgmgr=( \
-      [arch]="pacman -S --noconfirm" \
-      [arch-yay]="yay -Sy" \
-      [alpine]="apk add --no-cache" \
-      [debian]="apt-get install -y" \
-      [ubuntu]="apt-get install -y" \
+      [arch]="pacman" \
+      [arch-yay]="yay" \
+      [alpine]="apk" \
+      [debian]="apt-get" \
+      [ubuntu]="apt-get" \
+    )
+
+    declare -A install_args
+    install_args=( \
+      [arch]="-S --noconfirm" \
+      [arch-yay]="-Sy" \
+      [alpine]="add --no-cache" \
+      [debian]="install -y" \
+      [ubuntu]="install -y" \
     )
 
     distro=$(cat /etc/os-release | tr [:upper:] [:lower:] | grep -Poi '(debian|ubuntu|red hat|centos|arch|alpine)' | uniq)
-    modifier=
+    pkg_modifier=
     if [ $(which yay) ]; then
-	modifier=-yay
+	pkg_modifier=-yay
     fi
 
-    cmd="${pkgmgr[$distro$modifier]}"
-    [[ ! $cmd ]] && return 1
+    pkg_mgr="${pkgmgr[$distro$pkg_modifier]}"
+    pkg_install_args="${install_args[$distro$pkg_modifier]}"
+    # Base manager without the yay wrapper - useful for plain repo queries.
+    pkg_mgr_base="$pkg_mgr"
+    [[ $pkg_mgr == "yay" ]] && pkg_mgr_base=pacman
+    [[ $pkg_mgr ]] || return 1
+}
+
+# Runs the detected package manager with arbitrary arguments, e.g.:
+#   pkg_run -q -Si sway              (query; -q means no status echo and no sudo)
+#   pkg_run -q -m pacman -Si sway    (query with an explicit manager)
+#   pkg_run -S --noconfirm foo       (install)
+function pkg_run () {
+    pkg_detect || return 1
+
+    local quiet=
+    local mgr=
+    while [[ $1 == "-q" || ( $1 == "-m" && $# -ge 2 ) ]]; do
+        case $1 in
+            -q) quiet=1 ;;
+            -m) mgr=$2; shift ;;
+        esac
+        shift
+    done
+    [[ $mgr ]] || mgr=$pkg_mgr
+
+    local usesudo=
+    # We cannot run sudo yay if there are aur packages - the following workaround is horrible.
+    if [[ ! $quiet ]] && [[ ! $EUID -eq 0 ]] && [[ ! "$pkg_modifier" =~ "yay" ]]; then
+        usesudo=sudo
+    fi
+
+    [[ $quiet ]] || echo_info Running: $usesudo $mgr $*
+    $usesudo $mgr "$@"
+}
+
+function pkg_install () {
+    local packages=$1
+
+    pkg_detect || return 1
 
     if [[ $packages ]]; then
-	# We cannot run sudo yay if there are aur packages - the following workaround is horrible.
-        if [[ ! $EUID -eq 0 ]] && [[ ! "$modifier" =~ "yay" ]]; then
-            usesudo=sudo
-	fi
-        echo_info Installing package with: $usesudo $cmd $@
-        $usesudo $cmd $@
+        pkg_run $pkg_install_args $@
     else
-        echo_info Installing package with: $cmd
-        echo $cmd
+        echo_info Install command: $pkg_mgr $pkg_install_args
+        echo "$pkg_mgr $pkg_install_args"
     fi
 }
 

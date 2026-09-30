@@ -1,0 +1,76 @@
+// waybar config for sway
+// Colors match the old i3bar palette from the i3 config.
+{
+    "layer": "bottom",
+    "position": "bottom",
+    "height": 36,
+    "spacing": 6,
+    "font": "JetBrainsMono Nerd Font 12",
+
+    "modules-left": ["sway/workspaces", "sway/mode"],
+    "modules-center": ["sway/window"],
+    "modules-right": [
+        "cpu",
+        "memory",
+        // "battery",  // no battery on this machine; check ls /sys/class/power_supply/ if you add one
+        "network",
+        "pulseaudio",
+        "clock",
+        "tray"
+    ],
+
+    "sway/workspaces": {
+        "format": "<span size='large'>{icon}</span> {name}",
+        "format-icons": {
+            "1": "",
+            "2": "",
+            "10": ""
+        },
+        "disable-scroll": false
+    },
+    "sway/mode": {
+        "format": "<span size='xx-large' rise='-3000'></span> {name}"
+    },
+    "sway/window": {
+        "format": "{title}",
+        "max-length": 200
+    },
+    "cpu": {
+        "format": "<span size='xx-large' rise='-3000'>󰍛</span> {usage}%"
+    },
+    "memory": {
+        "format": "<span size='xx-large' rise='-3000'></span> {}"
+    },
+    // "battery": {
+    //     "format": "{icon} {capacity}%",
+    //     "format-charging": "{icon} {capacity}% ",
+    //     "format-plugged": "{icon} {capacity}% ",
+    //     "bat": "BAT1"
+    // },
+    "network": {
+        "format-wifi": "<span size='xx-large' rise='-3000'></span> {essid} {signalStrength}%",
+        "format-ethernet": "<span size='xx-large' rise='-3000'></span> {ifname}",
+        "format-disconnected": "<span size='xx-large' rise='-3000'></span> disconnected"
+    },
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "scroll-step": 5,
+        "on-click": "pavucontrol",
+        "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+",
+        "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
+    },
+    "clock": {
+        "format": "{:%Y-%m-%d %H:%M}",
+        "interval": 30
+    },
+    "tray": {
+        "icon-size": 24,
+        "spacing": 8
+    },
+
+    "colors": {
+        "background": "#FF0000",
+        "foreground": "#F9FAF9",
+        "separator": "#454947"
+    }
+}
