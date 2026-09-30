@@ -345,8 +345,6 @@ bindsym $mod+F4 exec "rhythmbox-client --play-pause"
 bindsym $mod+F5 exec "rhythmbox-client --next"
 bindsym $mod+F6 exec "rhythmbox-client --previous"
 bindsym $mod+F7 exec "rhythmbox-client --clear-queue"
-bindsym --release Print exec --no-startup-id scrot
-bindsym --release Shift+Print exec --no-startup-id scrot -s
 bindsym XF86MonBrightnessDown exec "xbacklight -dec 20"
 bindsym XF86MonBrightnessUp exec "xbacklight -inc 20"
 bindsym XF86AudioRaiseVolume exec "amixer -D pulse sset Master 5%+"
