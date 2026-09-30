@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+#
+# Initialize sway within this system.
+#
+# The scripts has to be run from the ar-settings repository.
+#
+set -euo pipefail
+
+# For skipping sections, use this trick:
+#
+#   cat >/dev/null <<LABEL
+#
+# see the brilliant answer here: https://stackoverflow.com/a/45538151
+
+source ./home/.local/share/ar/helpers.sh
+
+echo_info "Installing sway and related packages"
+
+# wlroots is released as versioned packages (wlroots0.20, ...) - there is no
+# stable 'wlroots' name, so resolve the one the current sway depends on.
+# Query with the base manager (pacman, not yay). The field is 'Depends On:'
+# in recent pacman (localized variants start with 'Depends' as well).
+pkg_detect || true
+wlroots_pkg=$(pkg_run -q -m "$pkg_mgr_base" -Si sway 2> /dev/null \
+    | sed -n 's/^Depends[^:]*: *//p' | tr ' ' '\n' | grep -m1 '^wlroots' || true)
+
+# wlr-protocols is required by conky's native Wayland backend: it ships
+# wlr-layer-shell-unstable-v1.xml, which conky loads at runtime to create a
+# layer-shell surface. Without it conky silently falls back to the X11/
+# Xwayland backend and gets tiled as a normal window by sway.
+sway_packages=(sway swaybg swayidle waybar wlogout \
+               swaylock-effects \
+               grim slur brightnessctl \
+               dunst rofi foot conky wlr-protocols pcmanfm-gtk3 flameshot wev \
+               xdg-desktop-portal-gtk \
+               keepassxc accountsservice \
+               ttf-jetbrains-mono ttf-noto-nerd \
+               lightdm-gtk-greeter lightdm onboard)
+if [[ $wlroots_pkg ]]; then
+    sway_packages=(sway "$wlroots_pkg" "${sway_packages[@]:1}")
+else
+    echo_warn "Could not resolve the wlroots package from sway's dependencies - sway will pull it in itself"
+fi
+
+pkg_install "${sway_packages[@]}"
