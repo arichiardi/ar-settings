@@ -12,10 +12,6 @@ set -euo pipefail
 #
 # see the brilliant answer here: https://stackoverflow.com/a/45538151
 
-home_dir=$(pwd)/home
-secret_bin=$home_dir/.local/bin/secret
-temp_dir=$(mktemp -d -t "ar-init-i3.XXXXXXXXXX")
-
 source ./home/.local/share/ar/helpers.sh
 
 # For xdg-desktop-portal-gtk see
@@ -27,5 +23,3 @@ pkg_install i3-wm i3blocks i3exit i3lock i3status i3-battery-popup-git \
             keepassxc  accountsservice \
             ttf-jetbrains-mono ttf-noto-nerd \
             lxsession-gtk3 lightdm-gtk-greeter lightdm onboard
-
-popd > /dev/null
