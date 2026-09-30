@@ -1,0 +1,11 @@
+# Custom session entry from the ar-settings repo (usr/share/wayland-sessions/).
+# Not owned by any package: it exists to launch sway with --unsupported-gpu,
+# which is required for the proprietary NVIDIA driver.
+# Safe to delete if you switch GPU drivers or once upstream supports nvidia.
+[Desktop Entry]
+Name=Sway (nvidia)
+Comment=Tiling Wayland compositor for nvidia.
+TryExec=sway
+Exec=sway --unsupported-gpu
+Icon=sway
+Type=Application
