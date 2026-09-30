@@ -1,7 +1,15 @@
 #!/bin/bash
 
-conky -c $HOME/.config/conky/conky_shortcuts.conf &&
-conky -c $HOME/.config/conky/conky.conf
-# or $HOME/.config/conky/conky_server.conf
+# Pick the conky config by display server. The header voffsets differ between
+# the X11 and native Wayland backends (different font metrics), so a single
+# shared config can't be tuned for both. conky_wayland.conf carries the
+# Wayland offsets; conky.conf is the X11/Xwayland variant.
+if [[ -n "$WAYLAND_DISPLAY" ]]; then
+    main_conf="$HOME/.config/conky/conky_wayland.conf"
+else
+    main_conf="$HOME/.config/conky/conky.conf"
+fi
+
+conky -c "$main_conf" &
 
 exit 0
