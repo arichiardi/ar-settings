@@ -257,9 +257,13 @@ source_with_bench() {
 }
 
 # Echo a PINENTRY_USER_DATA prefix for commands that run in a TUI on the
-# desktop, so gpg passphrase prompts use a graphical pinentry. Emits
-# nothing when the dispatcher that honours the variable is not installed.
-pinentry_hint () { [[ -x /usr/local/bin/pinentry-dispatch ]] && echo 'PINENTRY_USER_DATA=gtk '; }
+# desktop, so gpg passphrase prompts use a graphical pinentry. macOS gets
+# the native pinentry-mac, everything else the GTK pinentry. Emits nothing
+# when the dispatcher that honours the variable is not installed.
+pinentry_hint () {
+    [[ -x /usr/local/bin/pinentry-dispatch ]] || return 0
+    if is_os darwin; then echo 'PINENTRY_USER_DATA=mac '; else echo 'PINENTRY_USER_DATA=gtk '; fi
+}
 
 # Nice approach taken from here: https://stackoverflow.com/a/29239609
 is_os () { [[ $OSTYPE == *$1* ]]; }

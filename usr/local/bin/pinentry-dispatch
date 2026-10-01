@@ -9,14 +9,19 @@
 #   PINENTRY_USER_DATA=emacs   -> pinentry-emacs   (Emacs minibuffer)
 #   PINENTRY_USER_DATA=curses  -> pinentry-curses  (terminal UIs, pass)
 #   PINENTRY_USER_DATA=gtk     -> pinentry-gtk     (TUIs on a desktop, e.g. pi)
+#   PINENTRY_USER_DATA=mac     -> pinentry-mac     (macOS native dialog)
 #   PINENTRY_USER_DATA=qt      -> pinentry-qt
 #
-# No hint: use the graphical pinentry when a display is available,
-# fall back to pinentry-tty on a bare console.
+# No hint: use pinentry-mac when installed, else the graphical pinentry
+# when a display is available, else pinentry-tty on a bare console.
 #
 # NOTE: pinentry-emacs only works while an Emacs with pinentry mode is
 # running; if the hint is set but the program fails, the user must retry
 # without the hint.
+
+# Trace every routing decision so a broken hint or missing binary is
+# visible. gpg-agent runs with stderr on the tty that started it.
+_dispatch_log () { printf 'pinentry-dispatch: %s\n' "$*" >&2; }
 
 case "${PINENTRY_USER_DATA:-}" in
     emacs)
@@ -26,21 +31,30 @@ case "${PINENTRY_USER_DATA:-}" in
         exec /usr/bin/pinentry-curses "$@"
         ;;
     gtk)
-        if [ -n "${WAYLAND_DISPLAY:-}" ]; then
-            exec /usr/bin/pinentry-gnome3 "$@"
-        else
-            exec /usr/bin/pinentry-gtk "$@"
+        _dispatch_log "hint=gtk DISPLAY=${DISPLAY:-} WAYLAND=${WAYLAND_DISPLAY:-}"
+        exec /usr/bin/pinentry-gtk "$@"
+        ;;
+    mac)
+        if [ -x /opt/homebrew/bin/pinentry-mac ]; then
+            _dispatch_log "hint=mac backend=pinentry-mac"
+            exec /opt/homebrew/bin/pinentry-mac "$@"
         fi
+        _dispatch_log "hint=mac but pinentry-mac not found, falling back to tty"
+        exec /usr/bin/pinentry-tty "$@"
         ;;
     qt)
         exec /usr/bin/pinentry-qt "$@"
         ;;
     *)
-        if [ -n "${WAYLAND_DISPLAY:-}" ]; then
-            exec /usr/bin/pinentry-gnome3 "$@"
-        elif [ -n "${DISPLAY:-}" ]; then
+        if [ -x /opt/homebrew/bin/pinentry-mac ]; then
+            _dispatch_log "no hint, backend=pinentry-mac"
+            exec /opt/homebrew/bin/pinentry-mac "$@"
+        fi
+        if [ -n "${DISPLAY:-}" ]; then
+            _dispatch_log "no hint, x display available"
             exec /usr/bin/pinentry-gtk "$@"
         fi
+        _dispatch_log "no hint and no x display, using tty"
         exec /usr/bin/pinentry-tty "$@"
         ;;
 esac
