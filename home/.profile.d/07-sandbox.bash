@@ -28,9 +28,11 @@ _sandbox_agent_env_whitelist=(
     PI_ACP_ENABLE_EMBEDDED_CONTEXT
     PI_CODING_AGENT_DIR
     PI_TELEMETRY
+    PINENTRY_USER_DATA
     SEARXNG_URL
     SSH_AUTH_SOCK
     USER
+    WAYLAND_DISPLAY
 )
 export SANDBOX_AGENT_ENV_WHITELIST="${_sandbox_agent_env_whitelist[*]}"
 

@@ -1,0 +1,46 @@
+#!/bin/sh
+# pinentry-dispatch - route gpg-agent pinentry requests to the right backend.
+#
+# gpg-agent launches this script (configured via `pinentry-program`) for
+# every passphrase prompt. The calling application hints at its environment
+# through PINENTRY_USER_DATA, a GnuPG-defined variable.
+#
+# Hints understood (set by the application before invoking gpg):
+#   PINENTRY_USER_DATA=emacs   -> pinentry-emacs   (Emacs minibuffer)
+#   PINENTRY_USER_DATA=curses  -> pinentry-curses  (terminal UIs, pass)
+#   PINENTRY_USER_DATA=gtk     -> pinentry-gtk     (TUIs on a desktop, e.g. pi)
+#   PINENTRY_USER_DATA=qt      -> pinentry-qt
+#
+# No hint: use the graphical pinentry when a display is available,
+# fall back to pinentry-tty on a bare console.
+#
+# NOTE: pinentry-emacs only works while an Emacs with pinentry mode is
+# running; if the hint is set but the program fails, the user must retry
+# without the hint.
+
+case "${PINENTRY_USER_DATA:-}" in
+    emacs)
+        exec /usr/bin/pinentry-emacs "$@"
+        ;;
+    curses)
+        exec /usr/bin/pinentry-curses "$@"
+        ;;
+    gtk)
+        if [ -n "${WAYLAND_DISPLAY:-}" ]; then
+            exec /usr/bin/pinentry-gnome3 "$@"
+        else
+            exec /usr/bin/pinentry-gtk "$@"
+        fi
+        ;;
+    qt)
+        exec /usr/bin/pinentry-qt "$@"
+        ;;
+    *)
+        if [ -n "${WAYLAND_DISPLAY:-}" ]; then
+            exec /usr/bin/pinentry-gnome3 "$@"
+        elif [ -n "${DISPLAY:-}" ]; then
+            exec /usr/bin/pinentry-gtk "$@"
+        fi
+        exec /usr/bin/pinentry-tty "$@"
+        ;;
+esac
