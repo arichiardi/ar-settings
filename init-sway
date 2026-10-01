@@ -35,7 +35,8 @@ sway_packages=(sway swaybg swayidle waybar wlogout \
                xdg-desktop-portal-gtk \
                keepassxc accountsservice \
                ttf-jetbrains-mono ttf-noto-nerd \
-               lightdm-gtk-greeter lightdm onboard)
+               lightdm-gtk-greeter lightdm onboard \
+               librsvg)
 if [[ $wlroots_pkg ]]; then
     sway_packages=(sway "$wlroots_pkg" "${sway_packages[@]:1}")
 else
