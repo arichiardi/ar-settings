@@ -36,6 +36,15 @@ echo 'pinentry-program /usr/bin/pinentry-tty' >> ~/.gnupg/gpg-agent.conf
 gpgconf --kill gpg-agent
 ```
 
+To route prompts to the right pinentry backend (Emacs, terminal, or
+graphical), point the agent at the dispatcher instead:
+
+```shell
+cp usr/local/bin/pinentry-dispatch /usr/local/bin/
+echo 'pinentry-program /usr/local/bin/pinentry-dispatch' > ~/.gnupg/gpg-agent.conf
+gpgconf --kill gpg-agent
+```
+
 ### Running
 
 ```shell
