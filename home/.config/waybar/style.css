@@ -24,3 +24,11 @@ window#waybar {
 #workspaces {
     margin: 0 4px;
 }
+
+/* Binding-mode indicator (e.g. resize/gaps mode): make it stand out */
+#mode {
+    color: #FDF6E3;
+    background-color: #556064;
+    padding: 0 8px;
+    border-radius: 3px;
+}
