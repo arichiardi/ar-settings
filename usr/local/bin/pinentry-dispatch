@@ -12,8 +12,10 @@
 #   PINENTRY_USER_DATA=mac     -> pinentry-mac     (macOS native dialog)
 #   PINENTRY_USER_DATA=qt      -> pinentry-qt
 #
-# No hint: use pinentry-mac when installed, else the graphical pinentry
-# when a display is available, else pinentry-tty on a bare console.
+# No hint: use the tty pinentry by default so ssh sessions work without
+# a local desktop. A graphical pinentry is used only when a display is
+# explicitly available: pinentry-mac when installed, else pinentry-gtk
+# when DISPLAY or WAYLAND_DISPLAY is set.
 #
 # NOTE: pinentry-emacs only works while an Emacs with pinentry mode is
 # running; if the hint is set but the program fails, the user must retry
@@ -50,11 +52,11 @@ case "${PINENTRY_USER_DATA:-}" in
             _dispatch_log "no hint, backend=pinentry-mac"
             exec /opt/homebrew/bin/pinentry-mac "$@"
         fi
-        if [ -n "${DISPLAY:-}" ]; then
-            _dispatch_log "no hint, x display available"
+        if [ -n "${DISPLAY:-}" ] || [ -n "${WAYLAND_DISPLAY:-}" ]; then
+            _dispatch_log "no hint, display available DISPLAY=${DISPLAY:-} WAYLAND=${WAYLAND_DISPLAY:-}"
             exec /usr/bin/pinentry-gtk "$@"
         fi
-        _dispatch_log "no hint and no x display, using tty"
+        _dispatch_log "no hint and no display, using tty"
         exec /usr/bin/pinentry-tty "$@"
         ;;
 esac
