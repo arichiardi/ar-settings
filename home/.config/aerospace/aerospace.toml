@@ -107,6 +107,12 @@ left = 'resize width +50'
 enter = 'mode main'
 esc = 'mode main'
 
+# Pinentry dialogs must stay out of the tiling layout, so they float and
+# stay centered on top of the calling terminal.
+[[on-window-detected]]
+    if.app-id = 'org.gnupg.Pinentry'
+    run = 'layout floating'
+
 [[on-window-detected]]
     if.app-id = 'com.microsoft.teams2'
     check-further-callbacks = true
