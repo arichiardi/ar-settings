@@ -29,7 +29,11 @@
         "disable-scroll": false
     },
     "sway/mode": {
-        "format": "<span size='xx-large' rise='-3000'></span> {name}"
+        // Placeholder is "{}" (waybar inserts the current binding mode there),
+        // NOT "{name}". No Nerd-Font glyph: the warning-triangle glyph (U+F062)
+        // does not resolve under "JetBrainsMono Nerd Font Mono", so Pango fell
+        // back to a red-tinted font. Colored via #mode in style.css.
+        "format": "{}"
     },
     "sway/window": {
         "format": "{title}",

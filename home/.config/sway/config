@@ -226,22 +226,32 @@ bindsym $mod+Mod1+r mode "$mode_resize"
 # Wallpaper: swaybg is started by sway itself, e.g.:
 # output * bg ~/wallpaper.png fill
 exec_always --no-startup-id bash -c 'pkill -x nm-applet; sleep 0.25; exec nm-applet'
-exec --no-startup-id bash -c 'pkill -x conky; sleep 0.25; exec start_conky'
+exec_always --no-startup-id bash -c 'pkill -x conky; sleep 0.25; exec start_conky'
 exec swayidle -w \
     timeout 300 'swaylock' \
     timeout 1805 'swaymsg "output * power off"' \
     resume 'swaymsg "output * power on"'
 exec_always --no-startup-id keepassxc
 exec --no-startup-id flameshot
+# waybar is the status bar; exec_always so it (re)starts on config reload,
+# where swaybar_command would not re-run (it only fires at compositor start).
+# pkill guard (same as nm-applet) kills the old instance on reload before
+# starting a fresh one. Safe here: exec runs the command directly, so there is
+# no 'bash -c' wrapper whose own cmdline contains 'waybar' for pkill to match.
+exec_always --no-startup-id bash -c 'pkill -x waybar; sleep 0.25; exec waybar'
 
-# Start the bar (waybar reads ~/.config/waybar/config)
-bar {
-	swaybar_command bash -c 'pkill waybar; waybar'
-	position bottom
-
-	bindsym button4 nop
-	bindsym button5 nop
-}
+# We use waybar (started above via exec_always) as the status bar, not sway's
+# own bar. waybar reserves the bar area itself as a layer-shell surface. Do NOT
+# re-enable the bar {} block below: it makes sway fork its own swaybar, giving
+# two bars. (It is kept here, commented, for reference.) Mod+m below still
+# toggles the whole bar area, including waybar.
+#
+# bar {
+#	position bottom
+#
+#	bindsym button4 nop
+#	bindsym button5 nop
+#}
 
 # hide/unhide bar
 bindsym $mod+m bar mode toggle
