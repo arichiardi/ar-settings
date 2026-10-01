@@ -36,6 +36,7 @@ bwrap_args=(
     --share-net
     --bind "/run/user/$(id -u)" "/run/user/$(id -u)"
     --tmpfs /tmp
+    --tmpfs /run
     --dev-bind /dev /dev
     --proc /proc
     --ro-bind /usr /usr
@@ -62,6 +63,19 @@ for dir in $SANDBOX_AGENT_DIR_RW_WHITELIST; do
         echo_warn "Bind skipped: $dir does not exist"
     fi
 done
+
+# journalctl read-only access.
+# /run is a fresh tmpfs, so journald's runtime socket is not exposed.
+# Only journal data and the systemd binaries/units needed by journalctl are bound, and all read-only.
+if [[ -d /var/log/journal ]]; then
+    bwrap_args+=( --ro-bind /var/log/journal /var/log/journal )
+fi
+if [[ -d /run/log/journal ]]; then
+    bwrap_args+=( --ro-bind /run/log/journal /run/log/journal )
+fi
+if [[ -d /usr/lib/systemd ]]; then
+    bwrap_args+=( --ro-bind /usr/lib/systemd /usr/lib/systemd )
+fi
 
 for dir in $SANDBOX_AGENT_DIR_RO_WHITELIST; do
     if [[ -d "$dir" ]]; then
