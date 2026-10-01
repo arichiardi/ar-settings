@@ -7,5 +7,14 @@ Name=Sway (nvidia)
 Comment=Tiling Wayland compositor for nvidia.
 TryExec=sway
 Exec=sway --unsupported-gpu
+# Icon shown in the greeter. The active greeter is slick-greeter
+# (lightdm.conf: greeter-session=lightdm-slick-greeter), which ignores this
+# key and instead looks for a badge file named after the session key:
+# /usr/share/slick-greeter/badges/sway-nvidia.svg (shipped by ar-settings).
+# Icon=sway is kept only for non-greeter consumers (e.g. other session lists).
 Icon=sway
 Type=Application
+# DesktopNames is how lightdm matches this entry to an available desktop
+# environment. Without it lightdm will not offer/launch the session (clicking
+# the entry does nothing). Must list sway to be treated as a sway session.
+DesktopNames=sway;wlroots
