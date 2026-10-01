@@ -256,6 +256,11 @@ source_with_bench() {
   fi
 }
 
+# Echo a PINENTRY_USER_DATA prefix for commands that run in a TUI on the
+# desktop, so gpg passphrase prompts use a graphical pinentry. Emits
+# nothing when the dispatcher that honours the variable is not installed.
+pinentry_hint () { [[ -x /usr/local/bin/pinentry-dispatch ]] && echo 'PINENTRY_USER_DATA=gtk '; }
+
 # Nice approach taken from here: https://stackoverflow.com/a/29239609
 is_os () { [[ $OSTYPE == *$1* ]]; }
 is_nix () {

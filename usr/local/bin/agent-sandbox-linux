@@ -34,9 +34,10 @@ bwrap_args=(
     --unshare-uts
     --unshare-cgroup
     --share-net
-    --bind "/run/user/$(id -u)" "/run/user/$(id -u)"
     --tmpfs /tmp
     --tmpfs /run
+    --dir /run/user
+    --bind "/run/user/$(id -u)" "/run/user/$(id -u)"
     --dev-bind /dev /dev
     --proc /proc
     --ro-bind /usr /usr
