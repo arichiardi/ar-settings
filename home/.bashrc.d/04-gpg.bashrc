@@ -8,18 +8,9 @@
 
 export GPG_TTY=$(tty)
 
-# Only update the agent's TTY if we're not using a dispatcher.
-# The dispatcher handles TTY/display routing on its own.
-if [[ ! -x /usr/local/bin/pinentry-dispatch ]]; then
-    gpg-connect-agent updatestartuptty /bye >/dev/null
-fi
-
-export GNUPGCONFIG=${GNUPGHOME:-"$HOME/.gnupg/gpg-agent.conf"}
-if grep -q enable-ssh-support "$GNUPGCONFIG"; then
-  export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
-fi
-
-# Only update TTY again if not using a dispatcher.
-if [[ ! -x /usr/local/bin/pinentry-dispatch ]]; then
+# updatestartuptty is skipped when the agent routes prompts through the
+# pinentry dispatcher, which handles TTY routing on its own.
+_gpg_agent_conf="${GNUPGHOME:-$HOME/.gnupg}/gpg-agent.conf"
+if ! grep -q 'pinentry-program.*pinentry-dispatch' "$_gpg_agent_conf" 2>/dev/null; then
     gpg-connect-agent updatestartuptty /bye >/dev/null
 fi
