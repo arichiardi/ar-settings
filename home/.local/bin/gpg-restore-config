@@ -40,8 +40,6 @@ if [ ! -d "$src_dir" ]; then
     exit 1
 fi
 
-source $(readlink -e "$script_dir/helpers.sh")
-
 echo "Restoring config files"
 cp -iv "$src_dir/gpg.conf" "$gpg_homedir"
 cp -iv "$src_dir/gpg-agent.conf" "$gpg_homedir"
