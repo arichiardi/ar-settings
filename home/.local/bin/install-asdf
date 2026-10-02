@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# install-asdf.sh — Install asdf binary into ~/.local/bin (Termux / linux-arm64)
+set -euo pipefail
+
+VERSION="${1:-}"
+
+if [[ -z "$VERSION" ]]; then
+    echo "Usage: $0 <version>" >&2
+    echo "Example: $0 v0.20.2" >&2
+    exit 1
+fi
+
+# Normalize: strip leading 'v' if present for URL, keep for display
+TAG="${VERSION#v}"
+
+URL="https://github.com/asdf-vm/asdf/releases/download/v${TAG}/asdf-v${TAG}-linux-arm64.tar.gz"
+DEST="$HOME/.local/bin"
+TMP="$(mktemp -d)"
+
+trap 'rm -rf "$TMP"' EXIT
+
+echo "→ Downloading asdf v${TAG} (linux-arm64)…"
+curl -fSL --progress-bar -o "$TMP/asdf.tar.gz" "$URL"
+
+echo "→ Extracting…"
+tar xzf "$TMP/asdf.tar.gz" -C "$TMP"
+
+mkdir -p "$DEST"
+mv "$TMP/asdf" "$DEST/asdf"
+chmod +x "$DEST/asdf"
+
+echo "✓ Installed asdf to $DEST/asdf"
+asdf --version
