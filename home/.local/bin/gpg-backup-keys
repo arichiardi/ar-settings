@@ -5,11 +5,14 @@ do_usage() {
     echo -n
     echo "Usage:"
     echo "$script_name [--homedir <GnuPG home dir>] -i|--identity <gpg email> -d|--dest <destination dir>"
+    exit "${1:-0}"
 }
 
 set +e
 TEMP=`getopt -o hd:i: --long help,homedir:,dest:,identity: -n "$script_name" -- "$@"`
+getopt_rc=$?
 set -e
+[ "$getopt_rc" -eq 0 ] || do_usage 1
 eval set -- "$TEMP"
 
 gpg_homedir=
@@ -22,24 +25,21 @@ while true ; do
         -d|--dest) dest_dir="$2" ; shift 2 ;;
         -i|--identity) gpg_identity="$2" ; shift 2 ;;
         --homedir) gpg_homedir="$2" ; shift 2 ;;
-        -h|--help) shift ; do_usage ; break ;;
+        -h|--help) do_usage 0 ;;
         --) shift ; break ;;
-        :) echo "Error: -${OPTARG} requires an argument." ; do_usage ;;
-        *) do_usage ; exit 1 ;;
+        *) do_usage 1 ;;
     esac
 done
 
 if [ -z "$gpg_identity" ]; then
     echo "The GPG identity is required."
-    do_usage
-    exit 1
+    do_usage 1
 fi
 
 dest_dir=$(readlink -m "${dest_dir:=.}")
 if [ ! -d "$dest_dir" ]; then
     echo "Destination $dest_dir not found."
-    do_usage
-    exit 1
+    do_usage 1
 fi
 
 gpg_args=""

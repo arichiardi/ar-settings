@@ -10,19 +10,20 @@ do_usage() {
     echo
     echo "Usage:"
     echo " -p|--primary <xrandr id> -l|left <xrandr id> -r|--right <xrandr id>"
-    exit 1
+    exit "${1:-0}"
 }
 
 do_error() {
   echo $1
   echo
-  do_usage
-  exit 1
+  do_usage 1
 }
 
 set +e
 TEMP=`getopt -o hp:r:l: --long help,primary:,left:,right: -n 'primary-between-displays.sh' -- "$@"`
+getopt_rc=$?
 set -e
+[ "$getopt_rc" -eq 0 ] || do_usage 1
 eval set -- "$TEMP"
 
 primary_id=
@@ -34,9 +35,9 @@ while true ; do
         -p|--primary) primary_id="$2" ; shift 2 ;;
         -r|--right) right_id="$2" ; shift 2 ;;
         -l|--left) left_id="$2" ; shift 2 ;;
-        -h|--help) shift ; do_usage ; break ;;
+        -h|--help) do_usage 0 ;;
         --) shift ; break ;;
-        *) do_usage ; exit 1 ;;
+        *) do_usage 1 ;;
     esac
 done
 

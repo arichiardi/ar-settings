@@ -6,11 +6,14 @@ do_usage() {
     echo -n
     echo "Usage:"
     echo "$script_name [--homedir *GPG home dir*] [-s|--secret] [-l|--label *file label*] -d|--dest *destination folder*"
+    exit "${1:-0}"
 }
 
 set +e
 TEMP=`getopt -o hsd:l: --long help,homedir:,secret,no-overwrite,dest:,label: -n "$script_name" -- "$@"`
+getopt_rc=$?
 set -e
+[ "$getopt_rc" -eq 0 ] || do_usage 1
 eval set -- "$TEMP"
 
 gpg_homedir=${GNUPGHOME:=$HOME/.gnupg}
@@ -27,31 +30,27 @@ while true ; do
         --no-overwrite) no_overwrite=true ; shift ;;
         -l|--label) dest_label="$2"; shift 2 ;;
         -d|--dest) dest_dir="$2" ; shift 2 ;;
-        -h|--help) shift ; do_usage ; break ;;
+        -h|--help) do_usage 0 ;;
         --) shift ; break ;;
-        :) echo "Error: -${OPTARG} requires an argument." ; do_usage ; exit 2 ;;
-        *) do_usage ; exit 1 ;;
+        *) do_usage 1 ;;
     esac
 done
 
 if [ -z "$dest_dir" ] ; then
     echo "Destination (-d|--dest) is required."
-    do_usage
-    exit 1
+    do_usage 1
 fi
 
 dest_dir=$(readlink -e "$dest_dir")
 if [ ! -d "$dest_dir" ] ; then
     echo "Destination $dest_dir not found."
-    do_usage
-    exit 1
+    do_usage 1
 fi
 
 gpg_homedir=$(readlink -e "$gpg_homedir")
 if [ ! -d "$gpg_homedir" ]; then
     echo "GPG home dir $gpg_homedir not found."
-    do_usage
-    exit 1
+    do_usage 1
 fi
 
 dest_name=gnupg
