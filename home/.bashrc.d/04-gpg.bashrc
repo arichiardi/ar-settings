@@ -3,8 +3,8 @@
 # https://superuser.com/a/1407685
 #
 # GPG_TTY is still useful for pinentry-curses and pinentry-tty.
-# The updatestartuptty command is skipped when using a pinentry dispatcher
-# (see /usr/local/bin/pinentry-dispatch) to avoid overriding its routing logic.
+# The updatestartuptty command is skipped when using the pinentry-dispatch
+# script to avoid overriding its routing logic.
 
 export GPG_TTY=$(tty)
 
