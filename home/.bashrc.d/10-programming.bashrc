@@ -2,7 +2,11 @@
 alias commit-ts='function commit-ts-fn { local datetime=$(date --iso-8601=second); local submodule_message="Commit on $datetime"; git add . ; git commit -m "$submodule_message"; }; commit-ts-fn'
 
 # Git
-alias g='hub'
+if command -v hub >/dev/null 2>&1; then
+    alias g='hub'
+else
+    alias g='git'
+fi
 alias gitalias="git config --get-regexp ^alias\." # from http://stackoverflow.com/questions/7066325/how-to-list-show-git-aliases
 
 # Maven
