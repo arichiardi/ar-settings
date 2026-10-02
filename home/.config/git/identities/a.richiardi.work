@@ -1,0 +1,9 @@
+[user]
+    email = a.richiardi.work@gmail.com
+    name = Andrea Richiardi
+    signingkey = 3D0E9F0881052A48
+[sendemail]
+    smtpserver = smtp.googlemail.com
+    smtpencryption = tls
+    smtpserverport = 587
+    smtpuser = a.richiardi.work@gmail.com
