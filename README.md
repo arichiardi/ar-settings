@@ -13,8 +13,6 @@ either be Ubuntu or Manjaro.
 
 #### Packages
 
-#### Packages
-
 For `Arch Linux`, the following dependencies are probably already installed and the bootstrap scripts will install the rest:
 
 ```shell
@@ -31,17 +29,19 @@ sudo pacman -S --needed git gnupg base-devel && git clone https://aur.archlinux.
 
 ```shell
 mkdir ~/.gnupg && chmod 700 ~/.gnupg
-
-echo 'pinentry-program /usr/bin/pinentry-tty' >> ~/.gnupg/gpg-agent.conf
-gpgconf --kill gpg-agent
 ```
 
 To route prompts to the right pinentry backend (Emacs, terminal, or
-graphical), point the agent at the dispatcher instead:
+graphical), copy the dispatcher to a directory on `PATH`:
 
 ```shell
 cp usr/local/bin/pinentry-dispatch /usr/local/bin/
-echo 'pinentry-program /usr/local/bin/pinentry-dispatch' > ~/.gnupg/gpg-agent.conf
+```
+
+Then set `pinentry-program` to that path in `~/.gnupg/gpg-agent.conf` by
+hand and reload the agent:
+
+```shell
 gpgconf --kill gpg-agent
 ```
 
