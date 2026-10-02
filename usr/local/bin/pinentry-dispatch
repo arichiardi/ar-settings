@@ -13,9 +13,9 @@
 #   PINENTRY_USER_DATA=qt      -> pinentry-qt
 #
 # No hint: use the tty pinentry by default so ssh sessions work without
-# a local desktop. A graphical pinentry is used only when a display is
-# explicitly available: pinentry-mac when installed, else pinentry-gtk
-# when DISPLAY or WAYLAND_DISPLAY is set.
+# a local desktop. Use pinentry-gtk only when DISPLAY or WAYLAND_DISPLAY
+# is set. macOS users must set PINENTRY_USER_DATA=mac for the native
+# dialog; the dispatcher does not guess.
 #
 # NOTE: pinentry-emacs only works while an Emacs with pinentry mode is
 # running; if the hint is set but the program fails, the user must retry
@@ -25,38 +25,46 @@
 # visible. gpg-agent runs with stderr on the tty that started it.
 _dispatch_log () { printf 'pinentry-dispatch: %s\n' "$*" >&2; }
 
+# Replace this process with backend $1. Abort when it is missing.
+# Remaining arguments go to the backend.
+_exec_backend () {
+    _name=$1
+    shift
+    _bin=$(command -v "$_name" 2>/dev/null)
+    if [ -z "$_bin" ]; then
+        _dispatch_log "fatal: backend not found: $_name"
+        exit 1
+    fi
+    exec "$_bin" "$@"
+}
+
 case "${PINENTRY_USER_DATA:-}" in
     emacs)
-        exec /usr/bin/pinentry-emacs "$@"
+        _dispatch_log "hint=emacs"
+        _exec_backend pinentry-emacs "$@"
         ;;
     curses)
-        exec /usr/bin/pinentry-curses "$@"
+        _dispatch_log "hint=curses"
+        _exec_backend pinentry-curses "$@"
         ;;
     gtk)
         _dispatch_log "hint=gtk DISPLAY=${DISPLAY:-} WAYLAND=${WAYLAND_DISPLAY:-}"
-        exec /usr/bin/pinentry-gtk "$@"
+        _exec_backend pinentry-gtk "$@"
         ;;
     mac)
-        if [ -x /opt/homebrew/bin/pinentry-mac ]; then
-            _dispatch_log "hint=mac backend=pinentry-mac"
-            exec /opt/homebrew/bin/pinentry-mac "$@"
-        fi
-        _dispatch_log "hint=mac but pinentry-mac not found, falling back to tty"
-        exec /usr/bin/pinentry-tty "$@"
+        _dispatch_log "hint=mac"
+        _exec_backend pinentry-mac "$@"
         ;;
     qt)
-        exec /usr/bin/pinentry-qt "$@"
+        _dispatch_log "hint=qt"
+        _exec_backend pinentry-qt "$@"
         ;;
     *)
-        if [ -x /opt/homebrew/bin/pinentry-mac ]; then
-            _dispatch_log "no hint, backend=pinentry-mac"
-            exec /opt/homebrew/bin/pinentry-mac "$@"
-        fi
         if [ -n "${DISPLAY:-}" ] || [ -n "${WAYLAND_DISPLAY:-}" ]; then
             _dispatch_log "no hint, display available DISPLAY=${DISPLAY:-} WAYLAND=${WAYLAND_DISPLAY:-}"
-            exec /usr/bin/pinentry-gtk "$@"
+            _exec_backend pinentry-gtk "$@"
         fi
         _dispatch_log "no hint and no display, using tty"
-        exec /usr/bin/pinentry-tty "$@"
+        _exec_backend pinentry-tty "$@"
         ;;
 esac
