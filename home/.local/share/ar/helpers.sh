@@ -259,9 +259,9 @@ source_with_bench() {
 # Echo a PINENTRY_USER_DATA prefix for commands that run in a TUI on the
 # desktop, so gpg passphrase prompts use a graphical pinentry. macOS gets
 # the native pinentry-mac, everything else the GTK pinentry. Emits nothing
-# when the dispatcher that honours the variable is not installed.
+# when the dispatcher that honours the variable is not on PATH.
 pinentry_hint () {
-    [[ -x /usr/local/bin/pinentry-dispatch ]] || return 0
+    command -v pinentry-dispatch >/dev/null 2>&1 || return 0
     if is_os darwin; then echo 'PINENTRY_USER_DATA=mac '; else echo 'PINENTRY_USER_DATA=gtk '; fi
 }
 
