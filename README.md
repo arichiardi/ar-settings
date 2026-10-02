@@ -45,6 +45,30 @@ hand and reload the agent:
 gpgconf --kill gpg-agent
 ```
 
+The dispatcher routes a prompt by the `PINENTRY_USER_DATA` hint:
+
+| Hint | Backend |
+| --- | --- |
+| `emacs` | `pinentry-emacs` |
+| `curses` | `pinentry-curses` |
+| `gtk` | `pinentry-gtk` |
+| `mac` | `pinentry-mac` |
+| `qt` | `pinentry-qt` |
+
+The backend must be on `PATH`. A missing backend stops the prompt with an
+error. With no hint, the dispatcher uses `pinentry-gtk` when `DISPLAY` or
+`WAYLAND_DISPLAY` is set, else `pinentry-tty`.
+
+macOS users must set the hint to get the native dialog:
+
+```shell
+export PINENTRY_USER_DATA=mac
+```
+
+The process that invokes `gpg` reads this variable, not the agent. The
+export covers terminal use. Set it in the environment of each GUI app
+(Emacs.app, IntelliJ, and others) that must show the dialog.
+
 ### Running
 
 ```shell
