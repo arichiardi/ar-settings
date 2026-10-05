@@ -92,7 +92,7 @@ if [[ -d "$HOME/.gnupg" ]]; then
     _gnupg_setup=true
     for path in "$HOME/.gnupg/pubring.kbx" "$HOME/.gnupg/trustdb.gpg" \
                 "$HOME/.gnupg/gpg.conf" "$HOME/.gnupg/gpg-agent.conf" \
-                "$HOME/.gnupg/private-keys-v1.d"; do
+                "$HOME/.gnupg/common.conf" "$HOME/.gnupg/private-keys-v1.d"; do
         if [[ -e "$path" ]]; then
             bwrap_args+=( --ro-bind "$path" "$path" )
         fi
