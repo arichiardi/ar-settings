@@ -112,6 +112,24 @@ git clone git@github.com:arichiardi/emacs.d.git emacs
 
 Then follow the instructions in the [README](https://github.com/arichiardi/emacs.d/blob/master/README.md).
 
+## WezTerm
+
+The WezTerm config lives in `home/.config/wezterm/wezterm.lua` (moved from
+the old `home/.wezterm.lua` location).
+
+On Arch Linux, the config needs these fonts installed:
+
+```shell
+yay -S ttf-jetbrains-mono-nerd noto-fonts-cjk noto-fonts-emoji
+```
+
+- `ttf-jetbrains-mono-nerd` — primary font (JetBrainsMono Nerd Font Mono)
+- `noto-fonts-cjk` — CJK glyph fallback (SC, JP, KR, TC)
+- `noto-fonts-emoji` — color emoji
+
+Optional extras: `ttf-nerd-fonts-symbols` and `ttf-nerd-fonts-symbols-common`
+for additional nerd icon glyphs.
+
 ## Secrets
 
 You should not know where we store the secrets but they are in this repo, as encrypted files.
