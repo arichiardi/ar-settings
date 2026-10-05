@@ -107,6 +107,14 @@
     (home-literal "/.gnupg/pubring.gpg.lock")
     (home-literal "/.gnupg/random_seed")
     (regex #"\.gnupg/\.#lk")
+
+    ;; dirmngr and keyboxd bind their own unix sockets on first use, and
+    ;; write their caches next to them. These paths hold public data only;
+    ;; private-keys-v1.d stays denied below.
+    (home-literal "/.gnupg/S.dirmngr")
+    (home-literal "/.gnupg/S.keyboxd")
+    (home-subpath "/.gnupg/crls.d")
+    (home-subpath "/.gnupg/public-keys.d")
 )
 
 (deny file-read* file-write*

@@ -99,7 +99,8 @@ if [[ -d "$gnupg_home" ]]; then
         fi
     done
     for socket in "$gnupg_home/S.gpg-agent" "$gnupg_home/S.gpg-agent.browser" \
-                  "$gnupg_home/S.gpg-agent.extra" "$gnupg_home/S.gpg-agent.ssh"; do
+                  "$gnupg_home/S.gpg-agent.extra" "$gnupg_home/S.gpg-agent.ssh" \
+                  "$gnupg_home/S.keyboxd" "$gnupg_home/S.dirmngr"; do
         if [[ -e "$socket" ]]; then
             bwrap_args+=( --bind "$socket" "$socket" )
         fi
