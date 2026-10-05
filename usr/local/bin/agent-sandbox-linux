@@ -87,18 +87,19 @@ for dir in $SANDBOX_AGENT_DIR_RO_WHITELIST; do
 done
 
 _gnupg_setup=false
-if [[ -d "$HOME/.gnupg" ]]; then
-    bwrap_args+=( --tmpfs "$HOME/.gnupg" )
+gnupg_home="${GNUPGHOME:-$HOME/.gnupg}"
+if [[ -d "$gnupg_home" ]]; then
+    bwrap_args+=( --tmpfs "$gnupg_home" )
     _gnupg_setup=true
-    for path in "$HOME/.gnupg/pubring.kbx" "$HOME/.gnupg/trustdb.gpg" \
-                "$HOME/.gnupg/gpg.conf" "$HOME/.gnupg/gpg-agent.conf" \
-                "$HOME/.gnupg/common.conf" "$HOME/.gnupg/private-keys-v1.d"; do
+    for path in "$gnupg_home/pubring.kbx" "$gnupg_home/trustdb.gpg" \
+                "$gnupg_home/gpg.conf" "$gnupg_home/gpg-agent.conf" \
+                "$gnupg_home/common.conf" "$gnupg_home/private-keys-v1.d"; do
         if [[ -e "$path" ]]; then
             bwrap_args+=( --ro-bind "$path" "$path" )
         fi
     done
-    for socket in "$HOME/.gnupg/S.gpg-agent" "$HOME/.gnupg/S.gpg-agent.browser" \
-                  "$HOME/.gnupg/S.gpg-agent.extra" "$HOME/.gnupg/S.gpg-agent.ssh"; do
+    for socket in "$gnupg_home/S.gpg-agent" "$gnupg_home/S.gpg-agent.browser" \
+                  "$gnupg_home/S.gpg-agent.extra" "$gnupg_home/S.gpg-agent.ssh"; do
         if [[ -e "$socket" ]]; then
             bwrap_args+=( --bind "$socket" "$socket" )
         fi
@@ -126,7 +127,7 @@ if [[ -d "$HOME/.ssh" ]]; then
     done
 fi
 
-for path in "$HOME/.gnupg/secring.gpg" "$HOME/.config/gh/hosts.yml"; do
+for path in "$gnupg_home/secring.gpg" "$HOME/.config/gh/hosts.yml"; do
     if [[ -d "$path" ]]; then
         bwrap_args+=( --tmpfs "$path" )
     elif [[ -f "$path" ]]; then
@@ -157,14 +158,14 @@ cmd=$1; shift
 
 if $_gnupg_setup && $_ssh_setup; then
     bwrap "${bwrap_args[@]}" -- /bin/bash -c '
-        chmod 700 "$HOME/.gnupg" "$HOME/.ssh"
+        chmod 700 "${GNUPGHOME:-$HOME/.gnupg}" "$HOME/.ssh"
         exec "$@"
     ' _ "$cmd" "$@" \
         11< <(printf '%s\n' "$_pw") \
         12< <(printf '%s\n' "$_gr")
 elif $_gnupg_setup; then
     bwrap "${bwrap_args[@]}" -- /bin/bash -c '
-        chmod 700 "$HOME/.gnupg"
+        chmod 700 "${GNUPGHOME:-$HOME/.gnupg}"
         exec "$@"
     ' _ "$cmd" "$@" \
         11< <(printf '%s\n' "$_pw") \
