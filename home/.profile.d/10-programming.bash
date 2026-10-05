@@ -41,6 +41,17 @@ export PI_CODING_AGENT_DIR=$HOME/.config/pi/agent
 export PI_CODING_AGENT_SESSION_DIR=$HOME/.pi/agent/sessions
 export PI_TELEMETRY=no
 
+# Route gpg passphrase prompts from pi to a graphical pinentry. Set the
+# hint only inside pi, and only when the dispatcher that honours it is on
+# PATH. macOS gets the native dialog; all other systems the GTK pinentry.
+if command -v pinentry-dispatch >/dev/null 2>&1 && in_pi; then
+    if is_os darwin; then
+        export PINENTRY_USER_DATA=mac
+    else
+        export PINENTRY_USER_DATA=gtk
+    fi
+fi
+
 # agent-safehouse
 export SAFEHOUSE_TRUST_WORKDIR_CONFIG=no
 

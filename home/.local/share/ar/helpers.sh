@@ -256,6 +256,24 @@ source_with_bench() {
   fi
 }
 
+# Return success when the current process runs under the Pi coding agent.
+# Pi exports PI_CODING_AGENT/AI_AGENT for its children; fall back to walking
+# the parent process chain, because a launcher that runs before Pi (like the
+# sandbox wrapper) cannot see those markers.
+in_pi () {
+    [ "${PI_CODING_AGENT:-}" = true ] && return 0
+    [ "${AI_AGENT:-}" = pi ] && return 0
+    local pid=$$ comm ppid
+    while [ "${pid:-1}" -gt 1 ]; do
+        comm=$(ps -o comm= -p "$pid" 2>/dev/null) || break
+        [ "$comm" = pi ] && return 0
+        ppid=$(ps -o ppid= -p "$pid" 2>/dev/null | tr -d ' ')
+        [ -n "$ppid" ] || break
+        pid=$ppid
+    done
+    return 1
+}
+
 # Echo a PINENTRY_USER_DATA prefix for commands that run in a TUI on the
 # desktop, so gpg passphrase prompts use a graphical pinentry. macOS gets
 # the native pinentry-mac, everything else the GTK pinentry. Emits nothing
