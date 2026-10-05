@@ -42,8 +42,13 @@ Then set `pinentry-program` to that path in `~/.gnupg/gpg-agent.conf` by
 hand and reload the agent:
 
 ```shell
-gpgconf --kill gpg-agent
+gpgconf --reload gpg-agent
 ```
+
+You must reload the agent after you change `pinentry-program` or the
+dispatcher. A running agent keeps the old setting, so the prompt keeps
+using the old backend until the reload. `gpgconf --kill gpg-agent` also
+works. It stops the agent, and the next `gpg` call starts it again.
 
 The dispatcher routes a prompt by the `PINENTRY_USER_DATA` hint:
 
