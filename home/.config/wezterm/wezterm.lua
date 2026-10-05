@@ -9,6 +9,11 @@ local config = {}
 
 config.font = wezterm.font_with_fallback {
   {family = 'JetBrainsMono Nerd Font Mono'},
+  -- CJK coverage (Simplified Chinese, Japanese, Korean, Traditional)
+  {family = 'Noto Sans CJK SC'},
+  {family = 'Noto Sans CJK JP'},
+  {family = 'Noto Sans CJK KR'},
+  {family = 'Noto Sans CJK TC'},
   "Noto Color Emoji"
 }
 config.font_size = 12
@@ -18,7 +23,6 @@ config.initial_rows = 30
 config.enable_tab_bar = false
 config.audible_bell = 'Disabled'
 
-config.color_scheme = 'tokyonight'
 config.visual_bell = {
   fade_in_duration_ms = 75,
   fade_out_duration_ms = 75,
@@ -105,35 +109,21 @@ config.colors = {
     "#54ced6",
     "#f8f8f8",
   },
- 
-  -- Quick‑select / hint overlay – use ColorSpec tables
-  quick_select_label_fg   = { Color = "#181818" },
-  quick_select_label_bg   = { Color = "#f4bf75" },
-  quick_select_match_fg   = { Color = "#181818" },
-  quick_select_match_bg   = { Color = "#ac4242" },
 
-  -- Tab‑bar styling
+  -- Tab-bar styling (valid subfields: background, active_tab,
+  -- active_tab_when_closing_tab, new_tab). No visible effect while
+  -- enable_tab_bar = false.
   tab_bar = {
     background = "#2d2d2d",
     active_tab = {
       bg_color = "#2d2d2d",
       fg_color = "#cccccc",
     },
-    inactive_tab = {
-      bg_color = "#2d2d2d",
-      fg_color = "#828482",
-    },
     new_tab = {
       bg_color = "#2d2d2d",
       fg_color = "#cccccc",
     },
-    new_tab_hover = {
-      bg_color = "#f4bf75",
-      fg_color = "#181818",
-    },
-  },  -- trailing comma required
+  },
 }
 
-
 return config
-
