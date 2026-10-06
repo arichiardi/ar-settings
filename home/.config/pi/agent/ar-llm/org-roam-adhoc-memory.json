@@ -1,0 +1,15 @@
+{
+  "roam-directory": "~/git/ar-org/zettelkasten/",
+  "gpg-encrypt-to": ["a.richiardi.work@gmail.com"],
+  "journal-directory": "journal",
+  "entry-nodes": ["Me"],
+  "entry-node-cap": 5,
+  "ambient-cap-chars": 10000,
+  "journal-recent-days": 7,
+  "journal-titles-only-days": 14,
+  "include-open-todos": true,
+  "debug": {
+    "log-file": "~/tmp/org-roam-adhoc-memory-debug.log",
+    "context-file": "~/tmp/org-roam-adhoc-memory-context.log"
+  }
+}
