@@ -6,8 +6,8 @@
   "hideThinkingBlock": true,
   "compaction": {
     "enabled": true,
-    "reserveTokens": 98304,
-    "keepRecentTokens": 32768
+    "reserveTokens": 32768,
+    "keepRecentTokens": 65536
   },
   "enabledModels": [
     "qwen3.*",

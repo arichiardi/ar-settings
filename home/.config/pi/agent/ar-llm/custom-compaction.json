@@ -5,35 +5,36 @@
     "user": "Summarize this conversation with clear sections covering:\n\n1. Main goals and objectives discussed\n2. Key decisions made and their rationale\n3. Important code changes, file modifications, or technical details\n4. Current state of any ongoing work\n5. Any blockers, issues, or open questions\n6. Next steps that were planned or suggested\n\nBe thorough but concise. This summary will replace the ENTIRE conversation history.\n\nFormat as structured markdown with clear sections.\n{previous_summary}<conversation>\n{conversation}\n</conversation>"
   },
   "providers": {
-    "alba-local": {
-      "model": "LFM2.5-VL",
-      "request-params": {
-        "chat_template_kwargs": {
-          "enable_thinking": false
-        }
-      },
-      "stream-options": {
-        "maxTokens": 32758,
-        "temperature": 0.5
-      }
-    },
     "github-copilot": {
       "model": "mai-code-1.1-flash"
     },
     "llama.cpp": {
-      "model": "LFM2.5-VL",
+      "model": "LFM2.5-VL-3B",
+      "max-output-tokens": 4096,
+      "stream-options": {
+        "temperature": 0.5
+      },
       "request-params": {
         "chat_template_kwargs": {
           "enable_thinking": false
         }
       },
-      "stream-options": {
-        "maxTokens": 32758,
-        "temperature": 0.5
+      "chunking": {
+        "context-window": 32768,
+        "safety-tokens": 512,
+        "overlap-messages": 0,
+        "max-depth": 4
       }
     },
     "openrouter": {
-      "model": "google/gemma-4-26b-a4b-it:free"
+      "model": "mistralai/mistral-nemo",
+      "max-output-tokens": 4096,
+      "chunking": {
+        "context-window": 131072,
+        "safety-tokens": 512,
+        "overlap-messages": 0,
+        "max-depth": 4
+      }
     }
   }
 }
