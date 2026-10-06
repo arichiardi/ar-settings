@@ -58,5 +58,5 @@ export SAFEHOUSE_TRUST_WORKDIR_CONFIG=no
 # pnpm
 if command -v pnpm >/dev/null 2>&1; then
     export PNPM_HOME="$HOME/.local/share/pnpm"
-    export PATH="$PNPM_HOME:$PATH"
+    export PATH="$PNPM_HOME/bin:$PATH"
 fi
