@@ -53,9 +53,9 @@ if command -v direnv >/dev/null 2>&1; then
   eval "$(direnv hook bash)"
 fi
 
-# mcp
+# mcp venv
 if [ -f "$HOME/.local/share/venv/mcp/bin/activate" ]; then
-    alias mcp-venv='source $HOME/.local/share/venv/mcp/bin/activate'
+    source "$HOME/.local/share/venv/mcp/bin/activate"
 fi
 
 # goose
@@ -68,8 +68,6 @@ if command -v goose >/dev/null 2>&1; then
 fi
 
 # pi
-# pinentry_hint prefixes PINENTRY_USER_DATA=gtk when the
-# dispatcher is installed, so gpg prompts from this TUI use a graphical pinentry.
 if command -v pi >/dev/null 2>&1; then
     if is_os darwin; then
         alias pi="$(pinentry_hint)agent-sandbox-macos pi"
