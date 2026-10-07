@@ -37,19 +37,19 @@ if [[ ! "$script_args" =~ "-nw" ]] && [[ ! "$script_args" =~ "-c" ]] && [[ ! "$s
 fi
 
 is_running=false
-if `is_os linux`; then
+if is_os linux; then
     running_count=$(pgrep --exact --count emacs)
     is_running=`test "$running_count" -gt 0 && echo true || echo false`
-elif `is_os darwin`; then
+elif is_os darwin; then
     running_count=$(pgrep -x Emacs | uniq | wc -l)
     is_running=`test "$running_count" -gt 0 && echo true || echo false`
 fi
 
 if [[ "$is_running" == "false" ]]; then
-    if `is_os linux`; then
+    if is_os linux; then
         emacs_icon=$HOME/.icons/emacs.svg
         notify-send -i "$emacs_icon" -u normal -h "int:transient:1" "Emacs Server" "Starting, please wait."
-    elif `is_os darwin`; then
+    elif is_os darwin; then
         if command -v terminal-notifier &>/dev/null; then
             terminal-notifier -message "Starting, please wait." -title "Emacs Server" -sender "org.gnu.Emacs"
         else
@@ -62,7 +62,7 @@ echo "is_running=$is_running"
 echo "script_args=$script_args"
 echo "emacs_params=${emacs_params[*]}"
 
-if `is_os darwin`; then
+if is_os darwin; then
     # Forcing profile sourcing because it does not seem to happen on macos
     # temporarily disable -u to tolerate unbound vars in .profile
     source $HOME/.profile
