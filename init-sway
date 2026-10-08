@@ -30,7 +30,7 @@ wlroots_pkg=$(pkg_run -q -m "$pkg_mgr_base" -Si sway 2> /dev/null \
 # Xwayland backend and gets tiled as a normal window by sway.
 sway_packages=(sway swaybg swayidle waybar wlogout \
                swaylock-effects \
-               grim slur brightnessctl \
+               grim slur brightnessctl wl-clipboard \
                dunst rofi foot conky wlr-protocols pcmanfm-gtk3 flameshot wev \
                xdg-desktop-portal-gtk \
                keepassxc accountsservice \
