@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.84.4",
+  "lastChangelogVersion": "1.1.0",
   "defaultProvider": "github-copilot",
   "defaultModel": "gpt-5.6-luna",
   "defaultThinkingLevel": "low",
@@ -11,18 +11,20 @@
     "keepRecentTokens": 65536
   },
   "enabledModels": [
-    "qwen3.*",
+    "claude-opus-*",
+    "claude-sonnet-*",
+    "deepseek/deepseek-v4.1-*",
+    "google/gemma-4*",
+    "gpt*",
+    "liquid/*",
+    "LFM2.5*",
+    "kimi-k3",
+    "mai-code-1.1*",
+    "poolside/laguna-*",
     "qwen/qwen3.*-122b*",
     "qwen/qwen3.*-27b*",
     "qwen/qwen3.8*",
-    "claude-sonnet-*",
-    "claude-opus-*",
-    "google/gemma-4*",
-    "gpt*",
-    "mai-code-1.1*",
-    "poolside/laguna-*",
-    "kimi-k3",
-    "nemotron*"
+    "qwen3.*"
   ],
   "packages": [
     "npm:pi-subagents",
@@ -32,7 +34,8 @@
     "npm:pi-rewind",
     "npm:@ar-llm/pi-dir-providers",
     "npm:@ar-llm/pi-plan-mode",
-    "npm:@ar-llm/pi-skill-request-params"
+    "npm:@ar-llm/pi-handoff",
+    "npm:pi-token-speed"
   ],
   "subagents": {
     "agentOverridesByProvider": {
@@ -46,7 +49,8 @@
           "thinking": "medium"
         },
         "reviewer": {
-          "model": "github-copilot/gpt-5.6-luna"
+          "model": "github-copilot/gpt-5.6-luna",
+          "thinking": "high"
         },
         "worker": {
           "model": "github-copilot/gpt-5.6-luna"
@@ -78,6 +82,30 @@
         },
         "scout": {
           "model": "poolside/laguna-s-2.1:free"
+        }
+      },
+      "llama.cpp": {
+        "oracle": {
+          "model": "Qwen3.8-27B-Swift-MTP",
+          "thinking": "xhigh"
+        },
+        "planner": {
+          "model": "Qwen3.8-27B-Swift-MTP",
+          "thinking": "xhigh"
+        },
+        "reviewer": {
+          "model": "Qwen3.8-27B-Swift-MTP",
+          "thinking": "medium"
+        },
+        "worker": {
+          "model": "Qwen3.8-27B-Swift-MTP",
+          "thinking": "low"
+        },
+        "explorer": {
+          "model": "LFM2.5-VL-3B"
+        },
+        "scout": {
+          "model": "LFM2.5-VL-3B"
         }
       }
     }
