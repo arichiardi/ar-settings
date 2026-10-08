@@ -13,9 +13,10 @@
 #   PINENTRY_USER_DATA=qt      -> pinentry-qt
 #
 # No hint: use the tty pinentry by default so ssh sessions work without
-# a local desktop. Use pinentry-gtk only when DISPLAY or WAYLAND_DISPLAY
-# is set. macOS users must set PINENTRY_USER_DATA=mac for the native
-# dialog; the dispatcher does not guess.
+# a local desktop. When a display is available, pick the GUI backend from
+# the session type: Wayland -> pinentry-gnome3, X11 -> pinentry-gtk. macOS
+# users must set PINENTRY_USER_DATA=mac for the native dialog; the
+# dispatcher does not guess.
 #
 # NOTE: pinentry-emacs only works while an Emacs with pinentry mode is
 # running; if the hint is set but the program fails, the user must retry
@@ -38,6 +39,19 @@ _exec_backend () {
     exec "$_bin" "$@"
 }
 
+_exec_gui_backend () {
+    if [ -n "${WAYLAND_DISPLAY:-}" ]; then
+        _dispatch_log "gui backend: wayland WAYLAND=${WAYLAND_DISPLAY}, using gnome3"
+        _exec_backend pinentry-gnome3 "$@"
+    elif [ -n "${DISPLAY:-}" ]; then
+        _dispatch_log "gui backend: x11 DISPLAY=${DISPLAY}, using gtk"
+        _exec_backend pinentry-gtk "$@"
+    else
+        _dispatch_log "gui backend: no display, using tty"
+        _exec_backend pinentry-tty "$@"
+    fi
+}
+
 case "${PINENTRY_USER_DATA:-}" in
     emacs)
         _dispatch_log "hint=emacs"
@@ -48,8 +62,8 @@ case "${PINENTRY_USER_DATA:-}" in
         _exec_backend pinentry-curses "$@"
         ;;
     gtk)
-        _dispatch_log "hint=gtk DISPLAY=${DISPLAY:-} WAYLAND=${WAYLAND_DISPLAY:-}"
-        _exec_backend pinentry-gtk "$@"
+        _dispatch_log "hint=gtk"
+        _exec_gui_backend "$@"
         ;;
     mac)
         _dispatch_log "hint=mac"
@@ -60,11 +74,6 @@ case "${PINENTRY_USER_DATA:-}" in
         _exec_backend pinentry-qt "$@"
         ;;
     *)
-        if [ -n "${DISPLAY:-}" ] || [ -n "${WAYLAND_DISPLAY:-}" ]; then
-            _dispatch_log "no hint, display available DISPLAY=${DISPLAY:-} WAYLAND=${WAYLAND_DISPLAY:-}"
-            _exec_backend pinentry-gtk "$@"
-        fi
-        _dispatch_log "no hint and no display, using tty"
-        _exec_backend pinentry-tty "$@"
+        _exec_gui_backend "$@"
         ;;
 esac
