@@ -7,8 +7,8 @@
   "tuiMode": "regular",
   "compaction": {
     "enabled": true,
-    "reserveTokens": 32768,
-    "keepRecentTokens": 65536
+    "reserveTokens": 98304,
+    "keepRecentTokens": 32768
   },
   "enabledModels": [
     "claude-opus-*",
@@ -26,6 +26,7 @@
     "qwen/qwen3.8*",
     "qwen3.*"
   ],
+  "theme": "dark",
   "packages": [
     "npm:pi-subagents",
     "npm:pi-intercom",
