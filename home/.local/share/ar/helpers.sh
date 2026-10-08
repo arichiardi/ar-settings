@@ -16,6 +16,14 @@ function echo_skip  { printf "\r${light_yellow} %s${no_color}\n" "$*"; }
 function echo_ok    { printf "\r${light_green} %s${no_color}\n" "$*"; }
 function echo_fail  { printf "\r${light_red} %s${no_color}\n" "$*"; }
 
+# Ask before touching system state. Skipped when non-interactive.
+function confirm {
+    [[ -t 0 ]] || return 0
+    echo_warn "$1"
+    read -r -p "Continue? [y/N] " ans
+    [[ "$ans" == "y" || "$ans" == "Y" ]]
+}
+
 function installing  { echo_info "Installing $1..."; }
 function installnote { echo_info "   $1"; }
 function skipping    { echo_skip "   already installed; skipping."; }

@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+#
+# Initialize the host for the agent sandbox (agent-sandbox-linux).
+#
+# The sandbox drops supplementary groups, so journal access is granted
+# with user-keyed ACLs (UID-based, survives the user namespace):
+#   - /var/log/journal : one-time setfacl (persistent disk)
+#   - /run/log/journal : tmpfiles.d ACL (tmpfs, re-applied at boot)
+#
+# Usage:
+#   sudo init-sandbox-linux            # grants access to SUDO_USER
+#   sudo USERS="kapitan alice" init-sandbox-linux
+#
+set -euo pipefail
+
+# Grant access to the invoking user, not root.
+if [[ $EUID -eq 0 && -n "${SUDO_USER:-}" ]]; then
+    USERS="${USERS:-$SUDO_USER}"
+else
+    USERS="${USERS:-$(id -un)}"
+fi
+
+source ./home/.local/share/ar/helpers.sh
+
+command -v setfacl >/dev/null 2>&1 || {
+    echo_fail "setfacl not found. Install the acl package."
+    exit 1
+}
+
+acl_spec=""        # access entries
+acl_def_spec=""    # default entries, inherited by new files
+for u in $USERS; do
+    acl_spec="${acl_spec:+${acl_spec},}u:${u}:rX"
+    acl_def_spec="${acl_def_spec:+${acl_def_spec},}d:u:${u}:rX"
+done
+
+echo_info "Granting journal read access to: $USERS"
+
+# Persistent journal: one-time ACL, default entry covers rotated files.
+if [[ -d /var/log/journal ]]; then
+    confirm "Will run:
+  setfacl -R -m  '$acl_spec' /var/log/journal
+  setfacl -R -d -m '$acl_spec' /var/log/journal" \
+        && {
+        # Some files may carry pre-existing malformed ACLs; report them
+        # instead of aborting the whole tree.
+        failed=0
+        setfacl -R -m "$acl_spec" /var/log/journal || failed=1
+        setfacl -R -d -m "$acl_spec" /var/log/journal || failed=1
+        if [[ $failed -eq 1 ]]; then
+            echo_warn "setfacl failed on some files (see above)"
+        else
+            echo_ok "ACL set on /var/log/journal"
+        fi
+    }
+else
+    echo_skip "/var/log/journal does not exist"
+fi
+
+# Runtime journal: tmpfs, needs re-application at every boot.
+if [[ -d /etc/tmpfiles.d ]]; then
+    jgroup=$(getent group systemd-journal >/dev/null && echo systemd-journal || echo root)
+
+    tmpfiles_conf=/etc/tmpfiles.d/agent-sandbox-journal.conf
+    # Column order: type, path, mode, user, group, age, argument.
+    # The a line takes the ACL spec in the argument column.
+    confirm "Will write $tmpfiles_conf:
+  d /run/log/journal 2755 root $jgroup - -
+  a+ /run/log/journal - - - - ${acl_spec},${acl_def_spec}" \
+        && {
+        cat >"$tmpfiles_conf" <<EOF
+# User read ACL for the volatile journal (agent sandbox).
+# Users: $USERS
+d /run/log/journal 2755 root $jgroup - -
+a+ /run/log/journal - - - - ${acl_spec},${acl_def_spec}
+EOF
+        echo_ok "wrote $tmpfiles_conf"
+
+        if systemd-tmpfiles --create "$tmpfiles_conf"; then
+            echo_ok "applied to /run/log/journal"
+        else
+            echo_warn "systemd-tmpfiles failed; will apply at next boot"
+        fi
+    }
+else
+    echo_skip "/etc/tmpfiles.d does not exist"
+fi
+
+echo_info "Verify with: getfacl /var/log/journal | grep -E 'user:'"
