@@ -4,6 +4,7 @@
   "defaultModel": "gpt-5.6-luna",
   "defaultThinkingLevel": "low",
   "hideThinkingBlock": true,
+  "fullscreenCopyOnSelect": true,
   "compaction": {
     "enabled": true,
     "reserveTokens": 32768,
