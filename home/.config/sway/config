@@ -11,7 +11,9 @@ default_floating_border normal
 # Hide borders
 hide_edge_borders none
 
+# Pinentry passphrase dialogs to floating layout.
 for_window [class="(?i)pinentry"] floating enable border normal
+for_window [app_id="gcr-prompter"] floating enable border normal
 for_window [window_type="dialog"] floating enable
 
 # change borders
