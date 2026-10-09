@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Wrapper for llama.cpp binaries installed to /opt/llama.cpp by llamacpp-build.
+# Fixes "cannot open shared object file" by adding the lib/ dir to
+# LD_LIBRARY_PATH.
+#
+# Usage: llamacpp-wrap <tool> [args...]
+#   llamacpp-wrap server --model model.gguf --port 8080
+#   llamacpp-wrap llama-server --model model.gguf --port 8080
+# The "llama-" prefix is optional. Unprefixed tools resolve as-is first
+# (covers rpc-server, ggml-rpc-server, llama).
+set -euo pipefail
+
+LLAMA_ROOT="/opt/llama.cpp"
+if [ $# -lt 1 ]; then
+    echo "usage: ${0##*/} <tool> [args...]" >&2
+    echo "tools:" >&2
+    ls "${LLAMA_ROOT}/bin" >&2
+    exit 2
+fi
+
+TOOL="$1"
+shift
+
+# Bare "llama" with no subcommand just prints its menu. Reject it.
+if [ "${TOOL}" = "llama" ] && [ $# -eq 0 ]; then
+    echo "usage: llamacpp-wrap llama <subcommand> [args...]" >&2
+    exit 2
+fi
+
+BIN="${LLAMA_ROOT}/bin/${TOOL}"
+if [ ! -x "${BIN}" ] && [ -x "${LLAMA_ROOT}/bin/llama-${TOOL}" ]; then
+    BIN="${LLAMA_ROOT}/bin/llama-${TOOL}"
+fi
+
+export LD_LIBRARY_PATH="${LLAMA_ROOT}/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+
+exec "${BIN}" "$@"
