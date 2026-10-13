@@ -71,7 +71,7 @@ cmd-2 = 'workspace --auto-back-and-forth 2'
 cmd-3 = 'workspace --auto-back-and-forth 3'
 cmd-4 = 'workspace --auto-back-and-forth 4'
 cmd-5 = 'workspace --auto-back-and-forth 5'
-cmd-6 = 'workspace --auto-back-and-forth 6'
+cmd-6 = 'workspace --auto-back-and-forth 💬'
 cmd-7 = 'workspace --auto-back-and-forth 7'
 cmd-8 = 'workspace --auto-back-and-forth 8'
 cmd-9 = 'workspace --auto-back-and-forth 9'
@@ -82,7 +82,7 @@ cmd-shift-2 = 'move-node-to-workspace 2'
 cmd-shift-3 = 'move-node-to-workspace 3'
 cmd-shift-4 = 'move-node-to-workspace 4'
 cmd-shift-5 = 'move-node-to-workspace 5'
-cmd-shift-6 = 'move-node-to-workspace 6'
+cmd-shift-6 = 'move-node-to-workspace 💬'
 cmd-shift-7 = 'move-node-to-workspace 7'
 cmd-shift-8 = 'move-node-to-workspace 8'
 cmd-shift-9 = 'move-node-to-workspace 9'
@@ -129,6 +129,14 @@ esc = 'mode main'
     check-further-callbacks = true
     run = 'layout tiling'
 
+[[on-window-detected]]
+       if = 'test %{app-bundle-id} = com.tinyspeck.slackmacgap'
+       run = 'move-node-to-workspace 💬'
+
+[[on-window-detected]]
+       if = 'test %{app-bundle-id} = com.microsoft.teams2'
+       run = 'move-node-to-workspace 💬'
+
 # Monitor sequence number from left to right. 1-based indexing
 [workspace-to-monitor-force-assignment]
     1 = ['main', '^built-in']
@@ -136,7 +144,7 @@ esc = 'mode main'
     3 = ['main', '^built-in']
     4 = ['main', '^built-in']
     5 = ['main', '^built-in']
-    6 = ['secondary', '^built-in', 'main']
+    "💬" = ['secondary', '^built-in', 'main']
     7 = ['secondary', '^built-in', 'main']
     8 = ['secondary', '^built-in', 'main']
     9 = ['secondary', '^built-in', 'main']
