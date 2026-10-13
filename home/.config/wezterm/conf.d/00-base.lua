@@ -24,6 +24,7 @@ return function(config)
   config.initial_rows = 30
   config.enable_tab_bar = false
   config.audible_bell = 'Disabled'
+  config.color_scheme = 'tokyonight'
 
   config.visual_bell = {
     fade_in_duration_ms = 75,
@@ -58,11 +59,6 @@ return function(config)
       { key = "U", mods = "CTRL|SHIFT", action = wezterm.action.DisableDefaultAssignment },
 
       { key = "Tab", mods = "CTRL", action = wezterm.action.DisableDefaultAssignment },
-
-      -- Workaround for WezTerm bug: DEL sends \x08 (backspace) instead of \x1b[3~
-      -- when enable_kitty_keyboard = true. Re-sending via SendKey fixes the encoding.
-      -- https://github.com/wezterm/wezterm/issues/4129
-      { key = 'Delete', mods = '', action = wezterm.action.SendKey { key = 'Delete' } },
   }
 
   config.colors = {
@@ -95,20 +91,11 @@ return function(config)
       "#f8f8f8",
     },
 
-    -- Tab-bar styling (valid subfields: background, active_tab,
-    -- active_tab_when_closing_tab, new_tab). No visible effect while
-    -- enable_tab_bar = false.
-    tab_bar = {
-      background = "#2d2d2d",
-      active_tab = {
-        bg_color = "#2d2d2d",
-        fg_color = "#cccccc",
-      },
-      new_tab = {
-        bg_color = "#2d2d2d",
-        fg_color = "#cccccc",
-      },
-    },
+    -- Quick-select / hint overlay
+    quick_select_label_fg   = { Color = "#181818" },
+    quick_select_label_bg   = { Color = "#f4bf75" },
+    quick_select_match_fg   = { Color = "#181818" },
+    quick_select_match_bg   = { Color = "#ac4242" },
   }
 
 end
