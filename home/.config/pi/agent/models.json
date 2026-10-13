@@ -62,6 +62,121 @@
           }
         }
       ]
+    },
+    "llama.cpp": {
+      "models": [
+        {
+          "id": "Qwen3.8-27B",
+          "name": "Qwen3.8-27B",
+          "api": "openai-completions",
+          "baseUrl": "http://192.168.52.252:10434/v1",
+          "reasoning": true,
+          "thinkingLevelMap": {
+            "off": "off",
+            "minimal": null,
+            "low": "low",
+            "medium": "medium",
+            "high": null,
+            "xhigh": "xhigh"
+          },
+          "input": ["text", "image"],
+          "contextWindow": 250000,
+          "maxTokens": 250000,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0
+          },
+          "compat": {
+            "supportsStore": false,
+            "supportsDeveloperRole": false,
+            "supportsReasoningEffort": false,
+            "supportsUsageInStreaming": true,
+            "supportsStrictMode": false,
+            "maxTokensField": "max_tokens",
+            "thinkingFormat": "chat-template",
+            "chatTemplateKwargs": {
+              "enable_thinking": { "$var": "thinking.enabled" },
+              "preserve_thinking": true
+            }
+          }
+        },
+        {
+          "id": "Qwen3.8-27B-Swift",
+          "name": "Qwen3.8-27B-Swift",
+          "api": "openai-completions",
+          "baseUrl": "http://192.168.52.252:10434/v1",
+          "reasoning": true,
+          "thinkingLevelMap": {
+            "off": "off",
+            "minimal": null,
+            "low": "low",
+            "medium": "medium",
+            "high": null,
+            "xhigh": "xhigh"
+          },
+          "input": ["text", "image"],
+          "contextWindow": 262144,
+          "maxTokens": 262144,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0
+          },
+          "compat": {
+            "supportsStore": false,
+            "supportsDeveloperRole": false,
+            "supportsReasoningEffort": false,
+            "supportsUsageInStreaming": true,
+            "supportsStrictMode": false,
+            "maxTokensField": "max_tokens",
+            "thinkingFormat": "chat-template",
+            "chatTemplateKwargs": {
+              "enable_thinking": { "$var": "thinking.enabled" },
+              "preserve_thinking": true
+            }
+          }
+        },
+        {
+          "id": "Qwen3.8-27B-Swift-MTP",
+          "name": "Qwen3.8-27B-Swift-MTP",
+          "api": "openai-completions",
+          "baseUrl": "http://192.168.52.252:10434/v1",
+          "reasoning": true,
+          "thinkingLevelMap": {
+            "off": "off",
+            "minimal": null,
+            "low": "low",
+            "medium": "medium",
+            "high": null,
+            "xhigh": "xhigh"
+          },
+          "input": ["text", "image"],
+          "contextWindow": 200192,
+          "maxTokens": 200192,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0
+          },
+          "compat": {
+            "supportsStore": false,
+            "supportsDeveloperRole": false,
+            "supportsReasoningEffort": false,
+            "supportsUsageInStreaming": true,
+            "supportsStrictMode": false,
+            "maxTokensField": "max_tokens",
+            "thinkingFormat": "chat-template",
+            "chatTemplateKwargs": {
+              "enable_thinking": { "$var": "thinking.enabled" },
+              "preserve_thinking": true
+            }
+          }
+        }
+      ]
     }
   }
 }
