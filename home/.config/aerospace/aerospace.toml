@@ -75,7 +75,7 @@ cmd-6 = 'workspace --auto-back-and-forth 💬'
 cmd-7 = 'workspace --auto-back-and-forth 7'
 cmd-8 = 'workspace --auto-back-and-forth 8'
 cmd-9 = 'workspace --auto-back-and-forth 9'
-cmd-0 = 'workspace --auto-back-and-forth 10'
+cmd-0 = 'workspace --auto-back-and-forth ⚙️'
 
 cmd-shift-1 = 'move-node-to-workspace 1'
 cmd-shift-2 = 'move-node-to-workspace 2'
@@ -86,7 +86,7 @@ cmd-shift-6 = 'move-node-to-workspace 💬'
 cmd-shift-7 = 'move-node-to-workspace 7'
 cmd-shift-8 = 'move-node-to-workspace 8'
 cmd-shift-9 = 'move-node-to-workspace 9'
-cmd-shift-0 = 'move-node-to-workspace 10'
+cmd-shift-0 = 'move-node-to-workspace ⚙️'
 
 cmd-shift-c = 'reload-config'
 
@@ -107,6 +107,12 @@ down = 'resize height -50'
 left = 'resize width +50'
 enter = 'mode main'
 esc = 'mode main'
+
+# Windows that label their title with the gear emoji belong to the services
+# workspace. Keep this rule first so it wins over the app-based routing below.
+[[on-window-detected]]
+    if = 'test %{window-title} = ⚙️'
+    run = 'move-node-to-workspace ⚙️'
 
 # Pinentry dialogs must stay out of the tiling layout, so they float and
 # stay centered on top of the calling terminal.
@@ -148,4 +154,4 @@ esc = 'mode main'
     7 = ['secondary', '^built-in', 'main']
     8 = ['secondary', '^built-in', 'main']
     9 = ['secondary', '^built-in', 'main']
-   10 = ['secondary', '^built-in', 'main']
+    "⚙️" = ['secondary', '^built-in', 'main']
