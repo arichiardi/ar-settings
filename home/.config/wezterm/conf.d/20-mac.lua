@@ -13,25 +13,7 @@ return function(config)
     'Noto Color Emoji',
   }
   config.font_size = 16
-
-  config.color_scheme = 'tokyonight'
   config.scrollback_lines = 65536
-
-  config.colors = config.colors or {}
-  config.colors.quick_select_label_fg = { Color = '#181818' }
-  config.colors.quick_select_label_bg = { Color = '#f4bf75' }
-  config.colors.quick_select_match_fg = { Color = '#181818' }
-  config.colors.quick_select_match_bg = { Color = '#ac4242' }
-
-  config.colors.tab_bar = config.colors.tab_bar or {}
-  config.colors.tab_bar.inactive_tab = {
-    bg_color = '#2d2d2d',
-    fg_color = '#828482',
-  }
-  config.colors.tab_bar.new_tab_hover = {
-    bg_color = '#f4bf75',
-    fg_color = '#181818',
-  }
 
   config.keys = config.keys or {}
   local mac_keys = {
