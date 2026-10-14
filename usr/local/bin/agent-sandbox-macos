@@ -3,14 +3,16 @@
 # Requires safehouse.
 #
 # Env vars:
-#   SANDBOX_AGENT_ENV_WHITELIST  - space-delimited list of env var names passed into the sandbox.
-#   SANDBOX_AGENT_DIR_RW_WHITELIST - space-delimited list of host directories allowed RW access.
+#   SANDBOX_AGENT_ENV_WHITELIST    - space-delimited list of env var names passed into the sandbox.
+#   SANDBOX_AGENT_DIR_RW_WHITELIST - space-delimited list of host paths (files or dirs) allowed RW access.
+#   SANDBOX_AGENT_DIR_RO_WHITELIST - space-delimited list of host paths (files or dirs) allowed RO access.
 #
 set -euo pipefail
 
 # Read from environment, default to empty.
 SANDBOX_AGENT_ENV_WHITELIST="${SANDBOX_AGENT_ENV_WHITELIST:-}"
 SANDBOX_AGENT_DIR_RW_WHITELIST="${SANDBOX_AGENT_DIR_RW_WHITELIST:-}"
+SANDBOX_AGENT_DIR_RO_WHITELIST="${SANDBOX_AGENT_DIR_RO_WHITELIST:-}"
 
 echo_info() { echo "ℹ️  $*"; }
 echo_warn() { echo "⚠️ $*" >&2; }
@@ -30,13 +32,45 @@ init_agent_environment() {
     fi
 }
 
+# safehouse errors out on paths that do not exist, so drop missing entries
+# and warn. It also takes colon-separated lists, while the whitelists are
+# space-delimited, so replace the separator before use.
+existing_paths_colon_sep() {
+    local paths="$1" out="" path
+    for path in $paths; do
+        if [[ -e "$path" ]]; then
+            out="${out:+$out:}$path"
+        else
+            echo_warn "Path skipped (does not exist): $path"
+        fi
+    done
+    printf '%s' "$out"
+}
+
 safehouse_run() {
     echo_info "Sandbox env: $SANDBOX_AGENT_ENV_WHITELIST"
-    local safehouse_env_pass="$(echo $SANDBOX_AGENT_ENV_WHITELIST | tr ' ' ',')"
-    safehouse --enable=playwright-chrome \
-              --append-profile="$HOME/.config/agent-safehouse/agent-policy.sb" \
-              --env-pass="$safehouse_env_pass" \
-              "$@"
+    local safehouse_env_pass
+    safehouse_env_pass="$(echo $SANDBOX_AGENT_ENV_WHITELIST | tr ' ' ',')"
+
+    local -a args=(
+        --enable=playwright-chrome
+        --append-profile="$HOME/.config/agent-safehouse/agent-policy.sb"
+        --env-pass="$safehouse_env_pass"
+    )
+
+    local rw_dirs ro_dirs
+    rw_dirs="$(existing_paths_colon_sep "$SANDBOX_AGENT_DIR_RW_WHITELIST")"
+    ro_dirs="$(existing_paths_colon_sep "$SANDBOX_AGENT_DIR_RO_WHITELIST")"
+
+    if [[ -n "$rw_dirs" ]]; then
+        args+=(--add-dirs="$rw_dirs")
+    fi
+
+    if [[ -n "$ro_dirs" ]]; then
+        args+=(--add-dirs-ro="$ro_dirs")
+    fi
+
+    safehouse "${args[@]}" "$@"
 }
 
 init_agent_environment
