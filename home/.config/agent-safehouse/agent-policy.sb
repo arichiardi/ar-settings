@@ -201,9 +201,11 @@
 ;; Clojure
 (allow file-read* file-write*
   (home-subpath "/.babashka")
-  (home-subpath "/.clojure")
+  (home-subpath "/.cache/clojure")
+  (home-subpath "/.config/clojure")
   (home-subpath "/.deps.clj")
   (home-subpath "/.gitlibs")
+  (home-subpath "/.m2")
 )
     
 ;;
