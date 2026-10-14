@@ -6,6 +6,13 @@
 ;; ============================================================
 
 ;;
+;; Home-directory RW/RO grants live in home/.profile.d/07-sandbox.bash.
+;; agent-sandbox-macos passes those whitelists to safehouse with --add-dirs
+;; and --add-dirs-ro. Keep only macOS-only system rules, special-cased paths
+;; (GPG, SSH), and explicit denials here.
+;;
+
+;;
 ;; 00-base — deny-by-default baseline + HOME helper
 ;;
 
@@ -149,8 +156,6 @@
 ;; Allow non-sensitive SSH metadata that agents need for git/remote operations.
 (allow file-read*
     (home-literal "/.ssh")
-    (home-literal "/.ssh/known_hosts")                              ;; Host verification for GitHub/remote connections.
-    (home-literal "/.ssh/config")                                   ;; Custom host definitions used by git-ssh and scp.
     (home-subpath "/.ssh/config.d")                                 ;; Include-based SSH config fragments.
     (home-literal "/.ssh/allowed_signers")                          ;; SSH signature verification (git commit signing).
     (literal "/private/etc/ssh/ssh_config")                         ;; System SSH client config read during ssh/git-ssh connections.
@@ -160,7 +165,6 @@
 )
 
 (allow file-write*
-    (home-literal "/.ssh/known_hosts")     ;; Persist host keys on first connection.
     (home-literal "/.ssh/known_hosts.old") ;; Rotated during host key updates.
 )
 
@@ -198,50 +202,18 @@
     (subpath "/usr/local")
 )
 
-;; Clojure
-(allow file-read* file-write*
-  (home-subpath "/.babashka")
-  (home-subpath "/.cache/clojure")
-  (home-subpath "/.config/clojure")
-  (home-subpath "/.deps.clj")
-  (home-subpath "/.gitlibs")
-  (home-subpath "/.m2")
-)
-    
 ;;
-;; 60-workspace — project directories (read/write)
+;; 60-workspace — project directories (metadata)
 ;;
-
-(allow file-read* file-write*
-    (home-subpath "/git")
-    (home-subpath "/tmp"))
 
 (allow file-read-metadata
    (home-subpath "/Library"))
-
-;;
-;; 80-binaries
-;;
-
-(allow file-read* file-write*
-    (home-prefix  "/.local/bin/aadawscli")
-    (home-prefix  "/.local/bin/clj-nrepl-eval")
-    (home-subpath "/.local/bin/clj-paren-repair")
-    (home-prefix  "/.local/bin/cljfmt"))
 
 ;;
 ;; 85-apps
 ;;
 (allow file-read* file-write*
     (home-prefix  "/Library/Application Support/bruno"))
-
-;;
-;; 88-llm
-;;
-
-(allow file-read* file-write*
-    (home-subpath "/.config/pi")
-    (home-subpath "/.config/goose"))
 
 ;;
 ;; 90-explicit-denials — sensitive paths
