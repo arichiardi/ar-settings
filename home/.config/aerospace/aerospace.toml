@@ -111,7 +111,7 @@ esc = 'mode main'
 # Windows that label their title with the gear emoji belong to the services
 # workspace. Keep this rule first so it wins over the app-based routing below.
 [[on-window-detected]]
-    if = 'test %{window-title} = ⚙️'
+    if = 'test %{window-title} ~= ^⚙️'
     run = 'move-node-to-workspace ⚙️'
 
 # Pinentry dialogs must stay out of the tiling layout, so they float and
