@@ -1,73 +1,177 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
-# Opens a file in Emacs using emacsclient, starting the daemon if needed.
-#
-# emacsclient -a "" auto-starts the daemon if not running, inheriting
-# the calling process's window server session — no need for `open -a Emacs`.
+# Opens a file in Emacs via emacsclient, starting the daemon if needed.
+# Cold daemons start detached (nohup); init output goes to a log dir
+# under $TMPDIR (default /tmp), shown on the terminal and in the frame's
+# *messages* buffer with the socket path.
 #
 # Usage: emacsclient-daemon [emacsclient options] [file...]
-set -o pipefail
+set -euo pipefail
+script_name="$(basename "${0}")"
+emacsclient_bin="$(command -v emacsclient)"
 
-# log files — set up first so all errors are captured from the start
-if [[ -n "${EMACS_LOG_DIR:-}" ]]; then
-    emacs_log_out="${EMACS_LOG_DIR}/out.log"
-    emacs_log_err="${EMACS_LOG_DIR}/err.log"
-else
-    emacs_log_dir=$(mktemp -d -t emacs.XXXXXX 2>/tmp/emacsclient-daemon-bootstrap.err || echo /tmp)
-    emacs_log_out="${emacs_log_dir}/out.log"
-    emacs_log_err="${emacs_log_dir}/err.log"
+script_args="$*"
+
+# Logs live in $TMPDIR (default /tmp); set TMPDIR to move them.
+log_root="${TMPDIR:-/tmp}"
+log_root="${log_root%/}"
+
+# Tty frames need the real terminal on stdin/out/err (emacsclient relays
+# the TUI through its own fds); no output redirects on that path.
+want_tty=false
+want_gui=false
+for arg in $script_args; do
+    case "$arg" in
+        -nw|-t|--tty|--no-window-system) want_tty=true ;;
+        -c|--create-frame) want_gui=true ;;
+    esac
+done
+
+# No display: degrade -c to a tty frame so headless sessions get a daemon
+# frame instead of the -a fallback spawning a fresh emacs.
+degraded=false
+if $want_gui && [[ -z "${DISPLAY:-}" ]]; then
+    want_tty=true
+    degraded=true
 fi
+
+# Cold-start notice (non-tty path).
+notice_lines() {
+    printf 'logs: %s\n' "${daemon_log_dir:-$log_root/emacs-daemon.*}"
+    printf 'started daemon\n'
+    printf 'socket: %s\n' "${sock:-unknown}"
+}
+
+# Socket path of the running server (princ quotes; strip them).
+server_socket() {
+    local raw
+    raw="$("$emacsclient_bin" -a false --eval '(princ (if (stringp internal--daemon-sockname) internal--daemon-sockname (expand-file-name server-name server-socket-dir)))' 2>/dev/null)" || return 1
+    printf '%s\n' "${raw//\"/}"
+}
+
+# --socket: print the socket path and exit
+if [[ " $script_args " == *" --socket "* ]]; then
+    if socket_path="$(server_socket)"; then
+        echo "$socket_path"
+        if [[ -r "$log_root/emacs-daemon.logdir" ]]; then
+            echo "logs: $(cat "$log_root/emacs-daemon.logdir")"
+        fi
+        exit 0
+    fi
+    echo "emacsclient-daemon: no Emacs server running" >&2
+    exit 1
+fi
+
+# Opt-in tracing: EMACSCLIENT_DAEMON_TRACE=1 (tty: terminal, non-tty: err.log)
+if [[ -n "${EMACSCLIENT_DAEMON_TRACE:-}" ]]; then set -x; fi
+
+# emacsclient 31.1 (as tested) auto-starts a daemon when no server is
+# running, so every client call here passes -a false; only this function
+# starts daemons, detached, so init noise goes to its log dir and the
+# daemon outlives the session.
+# Returns 0 (already up), 1 (started), 2 (unreachable).
+ensure_daemon() {
+    "$emacsclient_bin" -a false --eval 't' >/dev/null 2>&1 && return 0
+    # Explicit $log_root: bare mktemp templates fall back to CWD.
+    daemon_log_dir="$(mktemp -d "$log_root/emacs-daemon.XXXXXX")"
+    # prune earlier cold-start log dirs
+    find "$log_root" -maxdepth 1 -type d -name 'emacs-daemon.*' \
+        ! -path "$daemon_log_dir" -exec rm -rf {} + 2>/dev/null || true
+    # pointer for later invocations
+    printf '%s\n' "$daemon_log_dir" > "$log_root/emacs-daemon.logdir"
+    nohup emacs --daemon </dev/null >>"$daemon_log_dir/daemon.log" 2>&1 &
+    # wait for the socket (config loading takes a few seconds)
+    local i
+    for i in $(seq 1 50); do
+        "$emacsclient_bin" -a false --eval 't' >/dev/null 2>&1 && return 1
+        sleep 0.2
+    done
+    return 2
+}
+
+if $want_tty; then
+    # Pre-set: `|| ens=$?` assigns only on failure; set -u needs this.
+    ens=0
+    ensure_daemon || ens=$?
+    if [[ $ens -eq 2 ]]; then
+        echo "emacsclient-daemon: could not reach an Emacs daemon" >&2
+        exit 1
+    fi
+    # Daemon log dir from the pointer; a missing dir means the daemon was
+    # replaced outside this wrapper.
+    log_dir="$(cat "$log_root/emacs-daemon.logdir" 2>/dev/null || true)"
+    [[ -d "$log_dir" ]] || log_dir=""
+    # Resolve once; a failure must not drop the line silently.
+    sock="$(server_socket)" || sock=unknown
+
+    # Per-frame terminal lines (persist in scrollback)
+    {
+        if [[ $ens -eq 1 ]]; then printf 'started daemon\n'; fi
+        printf 'logs: %s\n' "${log_dir:-unknown}"
+    } >&2
+
+    # Seed the frame's *messages* with the daemon's identity and init
+    # trace (survives the TUI taking over the screen).
+    payload="$( {
+        if [[ $ens -eq 1 ]]; then printf 'started daemon\n'; fi
+        printf 'logs: %s\n' "${log_dir:-unknown}"
+        printf 'socket: %s\n' "$sock"
+        # Cap the trace: one failed eval would drop the whole seed.
+        if [[ -n "$log_dir" && -r "$log_dir/daemon.log" ]]; then tail -n 200 "$log_dir/daemon.log"; fi
+    } | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' \
+        | awk 'NR > 1 { printf "\\n" } { printf "%s", $0 }')"
+    el="(let ((m (get-buffer-create \"*messages*\"))) (with-current-buffer m (let ((inhibit-read-only t)) (goto-char (point-max)) (insert \"\n${payload}\"))))"
+    "$emacsclient_bin" -a false --eval "$el" >/dev/null 2>&1 || true
+    # -c degrades to -nw (a headless daemon cannot serve -window-system).
+    # -a false: the daemon is guaranteed above; fail loudly on a race
+    # instead of letting the client spawn an untracked daemon.
+    tty_args=(-a false)
+    for arg in "$@"; do
+        if $degraded && [[ "$arg" == "-c" || "$arg" == "--create-frame" ]]; then
+            tty_args+=(-nw)
+        else
+            tty_args+=("$arg")
+        fi
+    done
+    exec "$emacsclient_bin" "${tty_args[@]}"
+fi
+
+# Non-tty requests: capture output in a throwaway log dir
+emacs_log_dir="$(mktemp -d "$log_root/${script_name}.XXXXXX")"
+emacs_log_out="$emacs_log_dir/out.log"
+emacs_log_err="$emacs_log_dir/err.log"
+trap 'rm -rf "$emacs_log_dir"' EXIT
+
+# keep the original terminal stderr for failure reports
+exec 3>&2
 
 exec 1>> "$emacs_log_out"
 exec 2>> "$emacs_log_err"
 
-echo "--- start $(date) ---"
-echo "script_args=$*"
+# Fallback to a fresh emacs when the daemon cannot serve a GUI frame
+emacs_params=(-a emacs)
 
-source $HOME/.local/share/ar/helpers.sh
-
-emacsclient_bin=$(which emacsclient)
-
-# -a "" tells emacsclient to start the daemon itself if no server is running
-emacs_params=(-a "")
-
-script_args="$*"
-if [[ ! "$script_args" =~ "-nw" ]] && [[ ! "$script_args" =~ "-c" ]] && [[ ! "$script_args" =~ "-f" ]]; then
-    emacs_params=(-c "${emacs_params[@]}")
+ens=0
+ensure_daemon || ens=$?
+if [[ $ens -eq 2 ]]; then
+    echo "emacsclient-daemon: could not reach an Emacs daemon" >&3
+    exit 1
+fi
+sock="$(server_socket)" || sock=unknown
+if [[ $ens -eq 1 ]]; then
+    notice_lines >&3
 fi
 
-is_running=false
-if is_os linux; then
-    running_count=$(pgrep --exact --count emacs)
-    is_running=`test "$running_count" -gt 0 && echo true || echo false`
-elif is_os darwin; then
-    running_count=$(pgrep -x Emacs | uniq | wc -l)
-    is_running=`test "$running_count" -gt 0 && echo true || echo false`
+"$emacsclient_bin" "${emacs_params[@]}" "$@"
+status=$?
+
+# Surface failures: show the last log lines, not a silent no-op
+if [[ $status -ne 0 ]]; then
+    {
+        echo "emacsclient-daemon: emacsclient failed (exit $status)"
+        echo "--- last lines of $emacs_log_err ---"
+        tail -n 10 "$emacs_log_err"
+    } >&3
 fi
 
-if [[ "$is_running" == "false" ]]; then
-    if is_os linux; then
-        emacs_icon=$HOME/.icons/emacs.svg
-        notify-send -i "$emacs_icon" -u normal -h "int:transient:1" "Emacs Server" "Starting, please wait."
-    elif is_os darwin; then
-        if command -v terminal-notifier &>/dev/null; then
-            terminal-notifier -message "Starting, please wait." -title "Emacs Server" -sender "org.gnu.Emacs"
-        else
-            osascript -e display notification "Starting, please wait." with title "Emacs Server"
-        fi
-    fi
-fi
-
-echo "is_running=$is_running"
-echo "script_args=$script_args"
-echo "emacs_params=${emacs_params[*]}"
-
-if is_os darwin; then
-    # Forcing profile sourcing because it does not seem to happen on macos
-    # temporarily disable -u to tolerate unbound vars in .profile
-    source $HOME/.profile
-fi
-
-set -x
-
-$emacsclient_bin "${emacs_params[@]}" "$@"
+exit $status
