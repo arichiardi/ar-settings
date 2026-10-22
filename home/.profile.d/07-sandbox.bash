@@ -20,6 +20,8 @@ _sandbox_agent_env_whitelist=(
     LOCAL_SERVER_HOST
     MCP_SEARCH_URL
     MC_REPO_DIR
+    ORG_ROAM_PI_MEMORY_DEBUG
+    ORG_ROAM_PI_MEMORY_TMPDIR
     PATH
     PGDATABASE
     PGHOST
