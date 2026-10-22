@@ -2,6 +2,10 @@
     email = a.richiardi.work@gmail.com
     name = Andrea Richiardi
     signingkey = 3D0E9F0881052A48
+[commit]
+    gpgSign = true
+[tag]
+    gpgSign = true
 [sendemail]
     smtpserver = smtp.googlemail.com
     smtpencryption = tls
