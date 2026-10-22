@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+#
+# Copy files from live machine paths into the repository and encrypt
+# them with symmetric gpg into <file>.gpg siblings.
+#
+# Each entry is "machine_path:repo_path". A file is encrypted only
+# when the copied plaintext is newer than its .gpg sibling. The
+# plaintext is kept in the repo working tree (gitignored).
+#
+# The script has to be run from the ar-settings repository root.
+#
+set -euo pipefail
+
+source ./home/.local/share/ar/helpers.sh
+source ./home/.local/bin/gpg-helpers.sh
+
+files=(
+    "/etc/caddy/Caddyfile:etc/caddy/Caddyfile"
+)
+
+for entry in "${files[@]}"; do
+    src=${entry%%:*}
+    dest=${entry#*:}
+
+    if [[ ! -f "$src" ]]; then
+        echo_warn "Missing, skipping: $src"
+        continue
+    fi
+
+    echo_info "Encrypting: $dest"
+    mkdir -p "$(dirname "$dest")"
+    if [[ -r "$src" ]]; then
+        cp -u "$src" "$dest"
+    else
+        echo_warn "Not readable, using sudo: $src"
+        sudo cp -u "$src" "$dest"
+        sudo chown "$USER" "$dest"
+    fi
+
+    if [[ -f "$dest.gpg" && ! "$dest" -nt "$dest.gpg" ]]; then
+        echo_info "   Unmodified: $dest"
+        continue
+    fi
+
+    gpg --yes $gpg_symmetric_args --symmetric --out "$dest.gpg" "$dest"
+done
