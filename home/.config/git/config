@@ -1,5 +1,3 @@
-[commit]
-    gpgSign = true
 [color]
     filemode = false
     diff = auto
@@ -54,7 +52,7 @@
     s = "status"
     b = "branch"
     ba = "branch -v -a"
-    c = "commit -S"
+    c = "commit"
     p = "pull"
     pfl = "push --force-if-includes --force-with-lease"
     f = "fetch -v"
