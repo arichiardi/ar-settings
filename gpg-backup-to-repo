@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+#
+# Encrypt live machine files into the repository as <repo_path>.gpg
+# siblings. The plaintext never touches the repo tree: it is streamed
+# straight from the source path into gpg.
+#
+# Each entry is "machine_path:repo_path". A file is re-encrypted only
+# when the live file is newer than its committed ciphertext.
+#
+# The script has to be run from the ar-settings repository root.
+#
+set -euo pipefail
+
+source ./home/.local/share/ar/helpers.sh
+source ./home/.local/bin/gpg-helpers.sh
+
+files=(
+    "/etc/caddy/Caddyfile:etc/caddy/Caddyfile"
+)
+
+for entry in "${files[@]}"; do
+    src=${entry%%:*}
+    dest=${entry#*:}
+
+    if [[ ! -f "$src" ]]; then
+        echo_warn "Missing, skipping: $src"
+        continue
+    fi
+
+    if [[ -f "$dest.gpg" && ! "$src" -nt "$dest.gpg" ]]; then
+        echo_info "Unmodified: $dest.gpg"
+        continue
+    fi
+
+    echo_info "Encrypting: $dest.gpg"
+    mkdir -p "$(dirname "$dest.gpg")"
+    if [[ -r "$src" ]]; then
+        gpg --yes $gpg_symmetric_args --symmetric --out "$dest.gpg" "$src"
+    else
+        echo_warn "Not readable, piping through sudo: $src"
+        sudo -v
+        sudo cat "$src" | gpg --yes $gpg_symmetric_args --symmetric --out "$dest.gpg"
+    fi
+
+    echo_info "Verifying: $dest.gpg"
+    gpg --quiet --yes $gpg_symmetric_args --decrypt --output /dev/null "$dest.gpg"
+done
