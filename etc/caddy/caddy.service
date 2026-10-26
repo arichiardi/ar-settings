@@ -24,11 +24,15 @@ Type=notify
 User=caddy
 # Group=users comes from the former caddy.service.d/override.conf drop-in.
 Group=users
+Restart=on-abnormal
 # Decrypts /etc/credstore.encrypted/caddy-creds into
 # ${CREDENTIALS_DIRECTORY}/caddy-creds at activation (KEY=VALUE lines,
 # e.g. DYNU_API_KEY). Created by init-caddy.
 LoadCredentialEncrypted=caddy-creds:caddy-creds
 # Absolute path: do not rely on DefaultPaths= for binary resolution.
+# Validate before starting; credentials reach all unit processes, so
+# the dynu placeholder resolves already at validation time.
+ExecStartPre=/usr/local/bin/caddy validate --envfile ${CREDENTIALS_DIRECTORY}/caddy-creds --config /etc/caddy/Caddyfile
 ExecStart=/usr/local/bin/caddy run --envfile ${CREDENTIALS_DIRECTORY}/caddy-creds --config /etc/caddy/Caddyfile
 ExecReload=/usr/local/bin/caddy reload --config /etc/caddy/Caddyfile --force
 TimeoutStopSec=5s
