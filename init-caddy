@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+#
+# Initialize caddy on this machine.
+#
+# Installs the required packages, sets up the dynu DNS token as a
+# systemd encrypted credential (caddy-creds), installs the custom
+# caddy.service unit, and drops the shared gpg-encrypted
+# Caddyfile (etc/caddy/Caddyfile.gpg) into /etc/caddy. The conf.d
+# directory is created empty: its content is per-machine and managed
+# by the user.
+#
+# Runs as a normal user: gpg needs your agent and terminal. Every
+# privileged operation calls sudo explicitly.
+#
+# The script has to be run from the ar-settings repository root.
+#
+set -euo pipefail
+
+source ./home/.local/share/ar/helpers.sh
+source ./home/.local/bin/gpg-helpers.sh
+
+src_dir=./etc/caddy
+dest_dir=/etc/caddy
+owner=caddy
+group=root
+# xcaddy and go are needed by caddy-build.
+packages=(caddy xcaddy go)
+
+creds_tmp=
+caddyfile_tmp=
+cleanup() {
+    local f
+    for f in "$creds_tmp" "$caddyfile_tmp"; do
+        [[ -n "$f" && -e "$f" ]] && \
+            shred --force --iterations=9 --zero --remove "$f" 2>/dev/null || true
+    done
+}
+trap cleanup EXIT
+
+confirm "Installing caddy packages, unit files, and shared Caddyfile." || {
+    echo_info "Aborted."
+    exit 1
+}
+
+echo_info "Installing packages"
+pkg_install "${packages[@]}"
+
+id "$owner" >/dev/null 2>&1 || {
+    echo_fail "User '$owner' still missing after installing caddy."
+    exit 1
+}
+
+echo_info "Setting up dynu credential"
+read -r -s -p "Enter Dynu DNS API token: " dynu_token || {
+    echo
+    echo_fail "No terminal available to read the token from."
+    exit 1
+}
+echo
+[[ -n "$dynu_token" ]] || { echo_fail "Token is required."; exit 1; }
+creds_tmp=$(mktemp)
+printf 'DYNU_API_KEY=%s\n' "$dynu_token" > "$creds_tmp"
+chmod 600 "$creds_tmp"
+unset dynu_token
+sudo mkdir -p /etc/credstore.encrypted
+sudo systemd-creds --name=caddy-creds encrypt "$creds_tmp" /etc/credstore.encrypted/caddy-creds
+success "Credential caddy-creds installed"
+
+echo_info "Installing unit files"
+# Stale drop-ins would override the merged unit below; remove them.
+sudo rm -rf /etc/systemd/system/caddy.service.d
+sudo install -o root -g root -m 644 "$src_dir/caddy.service" /etc/systemd/system/caddy.service
+sudo systemctl daemon-reload
+
+echo_info "Installing shared Caddyfile"
+sudo install -d -o "$owner" -g "$group" -m 755 "$dest_dir/conf.d"
+caddyfile_tmp=$(mktemp)
+gpg --quiet $gpg_symmetric_args --decrypt "$src_dir/Caddyfile.gpg" > "$caddyfile_tmp"
+sudo install -o "$owner" -g "$group" -m 640 "$caddyfile_tmp" "$dest_dir/Caddyfile"
+
+success "caddy initialized"
+echo_info "Next steps:"
+echo_info "  1. Add your site configs under $dest_dir/conf.d/"
+echo_info "  2. caddy validate --adapter caddyfile --config $dest_dir/Caddyfile --envfile <(sudo systemd-creds decrypt /etc/credstore.encrypted/caddy-creds -)"
+echo_info "  3. sudo systemctl enable --now caddy"

@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+#
+# Build a custom caddy binary with the DNS and webdav modules.
+#
+# Usage: caddy-build [version]
+# Defaults to the latest stable release when no version is given.
+#
+# The output binary is written to ./caddy in the current directory.
+#
+set -euo pipefail
+
+version=${1:-}
+
+args=(build --with github.com/caddy-dns/dynu --with github.com/mholt/caddy-webdav)
+[[ -n "$version" ]] && args+=( "$version" )
+
+echo "Running: xcaddy ${args[*]}"
+xcaddy "${args[@]}"
+
+echo "Done. Binary: $(pwd)/caddy"
+echo "Install with: sudo install -o caddy -g root -m 755 caddy /usr/local/bin/caddy"
