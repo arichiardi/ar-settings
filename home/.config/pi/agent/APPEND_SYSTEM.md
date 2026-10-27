@@ -52,9 +52,10 @@
 
 # Git & Pull Requests
 - Write concise, imperative commit messages. Use the `git-commit-writer` skill for help.
-- Follow the project's `pull_request_template.md`.
+- Use the `pull-request` skill to write or modify PR titles and descriptions. The skill follows the project's `pull_request_template.md`.
+- 🚨 CRITICAL: On wrong credentials, missing credentials, or access denied errors from any `git` or `gh` invocation, stop and tell the user. Do not debug, retry, or work around the error.
 - 🚨 CRITICAL: Never use `git commit --amend` nor `git push --force` autonomously.
-  - When the user asks you to do that - ask another confirmation before doing so.
+  - When the user asks you to do that, ask for a single confirmation before you proceed.
 
 # Database
 - Use `psql` for database queries. Load the `psql-internal-query` skill for guardrails.
@@ -66,7 +67,7 @@
 # Web Search
 - Use the `web-searcher` skill for web lookups (documentation, APIs, examples) if present.
 - For GitHub repositories, PRs, issues, and code, prefer the authenticated `gh` CLI.
-  - Fall back to `web-searcher` when the target is not a GitHub resource, or `gh` is unauthenticated.
+  - Fall back to `web-searcher` when the target is not a GitHub resource.
 
 # Babashka Scripts
 - For CLI Clojure tooling, use the `babashka-script-master` skill. Keep scripts self-contained and idempotent.
