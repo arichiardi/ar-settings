@@ -9,12 +9,12 @@ light_red='\033[1;31m'
 light_yellow='\033[1;33m'
 no_color='\033[0m'
 
-function echo_debug { printf "\r${light_blue} %s${no_color}\n" "$*"; }
-function echo_info  { printf "\r${light_green} %s${no_color}\n" "$*"; }
-function echo_warn  { printf "\r${light_yellow} %s${no_color}\n" "$*"; }
-function echo_skip  { printf "\r${light_yellow} %s${no_color}\n" "$*"; }
-function echo_ok    { printf "\r${light_green} %s${no_color}\n" "$*"; }
-function echo_fail  { printf "\r${light_red} %s${no_color}\n" "$*"; }
+function echo_debug { printf "\r${light_blue}%s${no_color}\n" "$*"; }
+function echo_info  { printf "\r${light_green}%s${no_color}\n" "$*"; }
+function echo_warn  { printf "\r${light_yellow}%s${no_color}\n" "$*"; }
+function echo_skip  { printf "\r${light_yellow}%s${no_color}\n" "$*"; }
+function echo_ok    { printf "\r${light_green}%s${no_color}\n" "$*"; }
+function echo_fail  { printf "\r${light_red}%s${no_color}\n" "$*"; }
 
 # Ask before touching system state. Skipped when non-interactive.
 function confirm {
