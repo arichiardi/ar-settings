@@ -37,9 +37,9 @@ fi
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 
-gpg --no-tty -q --batch --decrypt "$base"   > "$work/base"   2>/dev/null
-gpg --no-tty -q --batch --decrypt "$ours"   > "$work/ours"   2>/dev/null
-gpg --no-tty -q --batch --decrypt "$theirs" > "$work/theirs" 2>/dev/null
+gpg --no-tty -q --decrypt "$base"   > "$work/base"   2>/dev/null
+gpg --no-tty -q --decrypt "$ours"   > "$work/ours"   2>/dev/null
+gpg --no-tty -q --decrypt "$theirs" > "$work/theirs" 2>/dev/null
 
 # --- real 3-way merge on plaintext ----------------------------------------
 set +e
