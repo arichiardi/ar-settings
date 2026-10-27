@@ -302,6 +302,39 @@ is_nix () {
     [[ "${sys}" == "$1" ]];
 }
 
+# Number of parallel compile threads for CMake and other build systems.
+#
+# Usage:
+#   compile_threads           normal (default): physical cores
+#   compile_threads max       all logical CPUs (nproc)
+#   compile_threads min       low count for a memory-heavy build
+#   compile_threads <n>       explicit thread count
+#
+# Prints the count. The caller decides whether to export it, for example:
+#   export CMAKE_BUILD_PARALLEL_LEVEL=$(compile_threads min)
+compile_threads () {
+    local mode="${1:-normal}"
+    case "$mode" in
+        max)
+            nproc
+            ;;
+        min)
+            # A memory-heavy build swaps at a higher count.
+            printf '4\n'
+            ;;
+        normal|*[!0-9]*)
+            local phys
+            phys=$(awk -F: '/^physical id/{p=$2} /^core id/{print p"-"$2}' \
+                   /proc/cpuinfo 2>/dev/null | sort -u | wc -l)
+            [ "${phys:-0}" -gt 0 ] || phys=$(( $(nproc) / 2 ))
+            printf '%d\n' "$phys"
+            ;;
+        *)
+            printf '%d\n' "$mode"
+            ;;
+    esac
+}
+
 # Thank you flowblok!
 ###################################
 # AFTER PROFILING, COMMENTING OUT #

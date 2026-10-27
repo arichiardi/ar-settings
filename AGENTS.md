@@ -63,7 +63,7 @@ entry to its `files` array and run it from the repository root.
 
 - Use `#!/usr/bin/env bash`. Every script sets `set -euo pipefail`.
 - Root `init-*` scripts run from the repository root. They source
-  `./home/.local/share/ar/helpers.sh`.
+  `./usr/local/bin/ar-helpers.sh`.
 - `initialize/bin/*` scripts resolve `repo_root` from `git rev-parse` and must
   run from inside the repository.
 - Use the helper functions for output and guards:

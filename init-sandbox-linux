@@ -20,7 +20,7 @@ else
     USERS="${USERS:-$(id -un)}"
 fi
 
-source ./home/.local/share/ar/helpers.sh
+source ./usr/local/bin/ar-helpers.sh
 
 command -v setfacl >/dev/null 2>&1 || {
     echo_fail "setfacl not found. Install the acl package."

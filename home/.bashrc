@@ -138,10 +138,7 @@ ex ()
   fi
 }
 
-_ar_helpers="$HOME/.local/share/ar/helpers.sh"
-if [ -r "$_ar_helpers" ]; then
-    source "$_ar_helpers"
-fi
+source ar-helpers.sh
 
 for f in "${HOME}/.bashrc.d"/[0-9][0-9]-*.bashrc; do
   if [ -r "$f" ]; then

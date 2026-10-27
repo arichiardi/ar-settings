@@ -15,7 +15,7 @@ set -euo pipefail
 secret_bin=$(pwd)/home/.local/bin/secret
 temp_dir=$(mktemp -d -t "ar-init-home.XXXXXXXXXX")
 
-source ./home/.local/share/ar/helpers.sh
+source ./usr/local/bin/ar-helpers.sh
 
 dest_dir=/etc
 

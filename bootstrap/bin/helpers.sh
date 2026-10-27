@@ -1,1 +1,0 @@
-../../home/.local/share/ar/helpers.sh
