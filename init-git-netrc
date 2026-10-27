@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+#
+# Initialize the git netrc credentials helper on this machine.
+#
+# Pulls the upstream git-credential-netrc helper from the git repository
+# into /usr/local/bin and creates or appends to the per-user
+# GPG-encrypted ~/.netrc.gpg.
+#
+# Each step asks before it runs. Answer no to skip that step. Interrupt
+# with C-c to stop.
+#
+# The helper is pinned to the local git version.
+#
+# Runs as a normal user: gpg needs your agent and terminal. Every
+# privileged operation calls sudo explicitly.
+#
+# The script has to be run from the ar-settings repository root.
+#
+set -euo pipefail
+
+source ./home/.local/share/ar/helpers.sh
+
+helper_dest=/usr/local/bin/git-credential-netrc
+
+git_tag=v$(git --version | awk '{print $3}')
+helper_url="https://raw.githubusercontent.com/git/git/${git_tag}/contrib/credential/netrc/git-credential-netrc.perl"
+
+tmp_helper=
+netrc_tmp=
+cleanup() {
+    local f
+    for f in "$tmp_helper" "$netrc_tmp"; do
+        [[ -n "$f" && -e "$f" ]] && \
+            shred --force --iterations=9 --zero --remove "$f" 2>/dev/null || true
+    done
+}
+trap cleanup EXIT
+
+if confirm "Installing git-credential-netrc ($git_tag) to $helper_dest."; then
+    echo_info "Downloading git-credential-netrc $git_tag"
+    tmp_helper=$(mktemp)
+    curl -fsSL -o "$tmp_helper" "$helper_url"
+    chmod 755 "$tmp_helper"
+    sudo install -m 755 "$tmp_helper" "$helper_dest"
+    success "Installed $helper_dest"
+else
+    echo_skip "Skipping the helper install."
+fi
+
+if confirm "Setting up $HOME/.netrc.gpg."; then
+    if [[ ! -t 0 ]]; then
+        echo_warn "No terminal. Create or update $HOME/.netrc.gpg by hand. See README.md."
+    else
+        default_gpg_id=$(git config --get user.email || true)
+        read -r -p "GPG recipient id [$default_gpg_id]: " gpg_id
+        gpg_id=${gpg_id:-$default_gpg_id}
+        [[ -n "$gpg_id" ]] || { echo_fail "A GPG recipient is required."; exit 1; }
+
+        read -r -s -p "GitHub token: " gh_token || {
+            echo
+            echo_fail "No terminal available to read the token from."
+            exit 1
+        }
+        echo
+        [[ -n "$gh_token" ]] || { echo_fail "Token is required."; exit 1; }
+
+        netrc_gpg=$HOME/.netrc.gpg
+        # One entry per line. GitHub ignores the login for token auth.
+        entry="machine github.com protocol https login x-access-token password $gh_token"
+
+        netrc_tmp=$(mktemp)
+        chmod 600 "$netrc_tmp"
+        if [[ -f "$netrc_gpg" ]]; then
+            echo_info "$netrc_gpg exists; appending the github.com entry"
+            gpg --quiet --decrypt "$netrc_gpg" > "$netrc_tmp"
+            # Keep the appended entry on its own line.
+            if [[ -s "$netrc_tmp" && -n "$(tail -c1 "$netrc_tmp")" ]]; then
+                printf '\n' >> "$netrc_tmp"
+            fi
+        fi
+        printf '%s\n' "$entry" >> "$netrc_tmp"
+        unset gh_token entry
+
+        gpg --quiet --encrypt --recipient "$gpg_id" -o "$netrc_gpg" "$netrc_tmp"
+        chmod 600 "$netrc_gpg"
+        success "Wrote $netrc_gpg"
+    fi
+else
+    echo_skip "Skipping the netrc setup."
+fi
+
+echo_info "Next steps:"
+echo_info "  1. Enable the helper for your user:"
+echo_info "       git config --global credential.helper netrc"
+echo_info "     or add to ~/.config/git/config:"
+echo_info "       [credential]"
+echo_info "           helper = netrc"
+echo_info "  2. Test with: printf 'protocol=https\\nhost=github.com\\n\\n' | git-credential-netrc get -v"
