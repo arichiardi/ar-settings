@@ -14,8 +14,8 @@
 #     -F 'IQ3_KT,MTP' -E 'imatrix' \
 #     --local-dir /var/lib/llm/models/ik_llama
 #
-# Start:  ik_llama-start qwen3.8-flash-next-ik-mtp
-# Stop:   ik_llama-stop  qwen3.8-flash-next-ik-mtp
+# Start:  ik_llama-start qwen3.8-flash-next-mtp
+# Stop:   ik_llama-stop  qwen3.8-flash-next-mtp
 
 GGML_CUDA_NO_PINNED=1
 
@@ -33,4 +33,4 @@ LLAMA_ARG_ENDPOINT_METRICS=1
 #
 # Cache types ik_llama accepts: f32 f16 bf16 q8_0 q4_0 q4_1 iq4_nl q5_0 q5_1
 # q6_0 q8_KV. There is no q3 type. iq4_nl or q4_1 are the smallest.
-LLAMA_ARGS=--host 0.0.0.0 --port 11434 --alias Qwen3.8-Flash-Next-MTP --model models/ik_llama/Qwen3.8-Flash-Next-ik_llama-v3-IQ3_KT-00001-of-00002.gguf --defer-ple -ngl 49 -ot ffn_.*_exps=CPU -fa on -ctk q6_0 -ctv q6_0 -ictk q8_0 --jinja -c 16384 -b 2048 -ub 512 --ctx-checkpoints 16 -t 22 -tb 22 --no-mmap -sm graph -rtr --spec-type mtp:n_max=1,p_min=0.0 -md models/ik_llama/Qwen3.8-Flash-Next-MTP-ik_llama-IQ4_KT.gguf
+LLAMA_ARGS=--host 0.0.0.0 --port 11434 --alias Qwen3.8-Flash-Next-MTP --model /var/lib/llm/models/ik_llama/ji-farthing/Qwen3.8-Flash-Next-ik-llama-GGUF/Qwen3.8-Flash-Next-ik_llama-v3-IQ3_KT-00001-of-00002.gguf --defer-ple -ngl 49 -ot ffn_.*_exps=CPU -fa on -ctk q6_0 -ctv q6_0 -ictk q8_0 --jinja -c 16384 -b 2048 -ub 512 --ctx-checkpoints 16 -t 22 -tb 22 --no-mmap -sm graph -rtr --spec-type mtp:n_max=1,p_min=0.0 -md /var/lib/llm/models/ik_llama/ji-farthing/Qwen3.8-Flash-Next-ik-llama-GGUF/Qwen3.8-Flash-Next-MTP-ik_llama-IQ4_KT.gguf
