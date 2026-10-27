@@ -1,0 +1,11 @@
+# Whole-file OpenPGP: show decrypted text in diffs and merge through
+# gpg-merge. Driver definitions live in git config, not in the repository.
+*.gpg diff=gpg merge=gpg
+
+# Caddyfile.gpg is GPG symmetric (passphrase, no recipient). gpg-merge
+# re-encrypts with GIT_GPGMERGE_KEY, which would turn it into a public-key
+# file and break init-caddy's --pinentry-mode=loopback decrypt.
+etc/caddy/Caddyfile.gpg diff=gpg -merge
+
+# Exported secret-key backups are binary OpenPGP packets, not ciphertext.
+bootstrap/gpg/*.gpg binary
