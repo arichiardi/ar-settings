@@ -1,0 +1,39 @@
+# ik_llama.cpp - Qwen3.8-Flash-Next, ji-farthing v3 IQ3_KT (text-only)
+#
+# Model card: https://huggingface.co/ji-farthing/Qwen3.8-Flash-Next-ik-llama-GGUF
+#
+# Hardware target: one RTX 4060 (8 GiB VRAM), 62 GiB RAM, 44 cores.
+#
+# Download:
+#   hfdownloader download ji-farthing/Qwen3.8-Flash-Next-ik-llama-GGUF \
+#     -F 'IQ3_KT,MTP' -E 'imatrix' \
+#     --local-dir /var/lib/llm/models/ik_llama
+#
+# Start:  ik_llama-start qwen3.8-flash-next-ik
+# Stop:   ik_llama-stop  qwen3.8-flash-next-ik
+
+# --defer-ple leaves the PLE table on disk. The 47.2 GiB of routed experts then
+# live in RAM, which fits the 62 GiB without freeing anything. IQ4_KT (52.6 GiB)
+# swaps; change only the model path if you want to compare.
+GGML_CUDA_NO_PINNED=1
+
+LLAMA_LOG_COLORS=1
+LLAMA_ARG_ENDPOINT_METRICS=1
+
+# -ngl 49 puts the 4.5 GiB of non-expert tensors on the GPU; the experts stay in
+# RAM via -ot. -ub 512 keeps the compute buffer small, which an 8 GiB card needs.
+# -c 32768 is about the 8 GiB ceiling. If it still runs out of memory, lower
+# -ngl (40, then 32) to move attention layers to the CPU.
+#
+# Cache types ik_llama accepts: f32 f16 bf16 q8_0 q4_0 q4_1 iq4_nl q5_0 q5_1
+# q6_0 q8_KV. q6_0 is nearly lossless and smaller than the card's q8_0. Use
+# q5_1 to save more VRAM, or -ctk-first/-ctk-last to mix per layer.
+#
+# -t / -tb: the Xeon E5-2699 v4 has 22 cores and 44 threads. This workload is
+# memory-bandwidth-bound, so use the physical cores. Hyperthreading (44) usually
+# makes generation slower. Tune -t between 16 and 22 with llama-bench.
+LLAMA_ARGS=--host 0.0.0.0 --port 11434 --alias Qwen3.8-Flash-Next --model models/ik_llama/Qwen3.8-Flash-Next-ik_llama-v3-IQ3_KT-00001-of-00002.gguf --defer-ple -ngl 49 -ot ffn_.*_exps=CPU -fa on -ctk q6_0 -ctv q6_0 -ictk q8_0 --jinja -c 32768 -b 2048 -ub 512 --ctx-checkpoints 16 -t 22 -tb 22 --no-mmap -sm graph -rtr
+
+# MTP head: 2.21 GiB more on the GPU. On 8 GiB it only fits with a small context.
+# To enable it, lower -c to about 16384 and append these two arguments:
+#   --spec-type mtp:n_max=1,p_min=0.0 -md models/ik_llama/Qwen3.8-Flash-Next-MTP-ik_llama-IQ4_KT.gguf
