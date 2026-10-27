@@ -74,6 +74,61 @@ The process that invokes `gpg` reads this variable, not the agent. The
 export covers terminal use. Set it in the environment of each GUI app
 (Emacs.app, IntelliJ, and others) that must show the dialog.
 
+#### Git credentials
+
+Git reads credentials from a GPG-encrypted netrc file through the upstream
+`git-credential-netrc` helper. Initialize it with:
+
+```shell
+./init-git-netrc
+```
+
+The script pulls the helper into `/usr/local/bin` and creates or appends to
+the per-user `~/.netrc.gpg`. Then enable it for your user:
+
+```shell
+git config --global credential.helper netrc
+```
+
+<details>
+<summary>Manual setup and details</summary>
+
+Enable the helper per user in `~/.config/git/config`:
+
+```shell
+git config --global credential.helper netrc
+```
+
+Pull the upstream helper by hand. Do not vendor a copy here. Pin the tag
+to the local git version:
+
+```shell
+git_tag=v$(git --version | awk '{print $3}')
+sudo curl -fsSL -o /usr/local/bin/git-credential-netrc \
+    "https://raw.githubusercontent.com/git/git/${git_tag}/contrib/credential/netrc/git-credential-netrc.perl"
+sudo chmod 755 /usr/local/bin/git-credential-netrc
+```
+
+Create the encrypted credentials file per user. One entry is one line. The
+plaintext never touches disk:
+
+```shell
+gpg --encrypt --recipient <gpg-id> -o ~/.netrc.gpg - <<'EOF'
+machine github.com protocol https login x-access-token password <token>
+EOF
+chmod 600 ~/.netrc.gpg
+```
+
+GitHub ignores the login for token auth. The token is the password.
+The login stays `x-access-token`.
+
+The helper auto-detects `~/.authinfo.gpg`, `~/.netrc.gpg`, `~/.authinfo`, and
+`~/.netrc` in `$HOME`, in that order. The first matching `machine`/`login`
+entry wins. The helper only supports `get`. The `--gpg <program>` flag
+overrides the GPG program, and `-f <file>` adds an explicit file.
+
+</details>
+
 ### Running
 
 ```shell
