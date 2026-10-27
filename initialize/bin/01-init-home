@@ -20,7 +20,7 @@ secret_bin=$repo_root/home/.local/bin/secret
 
 temp_dir=$(mktemp -d -t "ar-init-home.XXXXXXXXXX")
 
-source $repo_root/home/.local/share/ar/helpers.sh
+source $repo_root/usr/local/bin/ar-helpers.sh
 
 pushd $repo_root/home > /dev/null
 

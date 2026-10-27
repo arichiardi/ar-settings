@@ -12,7 +12,7 @@ set -euo pipefail
 #
 # see the brilliant answer here: https://stackoverflow.com/a/45538151
 
-source ./home/.local/share/ar/helpers.sh
+source ./usr/local/bin/ar-helpers.sh
 
 echo_info "Installing sway and related packages"
 

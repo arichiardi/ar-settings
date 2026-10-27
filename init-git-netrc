@@ -18,7 +18,7 @@
 #
 set -euo pipefail
 
-source ./home/.local/share/ar/helpers.sh
+source ./usr/local/bin/ar-helpers.sh
 
 helper_dest=/usr/local/bin/git-credential-netrc
 

@@ -10,7 +10,7 @@ set -euo pipefail
 tmpdir=$(mktemp -d -t "ar-settings-install-scripts.XXXXXXXXXX")
 bindir=$(systemd-path user-binaries)
 
-source ./home/.local/share/ar/helpers.sh
+source ./usr/local/bin/ar-helpers.sh
 
 # cat >/dev/null <<GOTO_ASDF
 

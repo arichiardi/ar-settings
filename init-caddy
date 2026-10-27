@@ -16,7 +16,7 @@
 #
 set -euo pipefail
 
-source ./home/.local/share/ar/helpers.sh
+source ./usr/local/bin/ar-helpers.sh
 source ./home/.local/bin/gpg-helpers.sh
 
 src_dir=./etc/caddy
