@@ -44,11 +44,11 @@ bwrap_args=(
     --ro-bind "$HOME" "$HOME"
     --dir /var
     --symlink ../tmp var/tmp
+    --perms 0700 --tmpfs /etc
     --ro-bind /etc/resolv.conf /etc/resolv.conf
     --die-with-parent
-    --dir /etc
-    --bind-data 11 /etc/passwd
-    --bind-data 12 /etc/group
+    --ro-bind-data 11 /etc/passwd
+    --ro-bind-data 12 /etc/group
 )
 
 # Drop supplementary groups (e.g. wheel)
@@ -97,6 +97,13 @@ for path in $SANDBOX_AGENT_DIR_RO_WHITELIST; do
         echo_warn "RO bind skipped: $path does not exist"
     fi
 done
+
+# The synthetic /etc is generated in the sandbox; the host /etc is never
+# bound. Remount it read-only so a write to /etc fails loudly instead of
+# silently vanishing into the tmpfs. --remount-ro does not recurse, so the
+# explicit binds above stay mounted. Any file that must be writable needs
+# an explicit RW bind, added before this line.
+bwrap_args+=( --remount-ro /etc )
 
 for var in $SANDBOX_AGENT_ENV_WHITELIST; do
     if [[ -n "${!var:-}" ]]; then
