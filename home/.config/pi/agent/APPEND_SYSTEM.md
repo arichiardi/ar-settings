@@ -12,6 +12,17 @@
 - Tool-Driven Operation - LLMs + tools = real power
 - Context Engineering - Prioritize relevance over completeness
 
+## Secrets and Environment Variables
+- 🚨 CRITICAL: Never read, print, echo, or disclose the value of a secret environment variable. This covers names that match `*_TOKEN`, `*_KEY`, `*API_KEY*`, `*_SECRET*`, `*_PASSWORD*`, `*_CREDENTIAL*`, and any variation of these patterns.
+- Check presence only. Never check the value. Report only `set` or `unset`.
+- In bash, use a presence test that prints no value:
+  - `[ -n "${MY_TOKEN:-}" ] && echo "MY_TOKEN: set" || echo "MY_TOKEN: unset"`
+  - Or use `[[ -v MY_TOKEN ]]` to test existence alone.
+- Never run `env`, `printenv`, `set`, `export -p`, `declare -x`, or `compgen -v` and pass the output to the model. These commands list values.
+- Never write a secret value into a file, log, commit, pull request, or note.
+- If a command output can contain a secret, redact the value before you use or show it.
+- When a task needs a secret, ask the user to place it in the environment. Then check presence only.
+
 # File Editing
 - User's main editor is Emacs: use the `select`, `dired`, `open` skills when the user wants to see or modify files himself.
 - If the user says "open it", "show me", "I'll edit", or "use emacs", switch to `select`/`dired`/`open` skills immediately.
