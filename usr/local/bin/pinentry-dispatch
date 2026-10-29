@@ -18,6 +18,9 @@
 # users must set PINENTRY_USER_DATA=mac for the native dialog; the
 # dispatcher does not guess.
 #
+# An empty hint means "no hint". Any other unrecognized value is a fatal
+# error, so a typo cannot silently fall back to a GUI prompt.
+#
 # NOTE: pinentry-emacs only works while an Emacs with pinentry mode is
 # running; if the hint is set but the program fails, the user must retry
 # without the hint.
@@ -73,7 +76,11 @@ case "${PINENTRY_USER_DATA:-}" in
         _dispatch_log "hint=qt"
         _exec_backend pinentry-qt "$@"
         ;;
-    *)
+    "")
         _exec_gui_backend "$@"
+        ;;
+    *)
+        _dispatch_log "fatal: unknown PINENTRY_USER_DATA hint: ${PINENTRY_USER_DATA}"
+        exit 1
         ;;
 esac

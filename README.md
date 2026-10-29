@@ -61,8 +61,10 @@ The dispatcher routes a prompt by the `PINENTRY_USER_DATA` hint:
 | `qt` | `pinentry-qt` |
 
 The backend must be on `PATH`. A missing backend stops the prompt with an
-error. With no hint, the dispatcher uses `pinentry-gtk` when `DISPLAY` or
-`WAYLAND_DISPLAY` is set, else `pinentry-tty`.
+error. A non-empty hint outside the table also stops the prompt with an
+error, so a typo fails loudly. With no hint, the dispatcher uses
+`pinentry-gtk` when `DISPLAY` or `WAYLAND_DISPLAY` is set, else
+`pinentry-tty`.
 
 macOS users must set the hint to get the native dialog:
 
