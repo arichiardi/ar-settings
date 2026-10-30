@@ -121,9 +121,11 @@ echo_info "Sandbox env: $SANDBOX_AGENT_ENV_WHITELIST"
 
 GIT_TERMINAL_PROMPT=${GIT_TERMINAL_PROMPT:-0}
 
-_pw="${USER}:x:$(id -u):$(id -g):${USER}:${HOME}:${SHELL:-/bin/bash}
+_user="${USER:-$(id -un)}"
+_grp="$(id -gn)"
+_pw="${_user}:x:$(id -u):$(id -g):${_user}:${HOME}:${SHELL:-/bin/bash}
 nobody:x:65534:65534:nobody:/nonexistent:/usr/bin/nologin"
-_gr="$(id -gn):x:$(id -g):
+_gr="${_grp}:x:$(id -g):
 nobody:x:65534:"
 
 cmd=$1; shift
