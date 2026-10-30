@@ -9,12 +9,19 @@
 set -euo pipefail
 script_name="$(basename "${0}")"
 emacsclient_bin="$(command -v emacsclient)"
+flock_bin="$(command -v flock || true)"
 
 script_args="$*"
 
 # Logs live in $TMPDIR (default /tmp); set TMPDIR to move them.
 log_root="${TMPDIR:-/tmp}"
 log_root="${log_root%/}"
+
+# Cold starts serialize on a per-user lock so two invocations cannot
+# start rival daemons. Prefer the runtime dir that holds the socket.
+lock_dir="${XDG_RUNTIME_DIR:-$log_root}"
+if [[ ! -d "$lock_dir" || ! -w "$lock_dir" ]]; then lock_dir="$log_root"; fi
+lock_file="$lock_dir/${script_name}.lock"
 
 # Tty frames need the real terminal on stdin/out/err (emacsclient relays
 # the TUI through its own fds); no output redirects on that path.
@@ -89,6 +96,33 @@ fi
 # Opt-in tracing: EMACSCLIENT_DAEMON_TRACE=1 (tty: terminal, non-tty: err.log)
 if [[ -n "${EMACSCLIENT_DAEMON_TRACE:-}" ]]; then set -x; fi
 
+# Cold starts serialize on $lock_file so two invocations cannot start
+# rival daemons. No-op when flock is unavailable.
+start_lock_fd=""
+acquire_start_lock() {
+    [[ -n "$flock_bin" ]] || return 0
+    exec {start_lock_fd}>"$lock_file"
+    "$flock_bin" "$start_lock_fd"
+}
+release_start_lock() {
+    [[ -n "$start_lock_fd" ]] || return 0
+    exec {start_lock_fd}>&-
+    start_lock_fd=""
+}
+
+# Release the start lock and any throwaway log dir on exit or signal.
+# The OS releases the lock too, but this keeps state explicit.
+cleanup() {
+    release_start_lock
+    if [[ -n "${emacs_log_dir:-}" ]]; then rm -rf "$emacs_log_dir"; fi
+}
+on_signal() {
+    cleanup
+    exit 1
+}
+trap cleanup EXIT
+trap on_signal HUP INT QUIT TERM PIPE
+
 # emacsclient 31.1 (as tested) auto-starts a daemon when no server is
 # running, so every client call here passes -a false; only this function
 # starts daemons, detached, so init noise goes to its log dir and the
@@ -98,28 +132,41 @@ if [[ -n "${EMACSCLIENT_DAEMON_TRACE:-}" ]]; then set -x; fi
 # ends when the socket answers or the daemon process exits.
 ensure_daemon() {
     "$emacsclient_bin" -a false --eval 't' >/dev/null 2>&1 && return 0
+    acquire_start_lock
+    # another wrapper may have started the daemon while we waited
+    if "$emacsclient_bin" -a false --eval 't' >/dev/null 2>&1; then
+        release_start_lock
+        return 0
+    fi
     # Explicit $log_root: bare mktemp templates fall back to CWD.
     daemon_log_dir="$(mktemp -d "$log_root/emacs-daemon.XXXXXX")"
-    # prune earlier cold-start log dirs
-    find "$log_root" -maxdepth 1 -type d -name 'emacs-daemon.*' \
-        ! -path "$daemon_log_dir" -exec rm -rf {} + 2>/dev/null || true
     # pointer for later invocations
     printf '%s\n' "$daemon_log_dir" > "$log_root/emacs-daemon.logdir"
     daemon_exit_status=""
-    nohup emacs --daemon </dev/null >>"$daemon_log_dir/daemon.log" 2>&1 &
+    # Do not leak the lock fd into the daemon: an inherited copy would
+    # hold the lock for the daemon's whole lifetime and block later runs.
+    if [[ -n "$start_lock_fd" ]]; then
+        nohup emacs --daemon </dev/null >>"$daemon_log_dir/daemon.log" 2>&1 \
+            {start_lock_fd}>&- &
+    else
+        nohup emacs --daemon </dev/null >>"$daemon_log_dir/daemon.log" 2>&1 &
+    fi
     daemon_pid=$!
     local waited=0
     while :; do
         if "$emacsclient_bin" -a false --eval 't' >/dev/null 2>&1; then
+            release_start_lock
             return 1
         fi
         if ! kill -0 "$daemon_pid" 2>/dev/null; then
             # the launcher can exit at the same instant the socket opens
             if "$emacsclient_bin" -a false --eval 't' >/dev/null 2>&1; then
+                release_start_lock
                 return 1
             fi
             daemon_exit_status=0
             wait "$daemon_pid" 2>/dev/null || daemon_exit_status=$?
+            release_start_lock
             return 2
         fi
         sleep 0.2
@@ -181,7 +228,6 @@ fi
 emacs_log_dir="$(mktemp -d "$log_root/${script_name}.XXXXXX")"
 emacs_log_out="$emacs_log_dir/out.log"
 emacs_log_err="$emacs_log_dir/err.log"
-trap 'rm -rf "$emacs_log_dir"' EXIT
 
 # keep the original terminal stderr for failure reports
 exec 3>&2
