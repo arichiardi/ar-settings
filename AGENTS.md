@@ -38,14 +38,27 @@ These rules are critical. Violation changes the live machine or destroys data.
    judgment call that the user and the agent decide per case. It includes
    `bootstrap/bin/*`, `initialize/bin/*`, root `init-*` scripts, and
    `install-*` scripts. Ask the user before any such script runs.
-2. Never decrypt, move, rename, or edit `secrets/*.kdbx`, `etc/*.gpg`,
-   `etc/*.enc`, `etc/**/*.enc`, or files under `home/.gnupg`.
-3. Never write outside the repository working tree without explicit user
+2. Never decrypt, move, rename, or edit an encrypted file without explicit
+   user approval for that file. Encrypted files include `secrets/*.kdbx`,
+   `etc/*.gpg`, `etc/*.enc`, `etc/**/*.enc`, any `*.gpg`, `*.enc`, `*.kdbx`,
+   or `*.age`, and files under `home/.gnupg`. Never ask `gpg-agent` for a
+   cached passphrase. Never type a passphrase for the user.
+3. Detect encrypted files before you act. List every `*.gpg`, `*.enc`,
+   `*.kdbx`, and `*.age` file under the tree and ask the user. Ask before you
+   read, grep, diff, or decrypt any of them. `rg` and `grep` read plaintext
+   bytes. A match in an encrypted file is noise, not content.
+4. Treat implicit decryption as decryption. Some tools decrypt without a clear
+   command:
+   - `git log -S`, `git log -p`, and `git diff` decrypt blobs when
+     `.gitattributes` maps a path to the `gpg` diff driver.
+   Ask the user before you run these commands.
+5. Never run `secret`, `secrets-*`, `vault-*`, `pass`, `age`, `sops`, or
+   `gpg` to print or export decrypted content. The `secrets-*` helpers wipe
+   the source file after a successful copy.
+6. Never write outside the repository working tree without explicit user
    approval. Editing a file in `home/` or `etc/` is a repository edit. Editing
    `$HOME` or `/etc` directly is a live-system edit.
-4. Never run `secret`, `secrets-*`, or `vault-*` helpers. They wipe the source
-   file after a successful copy.
-5. Treat the `initialize` scripts as merge tools. They run `vimdiff` against
+7. Treat the `initialize` scripts as merge tools. They run `vimdiff` against
    live files. They are interactive and destructive.
 
 ## Private config and data
