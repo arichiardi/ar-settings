@@ -42,6 +42,30 @@ notice_lines() {
     printf 'socket: %s\n' "${sock:-unknown}"
 }
 
+# Failure diagnostics for a daemon that never served the socket.
+# $1: file descriptor to write to (2 for tty, 3 for non-tty).
+daemon_failure_report() {
+    local fd="$1"
+    {
+        printf '%s: could not start an Emacs daemon\n' "$script_name"
+        printf 'command: emacs --daemon\n'
+        printf 'pid: %s\n' "${daemon_pid:-unknown}"
+        if [[ -n "${daemon_exit_status:-}" ]]; then
+            printf 'exit status: %s\n' "$daemon_exit_status"
+        else
+            printf '%s\n' 'the daemon process is still running but never opened its socket'
+        fi
+        printf 'logs: %s\n' "${daemon_log_dir:-unknown}"
+        if [[ -r "${daemon_log_dir:-}/daemon.log" ]]; then
+            printf '%s\n' '--- daemon.log (last 50 lines) ---'
+            tail -n 50 "$daemon_log_dir/daemon.log"
+            printf '%s\n' '--- end daemon.log ---'
+        else
+            printf '%s\n' '(no daemon.log written)'
+        fi
+    } >&"$fd"
+}
+
 # Socket path of the running server (princ quotes; strip them).
 server_socket() {
     local raw
@@ -69,7 +93,9 @@ if [[ -n "${EMACSCLIENT_DAEMON_TRACE:-}" ]]; then set -x; fi
 # running, so every client call here passes -a false; only this function
 # starts daemons, detached, so init noise goes to its log dir and the
 # daemon outlives the session.
-# Returns 0 (already up), 1 (started), 2 (unreachable).
+# Returns 0 (already up), 1 (started), 2 (daemon exited before serving).
+# No wall-clock cap: a heavy config can take minutes to init. The wait
+# ends when the socket answers or the daemon process exits.
 ensure_daemon() {
     "$emacsclient_bin" -a false --eval 't' >/dev/null 2>&1 && return 0
     # Explicit $log_root: bare mktemp templates fall back to CWD.
@@ -79,14 +105,29 @@ ensure_daemon() {
         ! -path "$daemon_log_dir" -exec rm -rf {} + 2>/dev/null || true
     # pointer for later invocations
     printf '%s\n' "$daemon_log_dir" > "$log_root/emacs-daemon.logdir"
+    daemon_exit_status=""
     nohup emacs --daemon </dev/null >>"$daemon_log_dir/daemon.log" 2>&1 &
-    # wait for the socket (config loading takes a few seconds)
-    local i
-    for i in $(seq 1 50); do
-        "$emacsclient_bin" -a false --eval 't' >/dev/null 2>&1 && return 1
+    daemon_pid=$!
+    local waited=0
+    while :; do
+        if "$emacsclient_bin" -a false --eval 't' >/dev/null 2>&1; then
+            return 1
+        fi
+        if ! kill -0 "$daemon_pid" 2>/dev/null; then
+            # the launcher can exit at the same instant the socket opens
+            if "$emacsclient_bin" -a false --eval 't' >/dev/null 2>&1; then
+                return 1
+            fi
+            daemon_exit_status=0
+            wait "$daemon_pid" 2>/dev/null || daemon_exit_status=$?
+            return 2
+        fi
         sleep 0.2
+        waited=$((waited + 1))
+        if (( waited % 50 == 0 )); then
+            printf '%s: still starting the daemon (%ss)\n' "$script_name" "$((waited / 5))" >&2
+        fi
     done
-    return 2
 }
 
 if $want_tty; then
@@ -94,7 +135,7 @@ if $want_tty; then
     ens=0
     ensure_daemon || ens=$?
     if [[ $ens -eq 2 ]]; then
-        echo "emacsclient-daemon: could not reach an Emacs daemon" >&2
+        daemon_failure_report 2
         exit 1
     fi
     # Daemon log dir from the pointer; a missing dir means the daemon was
@@ -154,7 +195,7 @@ emacs_params=(-a emacs)
 ens=0
 ensure_daemon || ens=$?
 if [[ $ens -eq 2 ]]; then
-    echo "emacsclient-daemon: could not reach an Emacs daemon" >&3
+    daemon_failure_report 3
     exit 1
 fi
 sock="$(server_socket)" || sock=unknown
