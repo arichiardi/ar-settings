@@ -128,6 +128,11 @@ nobody:x:65534:65534:nobody:/nonexistent:/usr/bin/nologin"
 _gr="${_grp}:x:$(id -g):
 nobody:x:65534:"
 
+if [[ $# -eq 0 ]]; then
+    echo_error "Usage: $0 <command> [args...]" >&2
+    exit 1
+fi
+
 cmd=$1; shift
 
 bwrap "${bwrap_args[@]}" -- "$cmd" "$@" \
