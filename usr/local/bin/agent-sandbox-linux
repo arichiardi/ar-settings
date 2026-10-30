@@ -123,7 +123,7 @@ GIT_TERMINAL_PROMPT=${GIT_TERMINAL_PROMPT:-0}
 
 _pw="${USER}:x:$(id -u):$(id -g):${USER}:${HOME}:${SHELL:-/bin/bash}
 nobody:x:65534:65534:nobody:/nonexistent:/usr/bin/nologin"
-_gr="${USER}:x:0:
+_gr="$(id -gn):x:$(id -g):
 nobody:x:65534:"
 
 cmd=$1; shift
