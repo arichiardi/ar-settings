@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+#
+# Generate a random token for a Caddy credential file.
+#
+# Usage: caddy-token <prefix>
+#
+# Prints <prefix>_<30 alphanumeric characters>.
+#
+set -euo pipefail
+
+prefix=${1:-}
+if [[ -z "$prefix" ]]; then
+    echo "Usage: $(basename "$0") <prefix>" >&2
+    exit 1
+fi
+
+# 30 alphanumeric characters from the kernel CSPRNG.
+read -r -n 30 suffix < <(LC_ALL=C tr -dc 'a-zA-Z0-9' < /dev/urandom)
+
+printf '%s_%s\n' "$prefix" "$suffix"
