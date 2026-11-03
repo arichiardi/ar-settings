@@ -10,13 +10,14 @@ repository into live system locations.
 
 ## Layout
 
-The repository keeps three mirror roots. Each root maps to a live location.
+Each top-level root maps to a live location.
 
 | Repo path | Live target | Content |
 | --- | --- | --- |
 | `home/` | `$HOME` | dotfiles, `.config/`, `.local/bin/`, bash and profile fragments |
 | `etc/` | `/etc` | system config such as `gitconfig`, `sudoers.d`, `caddy`, `conf.d` |
 | `usr/` | `/usr/local` | helper binaries under `usr/local/bin/`, Emacs site-lisp, icons |
+| `opt/` | `/opt` | LLM service conf under `opt/llm/conf/` |
 
 Other paths:
 
@@ -56,8 +57,8 @@ These rules are critical. Violation changes the live machine or destroys data.
    `gpg` to print or export decrypted content. The `secrets-*` helpers wipe
    the source file after a successful copy.
 6. Never write outside the repository working tree without explicit user
-   approval. Editing a file in `home/` or `etc/` is a repository edit. Editing
-   `$HOME` or `/etc` directly is a live-system edit.
+   approval. Editing a file in `home/`, `etc/`, or `opt/` is a repository edit.
+   Editing `$HOME`, `/etc`, or `/opt` directly is a live-system edit.
 7. Treat the `initialize` scripts as merge tools. They run `vimdiff` against
    live files. They are interactive and destructive.
 
@@ -120,8 +121,8 @@ Verify changes as follows.
 
 ## Editing rules
 
-- Edit files under `home/`, `etc/`, and `usr/` as repository files. Do not copy
-  them into place. The user runs the init scripts.
+- Edit files under `home/`, `etc/`, `usr/`, and `opt/` as repository files. Do
+  not copy them into place. The user runs the init scripts.
 - Preserve the mirror layout. A file in `home/.config/x` belongs to
   `$HOME/.config/x`.
 - Do not reformat existing config files. Change only the lines that the task
