@@ -1,4 +1,1 @@
 .envrc
-
-# vLLM service conf; the global gitignore drops *.env
-!opt/llm/conf/vllm/*.env
