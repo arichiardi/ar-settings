@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+#
+# Cron wrapper for ntfy-gpu-temp-info.
+#
+# Sources the ntfy secrets, sets the alert threshold, then calls
+# ntfy-gpu-temp-info.
+#
+# Crontab:
+#   */15 * * * * /usr/local/bin/cron-ntfy-gpu-temp-info
+
+set -euo pipefail
+
+# nvidia-smi lives in /opt/nvidia/bin, which cron does not put on PATH.
+export PATH="/opt/nvidia/bin:$PATH"
+
+source /root/ntfy-secrets.bash
+
+# Alert when a GPU reaches this temperature in Celsius.
+export GPU_TEMPERATURE_THRESHOLD=${GPU_TEMPERATURE_THRESHOLD:-85}
+
+exec /usr/local/bin/ntfy-gpu-temp-info "$@"

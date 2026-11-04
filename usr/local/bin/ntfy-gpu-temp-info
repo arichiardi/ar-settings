@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+#
+# Send a ntfy notification with the GPU temperatures and the processes that
+# use the GPUs.
+#
+# If any GPU is at or above the warning threshold, send a high-priority
+# alert. Below the threshold send a low-priority info message, unless
+# GPU_TEMPERATURE_ALERT_ONLY is set. A failed nvidia-smi query also sends a
+# high-priority alert.
+#
+# Environment:
+#   - NTFY_SERVER                 (required)
+#   - NTFY_ACCESS_TOKEN           (required)
+#   - GPU_TEMPERATURE_TOPIC       topic path, default NTFY_TOPIC or services_system
+#   - GPU_TEMPERATURE_THRESHOLD   warning threshold in Celsius, default 85
+#   - GPU_TEMPERATURE_ALERT_ONLY  when 1, stay silent below the threshold
+
+set -euo pipefail
+
+ntfy_topic=${GPU_TEMPERATURE_TOPIC:-${NTFY_TOPIC:-services_system}}
+warn_threshold=${GPU_TEMPERATURE_THRESHOLD:-85}
+alert_only=${GPU_TEMPERATURE_ALERT_ONLY:-0}
+
+gpu_query="index,name,temperature.gpu,utilization.gpu,memory.used,memory.total"
+proc_query="pid,process_name,used_memory"
+
+if ! gpu_output=$(nvidia-smi --query-gpu="$gpu_query" \
+        --format=csv,noheader,nounits 2>&1); then
+    priority=high
+    tags=warning,computer
+    title="GPU temperature check failed"
+    msg="nvidia-smi failed to query GPU temperatures:
+
+$gpu_output"
+else
+    max_temp=""
+    gpu_lines=""
+    while IFS= read -r line; do
+        [ -n "$line" ] || continue
+        index=$(echo "$line" | cut -d, -f1 | xargs)
+        name=$(echo "$line" | cut -d, -f2 | sed 's/^ *//; s/ *$//')
+        temp=$(echo "$line" | cut -d, -f3 | xargs)
+        util=$(echo "$line" | cut -d, -f4 | xargs)
+        mem_used=$(echo "$line" | cut -d, -f5 | xargs)
+        mem_total=$(echo "$line" | cut -d, -f6 | xargs)
+
+        gpu_lines="${gpu_lines}GPU ${index} ${name}: ${temp}°C, ${util}% util, ${mem_used}/${mem_total} MiB"$'\n'
+
+        if [ -z "$max_temp" ] || [ "$temp" -gt "$max_temp" ]; then
+            max_temp=$temp
+        fi
+    done <<< "$gpu_output"
+
+    proc_output=$(nvidia-smi --query-compute-apps="$proc_query" \
+        --format=csv,noheader,nounits 2>/dev/null || true)
+
+    proc_lines=""
+    while IFS= read -r line; do
+        [ -n "$line" ] || continue
+        pid=$(echo "$line" | cut -d, -f1 | xargs)
+        pname=$(echo "$line" | cut -d, -f2 | sed 's/^ *//; s/ *$//')
+        pmem=$(echo "$line" | cut -d, -f3 | xargs)
+
+        proc_lines="${proc_lines}  $(basename -- "$pname") (pid ${pid}, ${pmem} MiB)"$'\n'
+    done <<< "$proc_output"
+    [ -n "$proc_lines" ] || proc_lines="  none"$'\n'
+
+    if [ "$max_temp" -ge "$warn_threshold" ]; then
+        priority=high
+        tags=warning,fire
+        title="GPU temperature is at ${max_temp}°C"
+    elif [ "$alert_only" = 1 ]; then
+        exit 0
+    else
+        priority=low
+        tags=information_source,snowflake
+        title="GPU temperature info"
+    fi
+
+    msg="GPU temperatures (warning at ${warn_threshold}°C):
+
+${gpu_lines}
+processes:
+${proc_lines}"
+fi
+
+curl_authz="Authorization: Bearer $NTFY_ACCESS_TOKEN"
+curl_endpoint=$NTFY_SERVER/$ntfy_topic
+
+curl \
+    -H "$curl_authz" \
+    -H "Title: $title" \
+    -H "Priority: $priority" \
+    -H "Tags: $tags" \
+    -d "$msg" \
+    "$curl_endpoint"
