@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+#
+# Send a ntfy notification with ZFS pool info for one pool.
+#
+# Usage:
+#   ntfy-zpool-info POOL
+#
+# The pool name is required. The script checks pool capacity. A pool at or
+# above the warning threshold gets a high-priority alert. Below the threshold
+# it sends a low-priority info message, unless ZPOOL_ALERT_ONLY is set.
+#
+# Environment:
+#   - NTFY_SERVER           (required)
+#   - NTFY_ACCESS_TOKEN     (required)
+#   - NTFY_TOPIC            topic path, default services_system
+#   - ZPOOL_CAPACITY_WARN   warning threshold in percent, default 90
+#   - ZPOOL_ALERT_ONLY      when 1, stay silent below the threshold
+
+set -euo pipefail
+
+if [ $# -ne 1 ]; then
+    echo "usage: $(basename "$0") POOL" >&2
+    exit 2
+fi
+
+pool_name=$1
+warn_threshold=${ZPOOL_CAPACITY_WARN:-90}
+alert_only=${ZPOOL_ALERT_ONLY:-0}
+ntfy_topic=${NTFY_TOPIC:-services_system}
+
+capacity=$(zpool list -H -o capacity "$pool_name" | tr -d '%')
+
+if [ "$capacity" -ge "$warn_threshold" ]; then
+    priority=high
+    tags=warning,floppy_disk
+    title="ZFS pool $pool_name is at ${capacity}% capacity"
+elif [ "$alert_only" = 1 ]; then
+    exit 0
+else
+    priority=low
+    tags=information_source,floppy_disk
+    title="ZFS pool info for: $pool_name"
+fi
+
+iostat=$(zpool iostat -v "$pool_name")
+pool_status=$(zpool status -v "$pool_name")
+space=$(zfs list -r -o space "$pool_name")
+
+msg="capacity: ${capacity}% (warning at ${warn_threshold}%)
+
+$pool_status
+
+$space
+
+$iostat"
+
+curl_authz="Authorization: Bearer $NTFY_ACCESS_TOKEN"
+curl_endpoint=$NTFY_SERVER/$ntfy_topic
+
+curl \
+    -H "$curl_authz" \
+    -H "Title: $title" \
+    -H "Priority: $priority" \
+    -H "Tags: $tags" \
+    -d "$msg" \
+    "$curl_endpoint"

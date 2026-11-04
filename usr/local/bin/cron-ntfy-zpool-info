@@ -1,0 +1,18 @@
+#!/bin/bash
+#
+# Cron wrapper for ntfy-zpool-info.
+#
+# Sources the ntfy secrets, sets the alert threshold, then calls
+# ntfy-zpool-info for one pool.
+#
+# Crontab:
+#   */30 * * * * /usr/local/bin/cron-ntfy-zpool-info rpool
+
+set -euo pipefail
+
+source /root/ntfy-secrets.bash
+
+# Alert when a pool reaches this percent.
+export ZPOOL_CAPACITY_WARN=${ZPOOL_CAPACITY_WARN:-90}
+
+exec /usr/local/bin/ntfy-zpool-info "$@"
