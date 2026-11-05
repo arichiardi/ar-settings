@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+#
+# Block private network values in a commit.
+#
+# The hook scans the staged content of changed text files. It flags RFC1918
+# IPv4 addresses and the domains listed in .githooks/private-domains.txt.
+# Encrypted and binary files are skipped because their bytes are noise.
+#
+set -euo pipefail
+
+repo_root="$(git rev-parse --show-toplevel)"
+deny_file="$repo_root/.githooks/private-domains.txt"
+
+private_ip='(^|[^0-9])(10|192\.168|172\.(1[6-9]|2[0-9]|3[01]))\.[0-9]{1,3}\.[0-9]{1,3}([^0-9]|$)'
+
+deny=''
+if [[ -f "$deny_file" ]]; then
+    deny="$(grep -v -e '^#' -e '^$' "$deny_file" | paste -sd'|' - || true)"
+fi
+
+pattern="$private_ip"
+if [[ -n "$deny" ]]; then
+    pattern="$pattern|($deny)"
+fi
+
+mapfile -t files < <(git diff --cached --name-only --diff-filter=ACM -- .)
+[[ ${#files[@]} -eq 0 ]] && exit 0
+
+matches="$(git grep --cached -I -n -E "$pattern" -- "${files[@]}" || true)"
+if [[ -n "$matches" ]]; then
+    echo "pre-commit: private network value found in staged files:" >&2
+    echo "$matches" >&2
+    echo "Encrypt the file with gpg-backup-to-repo, or remove the value." >&2
+    exit 1
+fi

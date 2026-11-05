@@ -1,0 +1,3 @@
+# Domains and endpoints that must not appear in plaintext.
+# One extended regular expression per line. Blank lines and '#' are ignored.
+albaforge\.com

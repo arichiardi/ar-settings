@@ -65,12 +65,20 @@ These rules are critical. Violation changes the live machine or destroys data.
 
 Never commit a private value in plaintext. Private values include a custom
 domain, hostname, IP address, token, key, account identifier, and network
-detail. When you see one, stop and ask the user, and propose to encrypt the
-file.
+detail. A DNS name and an RFC1918 private IP count as private values. This
+covers `baseUrl`, CORS origins, and allowed-host settings. When you see one,
+stop and ask the user, and propose to encrypt the file.
 
 `gpg-backup-to-repo` snapshots a live machine file into the repository as
 `<repo_path>.gpg`. Prefer `.gpg` files. Add a `"<machine_path>:<repo_path>"`
-entry to its `files` array and run it from the repository root.
+entry to its `files` array and run it from the repository root. Pass a full
+path to update selected entries only, for example
+`./gpg-backup-to-repo home/.config/pi/agent/models.json`.
+
+Known private files:
+
+- `home/.config/pi/agent/models.json` - encrypted as `models.json.gpg`. It
+  holds local provider endpoints and tokens.
 
 ## Script conventions
 
@@ -108,6 +116,15 @@ Verify changes as follows.
    ```
 4. State which checks you ran. Do not claim a script works. Say that syntax
    passes and that runtime behavior needs the user's machine.
+5. Scan the staged tree for private values before you commit:
+   ```shell
+   .githooks/pre-commit
+   ```
+   `pre-commit` blocks RFC1918 IPs and the domains in
+   `.githooks/private-domains.txt`. Install it once per clone:
+   ```shell
+   git config core.hooksPath .githooks
+   ```
 
 ## Git conventions
 
