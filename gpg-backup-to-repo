@@ -17,6 +17,7 @@ source ./home/.local/bin/gpg-helpers.sh
 files=(
     "/etc/caddy/Caddyfile:etc/caddy/Caddyfile"
     "/etc/caddy/conf.d/alba.conf:etc/caddy/conf.d/alba.conf"
+    "/etc/caddy/conf.d/alba/ai-api-handler.caddy:etc/caddy/conf.d/alba/ai-api-handler.caddy"
     "/etc/caddy/conf.d/alba/llamacpp_handler.caddy:etc/caddy/conf.d/alba/llamacpp_handler.caddy"
     "/etc/caddy/conf.d/alba/llamaswap_handler.caddy:etc/caddy/conf.d/alba/llamaswap_handler.caddy"
 )
