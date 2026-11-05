@@ -7,12 +7,12 @@
 # Each entry is "machine_path:repo_path". A file is re-encrypted only
 # when the live file is newer than its committed ciphertext.
 #
-# Pass one or more full paths to restrict the run. A path matches the
-# machine path or the repo path of an entry. With no argument the script
-# updates every entry. Examples:
+# Pass one or more full live paths to restrict the run. With no argument
+# the script updates every entry. Examples:
 #
 #   ./gpg-backup-to-repo                    # all entries
-#   ./gpg-backup-to-repo home/.config/pi/agent/models.json
+#   ./gpg-backup-to-repo ~/.config/pi/agent/models.json
+#   ./gpg-backup-to-repo /etc/caddy/Caddyfile
 #
 # The script has to be run from the ar-settings repository root.
 #
@@ -36,8 +36,7 @@ if [[ $# -gt 0 ]]; then
         found=
         for entry in "${all_files[@]}"; do
             src=${entry%%:*}
-            dest=${entry#*:}
-            if [[ "$want" == "$src" || "$want" == "$dest" ]]; then
+            if [[ "$want" == "$src" ]]; then
                 selected+=("$entry")
                 found=1
                 break

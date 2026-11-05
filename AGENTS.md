@@ -72,8 +72,8 @@ stop and ask the user, and propose to encrypt the file.
 `gpg-backup-to-repo` snapshots a live machine file into the repository as
 `<repo_path>.gpg`. Prefer `.gpg` files. Add a `"<machine_path>:<repo_path>"`
 entry to its `files` array and run it from the repository root. Pass a full
-path to update selected entries only, for example
-`./gpg-backup-to-repo home/.config/pi/agent/models.json`.
+live path to update selected entries only, for example
+`./gpg-backup-to-repo ~/.config/pi/agent/models.json`.
 
 Known private files:
 
