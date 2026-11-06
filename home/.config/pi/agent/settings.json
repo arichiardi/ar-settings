@@ -25,9 +25,8 @@
     }
   },
   "enabledModels": [
-    "pelagic-ai/**",
     "deepseek/deepseek-v4.1-*",
-    "google/gemma-4*",
+    "google/gemma*",
     "liquid/*",
     "poolside/laguna-*",
     "qwen/qwen3.*-122b*",
