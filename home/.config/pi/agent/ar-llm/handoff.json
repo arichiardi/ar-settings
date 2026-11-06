@@ -1,11 +1,7 @@
 {
   "provider": {
-    "github-copilot": {
-      "claude-sonnet-4.6": {
-        "compat": {
-          "forceAdaptiveThinking": false
-        }
-      }
+    "alba-ai": {
+      "alba-ai/LFM3-Omni-2B": {}
     }
   }
 }
