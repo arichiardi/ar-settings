@@ -1,7 +1,15 @@
 {
   "provider": {
-    "alba-ai": {
-      "alba-ai/LFM3-Omni-2B": {}
+    "pelagic-ai": {
+      "liquid/LFM2.5-24B-A2B": {
+      }
+    },
+    "openrouter": {
+      "mistralai/mistral-nemo": {
+        "compat": {
+          "forceAdaptiveThinking": false
+        }
+      }
     }
   }
 }

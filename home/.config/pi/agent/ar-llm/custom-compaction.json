@@ -8,8 +8,8 @@
     "github-copilot": {
       "model": "mai-code-1.1-flash"
     },
-    "alba-ai": {
-      "model": "alba-ai/LFM3-Omni-2B",
+    "pelagic-ai": {
+      "model": "liquid/LFM3-Omni-2B",
       "max-output-tokens": 4096,
       "stream-options": {
         "temperature": 0.5
@@ -32,6 +32,7 @@
       "chunking": {
         "context-window": 131072,
         "safety-tokens": 512,
+        "estimation-chars-per-token": 4,
         "overlap-messages": 0,
         "max-depth": 4
       }

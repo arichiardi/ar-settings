@@ -1,7 +1,7 @@
 {
   "lastChangelogVersion": "1.5.0",
-  "defaultProvider": "alba-ai",
-  "defaultModel": "alba-ai/qwen3.8-flash-next",
+  "defaultProvider": "pelagic-ai",
+  "defaultModel": "qwen/qwen3.8-flash-next",
   "defaultThinkingLevel": "low",
   "hideThinkingBlock": true,
   "tuiMode": "regular",
@@ -10,31 +10,29 @@
     "reserveTokens": 16384,
     "keepRecentTokens": 24576,
     "modelOverrides": {
-      "alba-ai/alba-ai/LFM2.5-24B-A2B": {
+      "pelagic-ai/liquid/LFM2.5-24B-A2B": {
         "reserveTokens": 16384,
         "keepRecentTokens": 32768
       },
-      "alba-ai/alba-ai/gemma4-moe": {
+      "pelagic-ai/google/gemma4-moe": {
         "reserveTokens": 16384,
         "keepRecentTokens": 32768
       },
-      "alba-ai/alba-ai/qwen3.8-flash-next": {
+      "pelagic-ai/qwen/qwen3.8-flash-next": {
         "reserveTokens": 16384,
         "keepRecentTokens": 32768
       }
     }
   },
   "enabledModels": [
-    "alba-ai/*",
+    "pelagic-ai/**",
     "deepseek/deepseek-v4.1-*",
     "google/gemma-4*",
     "liquid/*",
-    "LFM2.5*",
     "poolside/laguna-*",
     "qwen/qwen3.*-122b*",
     "qwen/qwen3.*-27b*",
-    "qwen/qwen3.8*",
-    "qwen3.*"
+    "qwen/qwen3.8*"
   ],
   "theme": "dark",
   "packages": [
