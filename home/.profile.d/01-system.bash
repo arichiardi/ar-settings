@@ -1,3 +1,6 @@
+# https://bugzilla.redhat.com/show_bug.cgi?id=755553
+export BROWSER="firefox:google-chrome"
+
 if `is_os darwin`; then
     homebrew_dir=/opt/homebrew # hardcoding because brew --prefix is slow
 fi
