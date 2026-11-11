@@ -34,6 +34,9 @@
     "qwen/qwen3.8*"
   ],
   "theme": "dark",
+  "markdown": {
+    "codeBlockIndent": ""
+  },
   "packages": [
     "npm:pi-subagents",
     "npm:pi-intercom",
