@@ -69,6 +69,32 @@
         "scout": {
           "model": "poolside/laguna-s-2.1:free"
         }
+      },
+      "pelagic-ai": {
+        "oracle": {
+          "model": "qwen/qwen3.8-flash-next",
+          "thinking": "xhigh"
+        },
+        "planner": {
+          "model": "qwen/qwen3.8-flash-next",
+          "thinking": "medium"
+        },
+        "reviewer": {
+          "model": "qwen/qwen3.8-flash-next",
+          "thinking": "xhigh"
+        },
+        "worker": {
+          "model": "qwen/qwen3.8-flash-next",
+          "thinking": "medium"
+        },
+        "explorer": {
+          "model": "qwen/qwen3.8-flash-next",
+          "thinking": "low"
+        },
+        "scout": {
+          "model": "qwen/qwen3.8-flash-next",
+          "thinking": "low"
+        }
       }
     }
   },
