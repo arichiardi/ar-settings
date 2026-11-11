@@ -9,5 +9,11 @@ etc/caddy/Caddyfile.gpg diff=gpg -merge
 etc/caddy/conf.d/*.gpg diff=gpg -merge
 etc/caddy/conf.d/**/*.gpg diff=gpg -merge
 
+# The pi agent config is GPG symmetric (passphrase, no recipient), written by
+# gpg-backup-to-repo. Disable the merge driver: gpg-merge re-encrypts with
+# GIT_GPGMERGE_KEY, which turns a symmetric file into a public-key file and
+# breaks the symmetric decrypt loop.
+home/.config/pi/agent/*.gpg diff=gpg -merge
+
 # Exported secret-key backups are binary OpenPGP packets, not ciphertext.
 bootstrap/gpg/*.gpg binary
