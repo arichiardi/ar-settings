@@ -28,6 +28,7 @@ all_files=(
     "/etc/caddy/conf.d/alba/llamacpp_handler.caddy:etc/caddy/conf.d/alba/llamacpp_handler.caddy"
     "/etc/caddy/conf.d/alba/llamaswap_handler.caddy:etc/caddy/conf.d/alba/llamaswap_handler.caddy"
     "$HOME/.config/pi/agent/models.json:home/.config/pi/agent/models.json"
+    "$HOME/.config/pi/agent/settings.json:home/.config/pi/agent/settings.json"
 )
 
 if [[ $# -gt 0 ]]; then
