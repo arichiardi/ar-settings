@@ -46,6 +46,8 @@
     textconv = hexdump -v -C
 [diff "gpg"]
     textconv = gpg --no-tty -q --decrypt
+    cachetextconv = true
+    binary = true
 [alias]
     apr = "apply --reject"
     co = "checkout"
