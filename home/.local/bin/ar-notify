@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+#
+# Send a desktop notification. Best-effort: a missing notifier or a denied
+# permission never fails the caller.
+#
+# macOS prefers PATH terminal-notifier, then osascript. Linux uses notify-send.
+#
+# --image is attached with -contentImage on macOS (shown inside the
+# notification). The corner app icon still comes from the sending bundle.
+# Linux ignores --image for now.
+#
+# Usage: ar-notify --title TITLE --message MESSAGE [--image PATH]
+set -euo pipefail
+
+title='Notification'
+msg=''
+image=''
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --title)   title="${2:?--title needs a value}"; shift 2 ;;
+        --message) msg="${2:?--message needs a value}"; shift 2 ;;
+        --image)   image="${2:?--image needs a value}"; shift 2 ;;
+        -h|--help)
+            printf 'Usage: %s --title TITLE --message MESSAGE [--image PATH]\n' \
+                "$(basename "$0")"
+            exit 0
+            ;;
+        *)
+            printf '%s: unknown option: %s\n' "$(basename "$0")" "$1" >&2
+            exit 2
+            ;;
+    esac
+done
+
+if [[ "$OSTYPE" == *darwin* ]]; then
+    if command -v terminal-notifier >/dev/null 2>&1; then
+        args=(-message "$msg" -title "$title")
+        [[ -n "$image" && -r "$image" ]] && args+=(-contentImage "$image")
+        terminal-notifier "${args[@]}" >/dev/null 2>&1 || true
+    elif command -v osascript >/dev/null 2>&1; then
+        osascript -e "display notification \"$msg\" with title \"$title\"" \
+            >/dev/null 2>&1 || true
+    fi
+elif command -v notify-send >/dev/null 2>&1; then
+    notify-send -u normal -h 'int:transient:1' "$title" "$msg" \
+        >/dev/null 2>&1 || true
+fi

@@ -35,9 +35,15 @@ for arg in $script_args; do
 done
 
 # No display: degrade -c to a tty frame so headless sessions get a daemon
-# frame instead of the -a fallback spawning a fresh emacs.
+# frame instead of the -a fallback spawning a fresh emacs. Only X11/Wayland
+# Unix systems need a display server; macOS and Windows have a native GUI,
+# so identify those Unix systems positively instead of excluding macOS.
+needs_display=false
+case "$OSTYPE" in
+    linux*|*bsd*|*solaris*|*sunos*|*hurd*) needs_display=true ;;
+esac
 degraded=false
-if $want_gui && [[ -z "${DISPLAY:-}" ]]; then
+if $want_gui && $needs_display && [[ -z "${DISPLAY:-}" && -z "${WAYLAND_DISPLAY:-}" ]]; then
     want_tty=true
     degraded=true
 fi
@@ -47,6 +53,13 @@ notice_lines() {
     printf 'logs: %s\n' "${daemon_log_dir:-$log_root/emacs-daemon.*}"
     printf 'started daemon\n'
     printf 'socket: %s\n' "${sock:-unknown}"
+}
+
+# Cold-start notification. Best-effort: skip when ar-notify is missing.
+notify_starting() {
+    command -v ar-notify >/dev/null 2>&1 || return 0
+    ar-notify --title 'Emacs Server' --message 'Starting, please wait.' \
+        --image "$HOME/.local/share/icons/hicolor/32x32/apps/emacs.png"
 }
 
 # Failure diagnostics for a daemon that never served the socket.
@@ -143,6 +156,7 @@ ensure_daemon() {
     # pointer for later invocations
     printf '%s\n' "$daemon_log_dir" > "$log_root/emacs-daemon.logdir"
     daemon_exit_status=""
+    notify_starting
     # Do not leak the lock fd into the daemon: an inherited copy would
     # hold the lock for the daemon's whole lifetime and block later runs.
     if [[ -n "$start_lock_fd" ]]; then
