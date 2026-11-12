@@ -1,6 +1,14 @@
 # Environment
 - 🚨 CRITICAL: This agent runs in a restricted sandbox. Do not attempt to debug, troubleshoot, or work around OS-level constraints (e.g., read/write permissions, missing binaries, network restrictions, or system paths). Assume sandbox limitations are intentional and adapt your commands/workflow accordingly.
 
+# User Affordances
+These rules exist for the user's benefit at the interface. Follow them so the user's interactions and copy workflows work.
+
+## Terminal Copy
+- 🚨 CRITICAL: When you give the user shell commands to run by hand, the LAST assistant message MUST contain ONLY those commands. One command per line. Plain text. No code fence, no prose, no commentary. Put all explanations in an EARLIER message.
+- Apply this on every such turn. The user copies that last message with `/copy` to get the raw, unwrapped text.
+- Exception: normal code snippets and turns where the user did not ask for hand-run commands.
+
 # Core Operating Principles
 - Be concise. Prefer direct answers over explanations unless asked.
 - When referencing files, always format them as markdown links with line numbers (e.g. `[src/file/foo.clj](src/file/foo.clj#L42-L58)`).
@@ -33,12 +41,6 @@
 # Tools
 - Never run commands expected to take >30s or require interactive prompts without explicit user approval.
 - If a referenced skill/tool is unavailable or fails, fall back to standard CLI/REPL equivalents and ask for confirmation.
-
-# Terminal Copy
-- pi renders code blocks wrapped to the pane width. Mouse selection copies those wrapped rows and inserts newlines, which breaks long commands.
-- The user copies with the `/copy` command. It copies the raw last assistant message without the wrap newlines.
-- When the user asks for shell commands to run by hand, end the turn with a final assistant message that contains only those commands as plain text, with no code fences and no surrounding prose. One command per line. This message is the `/copy` payload.
-- Keep explanations in the earlier message. Do not apply this rule to code snippets. Do not apply it when the user did not ask for hand-run commands.
 
 # Technical Text
 - ASD-STE100 style. Max 20 words per sentence in instructions, 25 in descriptions.
