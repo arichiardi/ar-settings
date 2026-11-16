@@ -1,18 +1,25 @@
 ---
 description: Write concise, imperative Git commit messages adhering to strict style guidelines.
-argument-hint: "[LINK_1 LINK_2 ...]"
+argument-hint: "[INSTRUCTIONS] [LINK_OR_SHA_1 LINK_OR_SHA_2 ...]"
 ---
 
 # Write a Commit Message
 
 Write a short, clear commit message that summarizes the changes. You may handle multiple repositories.
 
+## Arguments
+
+- The first argument is an optional block of additional instructions.
+- Treat every remaining argument as a reference.
+- References can be links or commit SHAs.
+- If a remaining argument is neither a link nor a plausible commit SHA, warn that the first argument must be quoted, then ask for a corrected invocation.
+
 ## Context
 
 A commit message must explain why you make a change. The diff shows what
 changed, not why. Before you write, collect the reason:
 
-- Read every link the user provides.
+- Read every reference the user provides.
 - Look at related issues, pull requests, and recent commits.
 - Read the code and its history.
 - Ask the user when the reason is still unclear.
@@ -46,23 +53,32 @@ Do not guess the reason.
 ### Output Rules
 
 - Only return the commit message in your response. Do not include any additional meta-commentary.
+- Exception: if a remaining argument is neither a link nor a plausible commit SHA, warn that the first argument must be quoted, then ask for a corrected invocation instead of writing a commit message.
 - Do not include the raw diff output in the commit message.
 - Do not include any links in the commit message unless the user explicitly asks you to.
 - Think carefully before you write your commit message.
 
 What you write will be passed directly to `git commit -m "[message]"`.
 
-## Links
+## Instructions and References
 
-Links provided: ${@:-None}
+Instructions: ${1:-None}
+References: ${@:2}
 
-If one or more links are provided, read each one **before** writing the commit message. Use their content (PR description, issue summary, commit context, etc.) as additional context to better describe the motivation and intent behind the change. Do not copy text verbatim — synthesize it into the commit message naturally.
+The first argument is the instruction block. Preserve its complete meaning.
+The remaining arguments are references. Read every reference before writing the
+commit message.
 
-## Critical: Handling GitHub Links
+Use link content, issue summaries, pull request descriptions, and commit contents as supporting context. Do not copy text verbatim. Synthesize the context into the commit message naturally.
 
-- If the user provides a link to `github.com` (e.g., a PR, issue, or commit), you **MUST NEVER** use web search tools (such as `searxng`, `web_search`, or general browser tools).
+For a commit SHA, inspect the commit and its relevant history. Treat the SHA as documentation that supports the change, not as text to include in the message.
+
+## Critical: Handling GitHub References
+
+- If the user provides a reference to `github.com` (e.g., a PR, issue, or commit), you **MUST NEVER** use web search tools (such as `searxng`, `web_search`, or general browser tools).
 - You **MUST** use the GitHub CLI (`gh`) or the dedicated GitHub tool available in your environment to retrieve the content directly.
-- Use retrieved link content as context to inform the commit message.
+- Use retrieved reference content as context to inform the commit message.
+- For a SHA, use the relevant repository's Git history or GitHub CLI to inspect the commit directly.
 
 **Example:**
 
