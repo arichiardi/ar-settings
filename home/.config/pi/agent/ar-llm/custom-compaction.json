@@ -9,18 +9,14 @@
       "model": "mai-code-1.1-flash"
     },
     "pelagic-ai": {
-      "model": "liquid/LFM3-Omni-2B",
+      "model": "google/gemma4-moe",
       "max-output-tokens": 4096,
       "stream-options": {
         "temperature": 0.5
       },
-      "request-params": {
-        "chat_template_kwargs": {
-          "enable_thinking": false
-        }
-      },
       "chunking": {
-        "context-window": 32768,
+        "context-window": 131072,
+        "estimation-chars-per-token": 3,
         "safety-tokens": 512,
         "overlap-messages": 0,
         "max-depth": 4
