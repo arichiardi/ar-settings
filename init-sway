@@ -28,17 +28,30 @@ wlroots_pkg=$(pkg_run -q -m "$pkg_mgr_base" -Si sway 2> /dev/null \
 # wlr-layer-shell-unstable-v1.xml, which conky loads at runtime to create a
 # layer-shell surface. Without it conky silently falls back to the X11/
 # Xwayland backend and gets tiled as a normal window by sway.
-# hyprpolkitagent is the polkit authentication agent KeePassXC Quick Unlock
-# needs on Wayland. sway does not autostart a polkit agent, so Quick Unlock
-# fails with "No Polkit authentication agent was available" without one. The
-# agent is started from home/.config/sway/config.
+# polkit-gnome is the polkit authentication agent KeePassXC Quick Unlock needs.
+# sway does not autostart a polkit agent, so Quick Unlock fails with "No Polkit
+# authentication agent was available" without one.
+#
+# Use polkit-gnome (a GTK agent that runs under XWayland), not hyprpolkitagent.
+# hyprpolkitagent is a Wayland client on the hyprtoolkit/aquamarine renderer,
+# which needs a GBM allocator with PRIME buffer export. This box has 2x NVIDIA
+# RTX 3090 + an AMD Raphael iGPU. The agent auto-selects the lowest PCI GPU (the
+# NVIDIA GA102), whose proprietary userspace GBM has no PRIME export, so it
+# aborts on init with "Couldn't open a gbm fd". nvidia-open is only the kernel
+# module; the GBM/PRIME gap is userspace. Env knobs AQ_RENDER_DEVICE
+# (compositor-only) and __EGL_VENDOR_LIBRARY_FILENAMES=50_mesa.json (device
+# enumeration still lists NVIDIA first) do not help; the client has no device
+# index knob. polkit-gnome runs under XWayland and needs no GBM. It is the polkit
+# reference agent and is in the official extra repo, not AUR.
+#
+# The agent is started from home/.config/sway/config.
 sway_packages=(sway swaybg swayidle waybar wlogout \
                swaylock-effects \
                grim slur brightnessctl wl-clipboard \
                dunst rofi foot conky wlr-protocols pcmanfm-gtk3 flameshot wev \
                xdg-desktop-portal-gtk \
                keepassxc accountsservice \
-               hyprpolkitagent \
+               polkit-gnome \
                ttf-jetbrains-mono ttf-noto-nerd \
                lightdm-gtk-greeter lightdm onboard \
                librsvg)
