@@ -81,6 +81,8 @@ _sandbox_agent_dir_rw_whitelist=(
 
 _sandbox_agent_socket_whitelist=()
 
+_sandbox_agent_group_whitelist=()
+
 _sandbox_agent_gnupg_home="${GNUPGHOME:-$HOME/.gnupg}"
 
 if [[ -d "$_sandbox_agent_gnupg_home" ]]; then
@@ -107,3 +109,4 @@ export SANDBOX_AGENT_DIR_TMPFS_BINDS="${_sandbox_agent_dir_tmpfs_binds[*]}"
 export SANDBOX_AGENT_DIR_RO_WHITELIST="${_sandbox_agent_dir_ro_whitelist[*]}"
 export SANDBOX_AGENT_DIR_RW_WHITELIST="${_sandbox_agent_dir_rw_whitelist[*]}"
 export SANDBOX_AGENT_SOCKET_WHITELIST="${_sandbox_agent_socket_whitelist[*]}"
+export SANDBOX_AGENT_GROUP_WHITELIST="${_sandbox_agent_group_whitelist[*]}"

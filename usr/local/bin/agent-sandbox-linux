@@ -9,6 +9,9 @@
 #                                    empty mode-0700 tmpfs. The RO/RW/socket lists then bind
 #                                    selected paths back into the tmpfs.
 #   SANDBOX_AGENT_SOCKET_WHITELIST - space-delimited list of host unix sockets bind-mounted RW.
+#   SANDBOX_AGENT_GROUP_WHITELIST  - space-delimited list of group names or GIDs to map into
+#                                    the sandbox. Only groups the real user belongs to are
+#                                    mappable. Each becomes a bwrap --gid argument.
 set -euo pipefail
 
 # Read from environment, default to empty.
@@ -17,6 +20,7 @@ SANDBOX_AGENT_DIR_RW_WHITELIST="${SANDBOX_AGENT_DIR_RW_WHITELIST:-}"
 SANDBOX_AGENT_DIR_RO_WHITELIST="${SANDBOX_AGENT_DIR_RO_WHITELIST:-}"
 SANDBOX_AGENT_DIR_TMPFS_BINDS="${SANDBOX_AGENT_DIR_TMPFS_BINDS:-}"
 SANDBOX_AGENT_SOCKET_WHITELIST="${SANDBOX_AGENT_SOCKET_WHITELIST:-}"
+SANDBOX_AGENT_GROUP_WHITELIST="${SANDBOX_AGENT_GROUP_WHITELIST:-}"
 
 echo_info() { echo "ℹ️ $*"; }
 echo_warn() { echo "⚠️ $*" >&2; }
@@ -59,6 +63,23 @@ bwrap_args=(
 # Drop supplementary groups (e.g. wheel). The caller identity is mapped
 # through an unprivileged user namespace, so this works as non-root.
 bwrap_args+=( --unshare-user )
+
+# Map selected supplementary groups into the user namespace. bwrap accepts
+# --gid more than once and writes each GID into gid_map. The kernel only
+# allows mapping a GID the real user is a member of, so unlisted groups and
+# groups the caller lacks stay dropped.
+for group in $SANDBOX_AGENT_GROUP_WHITELIST; do
+    if [[ "$group" =~ ^[0-9]+$ ]]; then
+        gid="$group"
+    else
+        gid="$(getent group "$group" | cut -d: -f3 || true)"
+    fi
+    if [[ -n "$gid" ]]; then
+        bwrap_args+=( --gid "$gid" )
+    else
+        echo_warn "Group skipped: $group not found"
+    fi
+done
 
 # Whitelist entries are literal paths; globs are expanded in the profile
 # (07-sandbox.bash). Disable pathname expansion for the loops below.
