@@ -67,8 +67,8 @@
       "/\\btruncate\\b/i",
       "/\\bdd\\b/i",
       "/\\bshred\\b/i",
-      "(^|[^<])>(?!>)",
-      ">>",
+      "/(^|[^<])>(?!>)/",
+      "/>>/",
       "/\\bnpm\\s+(install|uninstall|update|ci|link|publish)/i",
       "/\\byarn\\s+(add|remove|install|publish)/i",
       "/\\bpnpm\\s+(add|remove|install|publish)/i",
@@ -89,18 +89,23 @@
     ]
   },
   "tools": {
-    "planModeTools": ["read", "bash", "grep", "find", "ls", "questionnaire", "ag"],
+    "planModeTools": ["read", "bash", "grep", "find", "ls", "questionnaire"],
     "normalModeTools": ["read", "bash", "edit", "write"]
   },
-  "extraction": {
+  "planFormat": {
     "planHeaderPattern": "/\\*{0,2}Plan:\\*{0,2}\\s*\\n/i",
     "stepNumberPattern": "/^\\s*(\\d+)[.)]\\s+\\*{0,2}([^*\\n]+)/gm",
     "doneMarkerPattern": "/\\[DONE:(\\d+)\\]/gi",
     "maxStepLength": 50,
-    "cleanStepText": true
+    "cleanStepText": true,
+    "hints": {
+      "planHeader": "Plan:",
+      "stepPrefix": "1."
+    }
   },
   "prompts": {
-    "planModeContext": "[PLAN MODE ACTIVE]\nYou are in plan mode - a read-only exploration mode for safe code analysis.\n\nRestrictions:\n- You can only use: {tools}\n- You CANNOT use: edit, write (file modifications are disabled)\n- Bash is restricted to an allowlist of read-only commands\n\nAsk clarifying questions using the questionnaire tool.\nUse brave-search skill via bash for web research.\n\nCreate a detailed numbered plan under a \"Plan:\" header:\n\nPlan:\n1. First step description\n2. Second step description\n...\n\nDo NOT attempt to make changes - just describe what you would do.",
-    "executionContext": "[EXECUTING PLAN - Full tool access enabled]\n\nRemaining steps:\n{todoList}\n\nExecute each step in order.\nAfter completing a step, include a [DONE:n] tag in your response."
+    "planModeContext": "[PLAN MODE ACTIVE]\nYou are in plan mode - a read-only exploration mode for safe code analysis.\n\nRestrictions:\n- You can only use: {tools}\n- You CANNOT use: edit, write (file modifications are disabled)\n- Bash is restricted to an allowlist of read-only commands\n\nAsk clarifying questions using the questionnaire tool.\nUse brave-search skill via bash for web research.\n\nCreate a detailed numbered plan under a \"{planHeader}\" header:\n\n{planHeader}\n{stepPrefix} First step description\n...\n\nDo NOT attempt to make changes - just describe what you would do.",
+    "executionContext": "[EXECUTING PLAN - Full tool access enabled]\n\nRemaining steps:\n{todoList}\n\nExecute each step in order.\nAfter completing a step, include a [DONE:n] tag in your response.",
+    "planCreationPrompt": "Your previous response did not contain an extractable plan.\nRespond with a plan under a \"{planHeader}\" header, as a numbered list of short steps (max {maxStepLength} characters each), e.g.:\n\n{planHeader}\n{stepPrefix} First step description\n\nDo not make any changes yet."
   }
 }
