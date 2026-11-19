@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+#
+# Report private values in reachable commit messages.
+#
+# A commit message is public once the commit is pushed. This script scans the
+# subject and body of every commit reachable from a ref. It prints the ref, the
+# commit, and the matching text. It scans commit metadata only. It runs no
+# `git log -p`, no `git log -S`, and no `git diff`, so it never decrypts a blob.
+#
+# Usage:
+#   git-private-msg-scan [ref ...]
+#
+# With no argument, scan refs/heads, refs/tags, and refs/remotes. Pass a ref to
+# narrow the scan. The exit status is 0 when no match is found, 1 otherwise.
+#
+set -euo pipefail
+
+# Custom DNS labels, one per line. Match every hostname that carries the label
+# and its top level domain, so one entry covers every sub-domain. Keep `.`
+# inside a bracket expression: this grep build mishandles a bare escaped dot in
+# an ERE. Blank lines and '#' are ignored.
+dns_rules=()
+while IFS= read -r rule; do
+    [[ "$rule" =~ ^[[:space:]]*([#]|$) ]] && continue
+    dns_rules+=("$rule")
+done <<'RULES'
+albaforge
+comcast
+RULES
+
+# Account identifiers to report, one per line. These are path fragments that
+# name a user account. The hook cannot rewrite these. A human must reword them.
+account_rules=()
+while IFS= read -r rule; do
+    [[ "$rule" =~ ^[[:space:]]*([#]|$) ]] && continue
+    account_rules+=("$rule")
+done <<'RULES'
+/home/cokap
+/home/kapitan
+/home/arichiardi
+/Users/arichi801
+arichi801@
+RULES
+
+build_pattern() {
+    local -n rules="$1"
+    local out='' rule esc
+    for rule in "${rules[@]}"; do
+        esc="$(printf '%s' "$rule" | sed 's/[[\.*^$()+?{|]/\\&/g')"
+        out="${out:+$out|}$esc"
+    done
+    printf '%s' "$out"
+}
+
+dns=''
+if (( ${#dns_rules[@]} > 0 )); then
+    dns="$(build_pattern dns_rules)"
+fi
+accounts=''
+if (( ${#account_rules[@]} > 0 )); then
+    accounts="$(build_pattern account_rules)"
+fi
+
+# A hostname match is the optional parent labels, the deny label, the dot, and
+# the top level domain. The look-behind stops a mid-token match.
+parts=()
+if [[ -n "$dns" ]]; then
+    parts+=('(^|[^[:alnum:]._-])(([[:alnum:]][[:alnum:]-]*[.])*('"$dns"')[.][[:alpha:]]{2,})+')
+fi
+if [[ -n "$accounts" ]]; then
+    parts+=("$accounts")
+fi
+if (( ${#parts[@]} == 0 )); then
+    echo "git-private-msg-scan: no rules loaded." >&2
+    exit 0
+fi
+pattern="$(printf '%s|' "${parts[@]}")"
+pattern="${pattern%|}"
+
+refs=("$@")
+if (( ${#refs[@]} == 0 )); then
+    mapfile -t refs < <(git for-each-ref --format='%(refname)' \
+        refs/heads refs/tags refs/remotes)
+fi
+
+status=0
+for ref in "${refs[@]}"; do
+    git rev-parse --verify --quiet "$ref" >/dev/null || continue
+    hits="$(git log "$ref" --no-merges --pretty='%H%x09%ad%x09%s%n%b%n\x00' \
+        --date=short | LC_ALL=C grep -iE "$pattern" || true)"
+    [[ -z "$hits" ]] && continue
+    status=1
+    echo "== $ref"
+    printf '%s\n' "$hits"
+done
+
+if (( status == 0 )); then
+    echo "git-private-msg-scan: no private value found in ${#refs[@]} ref(s)."
+fi
+exit "$status"

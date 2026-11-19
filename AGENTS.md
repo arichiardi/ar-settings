@@ -80,6 +80,32 @@ Known private files:
 - `home/.config/pi/agent/models.json` - encrypted as `models.json.gpg`. It
   holds local provider endpoints and tokens.
 
+### Commit messages
+
+Never put a private value in a commit message. A message is public once the
+commit is pushed. Write no custom domain, hostname, FQDN, sub-domain, IP
+address, token, key, account identifier, or network detail in a subject or
+body. Describe the host by its role, for example "the AI host" or "the search
+upstream". Use a port, a path, or a service name when the exact value is not
+needed.
+
+This rule applies to every place a message string is stored:
+
+- `git commit`, `git commit --amend`, and any rebase message.
+- A `rebase -i` label, for example `label <topic>` or `reset <ref>`.
+- `git notes`, tag messages, and a merge message.
+- A tool-authored message that you write, such as a scripted commit.
+
+Write no account identifier. A home directory path is an account identifier, so
+write `~/.config/git/ignore` and not `/home/<user>/.config/git/ignore`. The same
+holds for `/Users/<user>` and `/mnt/<user>`. Describe the path by its role.
+
+Scan your own message text before you commit. The `.githooks` hooks are the
+backstop: `prepare-commit-msg` replaces a custom DNS name with
+`[custom-domain]`, and `pre-commit` blocks a custom DNS name in staged files or
+in the message. A block is a signal to rewrite the message, not a reason to use
+`--no-verify`.
+
 ## Script conventions
 
 - Use `#!/usr/bin/env bash`. Every script sets `set -euo pipefail`.
@@ -120,8 +146,12 @@ Verify changes as follows.
    ```shell
    .githooks/pre-commit
    ```
-   `pre-commit` blocks RFC1918 IPs and the domains in
-   `.githooks/private-domains.txt`. Install it once per clone:
+   `pre-commit` blocks RFC1918 IPs, custom DNS names in staged files, and
+   custom DNS names in the commit message. The deny list lives inside
+   `.githooks/pre-commit` and `.githooks/prepare-commit-msg`. Do not create a
+   plaintext domain list file; it leaks the value it guards. `prepare-commit-msg`
+   does not rewrite an account identifier, so check that yourself. Install the
+   hooks once per clone:
    ```shell
    git config core.hooksPath .githooks
    ```
@@ -129,6 +159,8 @@ Verify changes as follows.
 ## Git conventions
 
 - Write concise, imperative commit messages.
+- Keep every private value out of a commit message. See "Commit messages" under
+  "Private config and data".
 - Commit signing is enabled. Do not disable it.
 - Never use `git commit --amend` or `git push --force` without explicit user
   confirmation.

@@ -2,34 +2,64 @@
 #
 # Block private network values in a commit.
 #
-# The hook scans the staged content of changed text files. It flags RFC1918
-# IPv4 addresses and the domains listed in .githooks/private-domains.txt.
-# Encrypted and binary files are skipped because their bytes are noise.
+# The hook scans the staged content of changed text files and the staged commit
+# message. It flags RFC1918 IPv4 addresses and custom DNS names. Encrypted and
+# binary files are skipped because their bytes are noise.
 #
 set -euo pipefail
 
 repo_root="$(git rev-parse --show-toplevel)"
-deny_file="$repo_root/.githooks/private-domains.txt"
-
 private_ip='(^|[^0-9])(10|192\.168|172\.(1[6-9]|2[0-9]|3[01]))\.[0-9]{1,3}\.[0-9]{1,3}([^0-9]|$)'
 
-deny=''
-if [[ -f "$deny_file" ]]; then
-    deny="$(grep -v -e '^#' -e '^$' "$deny_file" | paste -sd'|' - || true)"
-fi
+# Custom DNS labels to block, one label per line. Match a hostname that contains
+# the label and its top level domain, so one entry covers every sub-domain. Keep
+# `.` inside a bracket expression: this grep build mishandles a bare escaped dot
+# in an ERE. Blank lines and '#' are ignored.
+deny_rules=()
+while IFS= read -r rule; do
+    [[ "$rule" =~ ^[[:space:]]*([#]|$) ]] && continue
+    deny_rules+=("$rule")
+done <<'RULES'
+albaforge
+RULES
 
-pattern="$private_ip"
-if [[ -n "$deny" ]]; then
-    pattern="$pattern|($deny)"
+if (( ${#deny_rules[@]} > 0 )); then
+    deny=''
+    for rule in "${deny_rules[@]}"; do
+        deny="${deny:+$deny|}($rule)"
+    done
+    # A hostname match is the optional parent labels, then the deny label, the
+    # dot, and the top level domain. The look-behind stops a mid-token match.
+    private_dns='(^|[^[:alnum:]._-])(([[:alnum:]][[:alnum:]-]*[.])*'"$deny"'[.][[:alpha:]]{2,})+'
+    pattern="$private_ip|$private_dns"
+else
+    pattern="$private_ip"
 fi
 
 mapfile -t files < <(git diff --cached --name-only --diff-filter=ACM -- .)
-[[ ${#files[@]} -eq 0 ]] && exit 0
-
-matches="$(git grep --cached -I -n -E "$pattern" -- "${files[@]}" || true)"
-if [[ -n "$matches" ]]; then
-    echo "pre-commit: private network value found in staged files:" >&2
-    echo "$matches" >&2
-    echo "Encrypt the file with gpg-backup-to-repo, or remove the value." >&2
-    exit 1
+if [[ ${#files[@]} -gt 0 ]]; then
+    matches="$(git grep --cached -I -n -E "$pattern" -- "${files[@]}" || true)"
+    if [[ -n "$matches" ]]; then
+        echo "pre-commit: private network value found in staged files:" >&2
+        echo "$matches" >&2
+        echo "Encrypt the file with gpg-backup-to-repo, or remove the value." >&2
+        exit 1
+    fi
 fi
+
+# Scan the commit message. A prepared message lives in .git/COMMIT_EDITMSG on a
+# normal commit, and in $GIT_EDITOR_PATH for `git commit -m`. An empty message
+# means the editor runs after this hook, so prepare-commit-msg is the guard.
+msg_files=("$repo_root/.git/COMMIT_EDITMSG")
+[[ -n "${GIT_EDITOR_PATH:-}" && -f "$GIT_EDITOR_PATH" ]] && msg_files+=("$GIT_EDITOR_PATH")
+
+for msg in "${msg_files[@]}"; do
+    [[ -f "$msg" && -s "$msg" ]] || continue
+    hits="$(LC_ALL=C grep -n -E "$pattern" -- "$msg" | grep -v '^#' || true)"
+    if [[ -n "$hits" ]]; then
+        echo "pre-commit: private network value found in commit message ($msg):" >&2
+        echo "$hits" >&2
+        echo "Describe the host without naming it, for example 'the AI host'." >&2
+        exit 1
+    fi
+done

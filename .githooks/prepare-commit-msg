@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+#
+# Replace custom DNS names in a commit message with a placeholder.
+#
+# A commit message is public once the commit is pushed. A custom domain, a
+# hostname, or a FQDN in a subject or body leaks the private network. This hook
+# rewrites every matching hostname, with all its parent labels, to
+# `[custom-domain]`, so no commit records one. The rule list lives inside this
+# file. Edit the rules heredoc.
+#
+set -euo pipefail
+
+msg_file="$1"
+msg_source="${2:-}"
+
+# A merge, revert, fixup, or squash message comes from an existing commit that
+# already passed this hook. Do not rewrite it.
+case "$msg_source" in
+    merge | revert | squash | commit) exit 0 ;;
+esac
+
+[[ -s "$msg_file" ]] || exit 0
+
+# Custom DNS labels to scrub, one label per line. The hook matches every
+# hostname that contains the label and its top level domain, so one entry covers
+# every sub-domain. Blank lines and '#' are ignored.
+deny_rules=()
+while IFS= read -r rule; do
+    [[ "$rule" =~ ^[[:space:]]*([#]|$) ]] && continue
+    deny_rules+=("$rule")
+done <<'RULES'
+albaforge
+RULES
+
+if (( ${#deny_rules[@]} == 0 )); then
+    exit 0
+fi
+
+# Build one alternation from literal labels.
+deny=''
+for rule in "${deny_rules[@]}"; do
+    deny="${deny:+$deny|}($rule)"
+done
+
+# A hostname match is the optional parent labels, then the deny label, the dot,
+# and the top level domain. The label classes are greedy, so a three label name
+# such as the host ai.<label>.com matches in full. Keep `.` inside a bracket
+# expression: this grep build mishandles a bare escaped dot in an ERE. The
+# look-behind stops a mid-token match, and it omits `. : / ,` so URL and path
+# delimiters stay in the output.
+host='(([[:alnum:]][[:alnum:]-]*[.])*'"$deny"'[.][[:alpha:]]{2,})+'
+pattern='(^|[^[:alnum:]._-])'"$host"
+sed_expr='s/(^|[^[:alnum:]._-])'"$host"'/\1[custom-domain]/g'
+
+if ! LC_ALL=C grep -q -E "$pattern" -- "$msg_file"; then
+    exit 0
+fi
+
+tmp="$(mktemp "${TMPDIR:-/tmp}/prepare-commit-msg.XXXXXX")"
+LC_ALL=C sed -E "$sed_expr" -- "$msg_file" > "$tmp"
+cat "$tmp" > "$msg_file"
+rm -f "$tmp"
+echo "prepare-commit-msg: replaced a custom DNS name with [custom-domain]." >&2
