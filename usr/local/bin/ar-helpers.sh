@@ -335,6 +335,46 @@ compile_threads () {
     esac
 }
 
+# Install a built tree so admins own it and run it, and a service user runs it:
+# dirs 2775 (setgid wheel), non-exec files 0664, bin_dirs 0775. Group write lets
+# an admin in wheel edit the prefix, binaries included, without sudo. The
+# service user keeps read plus execute only. Overwrite only; nothing under dest
+# is removed. Needs sudo and the wheel group.
+#
+# bin_dirs are passed in because rsync has already reset the modes in dest, so
+# scanning dest cannot tell what was executable.
+#
+# Usage:
+#   install_admin_rw_dir <source dir> <dest dir> [bin_dirs...]
+# Example:
+#   install_admin_rw_dir build/.inst /opt/llamacpp bin lib
+install_admin_rw_dir () {
+    local src="$1" dest="$2"
+    shift 2
+    local bin_dirs=("$@")
+
+    [ -d "$src" ] || { echo_fail "no source dir $src"; return 1; }
+
+    local gid
+    gid=$(id -g wheel 2>/dev/null) || { echo_fail "group wheel is missing here"; return 1; }
+
+    # Numeric ids: rsync resolves --chown names on the receiver too. No --chmod:
+    # rsync 3.5 rejects symlink modes, which versioned .so links need.
+    echo_info "Installing $src -> $dest as root:$gid"
+    sudo rsync -a --chown=0:"$gid" "$src/" "$dest/"
+
+    # setgid on dirs: files an admin edits later inherit wheel, so the group
+    # write bit survives editing.
+    sudo chown -R "0:$gid" "$dest"
+    sudo find "$dest" -type d -exec chmod 2775 {} ';'
+    sudo find "$dest" -type f ! -perm /111 -exec chmod 0664 {} ';'
+
+    local d
+    for d in "${bin_dirs[@]}"; do
+        sudo find "$dest/$d" -type f -exec chmod 0775 {} ';'
+    done
+}
+
 # Thank you flowblok!
 ###################################
 # AFTER PROFILING, COMMENTING OUT #
