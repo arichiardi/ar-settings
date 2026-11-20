@@ -81,7 +81,9 @@ _sandbox_agent_dir_rw_whitelist=(
 
 _sandbox_agent_socket_whitelist=()
 
-_sandbox_agent_group_whitelist=()
+# One primary group only: bwrap takes a single --gid and denies setgroups. Unset = no real
+# group. Journal access uses UID ACLs; see init-sandbox-linux.
+_sandbox_agent_primary_group=""
 
 _sandbox_agent_gnupg_home="${GNUPGHOME:-$HOME/.gnupg}"
 
@@ -109,4 +111,4 @@ export SANDBOX_AGENT_DIR_TMPFS_BINDS="${_sandbox_agent_dir_tmpfs_binds[*]}"
 export SANDBOX_AGENT_DIR_RO_WHITELIST="${_sandbox_agent_dir_ro_whitelist[*]}"
 export SANDBOX_AGENT_DIR_RW_WHITELIST="${_sandbox_agent_dir_rw_whitelist[*]}"
 export SANDBOX_AGENT_SOCKET_WHITELIST="${_sandbox_agent_socket_whitelist[*]}"
-export SANDBOX_AGENT_GROUP_WHITELIST="${_sandbox_agent_group_whitelist[*]}"
+export SANDBOX_AGENT_PRIMARY_GROUP="${_sandbox_agent_primary_group:-}"

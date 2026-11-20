@@ -9,9 +9,10 @@
 #                                    empty mode-0700 tmpfs. The RO/RW/socket lists then bind
 #                                    selected paths back into the tmpfs.
 #   SANDBOX_AGENT_SOCKET_WHITELIST - space-delimited list of host unix sockets bind-mounted RW.
-#   SANDBOX_AGENT_GROUP_WHITELIST  - space-delimited list of group names or GIDs to map into
-#                                    the sandbox. Only groups the real user belongs to are
-#                                    mappable. Each becomes a bwrap --gid argument.
+#   SANDBOX_AGENT_PRIMARY_GROUP    - one group NAME. Sets the sandbox primary group through
+#                                    bwrap --gid. A numeric GID is refused: it can name wheel.
+#                                    Unset grants no real group (nobody, gid 65534).
+#   SANDBOX_AGENT_GROUP_UNSAFE     - set to 1 to allow 'root' or 'wheel' as primary group.
 set -euo pipefail
 
 # Read from environment, default to empty.
@@ -20,7 +21,8 @@ SANDBOX_AGENT_DIR_RW_WHITELIST="${SANDBOX_AGENT_DIR_RW_WHITELIST:-}"
 SANDBOX_AGENT_DIR_RO_WHITELIST="${SANDBOX_AGENT_DIR_RO_WHITELIST:-}"
 SANDBOX_AGENT_DIR_TMPFS_BINDS="${SANDBOX_AGENT_DIR_TMPFS_BINDS:-}"
 SANDBOX_AGENT_SOCKET_WHITELIST="${SANDBOX_AGENT_SOCKET_WHITELIST:-}"
-SANDBOX_AGENT_GROUP_WHITELIST="${SANDBOX_AGENT_GROUP_WHITELIST:-}"
+SANDBOX_AGENT_PRIMARY_GROUP="${SANDBOX_AGENT_PRIMARY_GROUP:-}"
+SANDBOX_AGENT_GROUP_UNSAFE="${SANDBOX_AGENT_GROUP_UNSAFE:-}"
 
 echo_info() { echo "ℹ️ $*"; }
 echo_warn() { echo "⚠️ $*" >&2; }
@@ -64,22 +66,40 @@ bwrap_args=(
 # through an unprivileged user namespace, so this works as non-root.
 bwrap_args+=( --unshare-user )
 
-# Map selected supplementary groups into the user namespace. bwrap accepts
-# --gid more than once and writes each GID into gid_map. The kernel only
-# allows mapping a GID the real user is a member of, so unlisted groups and
-# groups the caller lacks stay dropped.
-for group in $SANDBOX_AGENT_GROUP_WHITELIST; do
+# Choose the primary group. Accept a group name only, never a numeric GID: a number such as
+# 998 names wheel on this host and bypasses the block below. bwrap rejects non-numeric gids,
+# so resolve the name here. bwrap calls setgid with --gid and denies setgroups, so
+# supplementary groups stay dropped.
+_sandbox_gid=""
+if [[ -n "$SANDBOX_AGENT_PRIMARY_GROUP" ]]; then
+    group="$SANDBOX_AGENT_PRIMARY_GROUP"
     if [[ "$group" =~ ^[0-9]+$ ]]; then
-        gid="$group"
-    else
-        gid="$(getent group "$group" | cut -d: -f3 || true)"
+        echo_error "Refusing numeric GID: $group. Use a group name, so 'wheel' stays blocked."
+        exit 1
     fi
-    if [[ -n "$gid" ]]; then
-        bwrap_args+=( --gid "$gid" )
-    else
-        echo_warn "Group skipped: $group not found"
+    # Block privileged names before lookup. getent sees no groups in a nested sandbox, and
+    # the caller's kernel group set excludes wheel (see /proc/self/status Groups), so an
+    # unresolvable name would otherwise fall through to gid 65534 and grant it.
+    if [[ "$group" == "root" || "$group" == "wheel" ]] && [[ "$SANDBOX_AGENT_GROUP_UNSAFE" != "1" ]]; then
+        echo_error "Refusing group: $group. Set SANDBOX_AGENT_GROUP_UNSAFE=1 to allow it."
+        exit 1
     fi
-done
+    gid="$(getent group "$group" | cut -d: -f3 || true)"
+    if [[ ! -n "$gid" ]]; then
+        # Warn and keep going: getent sees no groups inside a nested sandbox, so this check
+        # cannot tell a missing group from a starved /etc/group. A bad value must not exit.
+        echo_warn "Group skipped: $group. It resolves to no gid; the sandbox gets no real group."
+    else
+        _sandbox_gid="$gid"
+    fi
+fi
+
+# Unset grants no real group, so a login group such as wheel is never used by accident.
+if [[ ! -n "$_sandbox_gid" ]]; then
+    _sandbox_gid=65534
+fi
+
+bwrap_args+=( --gid "$_sandbox_gid" )
 
 # Whitelist entries are literal paths; globs are expanded in the profile
 # (07-sandbox.bash). Disable pathname expansion for the loops below.
