@@ -307,6 +307,7 @@ is_nix () {
 # Usage:
 #   compile_threads           normal (default): physical cores
 #   compile_threads max       all logical CPUs (nproc)
+#   compile_threads high      three quarters of the logical CPUs
 #   compile_threads min       low count for a memory-heavy build
 #   compile_threads <n>       explicit thread count
 #
@@ -317,6 +318,14 @@ compile_threads () {
     case "$mode" in
         max)
             nproc
+            ;;
+        high)
+            # Between normal and max. SMT siblings on part of the cores.
+            # A ratio keeps the count correct on machines with other CPU
+            # topologies. Round up so a small machine never equals min.
+            local logical=$(( $(nproc) * 3 / 4 ))
+            [ "$logical" -gt 0 ] || logical=1
+            printf '%d\n' "$logical"
             ;;
         min)
             # A memory-heavy build swaps at a higher count.
