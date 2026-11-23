@@ -5,7 +5,9 @@
 # straight from the source path into gpg.
 #
 # Each entry is "machine_path:repo_path". A file is re-encrypted only
-# when the live file is newer than its committed ciphertext.
+# when its ciphertext does not decrypt to the live plaintext. Content,
+# not mtime, decides. A git checkout restamps a ciphertext with the
+# current time, so an mtime check hides a stale snapshot forever.
 #
 # Pass one or more full live paths to restrict the run. With no argument
 # the script updates every entry. Examples:
@@ -53,6 +55,31 @@ else
     selected=("${all_files[@]}")
 fi
 
+# Echo the live plaintext to stdout. Escalate with sudo when the file is
+# not readable by the caller.
+function read_src() {
+    if [[ -r "$1" ]]; then
+        cat "$1"
+    else
+        sudo -v
+        sudo cat "$1"
+    fi
+}
+
+# Return 0 when "$1" decrypts to exactly the plaintext of "$2". The
+# plaintext travels through a pipe into cmp. Never write it to disk. Keep
+# gpg stderr, which carries diagnostics and no key material, in $gpg_err
+# so the caller can report the reason.
+function content_matches() {
+    gpg --quiet --yes $gpg_symmetric_args --decrypt "$1" 2>"$gpg_err" \
+        | cmp -s - <(read_src "$2")
+}
+
+# The temp file holds gpg stderr only. shred -u zeroizes, truncates, and
+# unlinks it in one step.
+gpg_err=$(mktemp --tmpdir gpg-backup-verify.XXXXXX)
+trap 'shred -u "$gpg_err"' EXIT
+
 for entry in "${selected[@]}"; do
     src=${entry%%:*}
     dest=${entry#*:}
@@ -62,12 +89,19 @@ for entry in "${selected[@]}"; do
         continue
     fi
 
-    if [[ -f "$dest.gpg" && ! "$src" -nt "$dest.gpg" ]]; then
-        echo_info "Unmodified: $dest.gpg"
-        continue
+    reason=missing
+    if [[ -f "$dest.gpg" ]]; then
+        if content_matches "$dest.gpg" "$src"; then
+            echo_info "Unmodified: $dest.gpg"
+            continue
+        fi
+        reason="ciphertext does not match live content"
+        echo_warn "$dest.gpg: $reason"
+        while read -r line; do echo_info "  ${line#gpg: }"; done < "$gpg_err"
+        confirm "Re-encrypt $dest.gpg from $src?"
     fi
 
-    echo_info "Encrypting: $dest.gpg"
+    echo_info "Encrypting: $dest.gpg ($reason)"
     mkdir -p "$(dirname "$dest.gpg")"
     if [[ -r "$src" ]]; then
         gpg --yes $gpg_symmetric_args --symmetric --out "$dest.gpg" "$src"
@@ -78,5 +112,10 @@ for entry in "${selected[@]}"; do
     fi
 
     echo_info "Verifying: $dest.gpg"
-    gpg --quiet --yes $gpg_symmetric_args --decrypt --output /dev/null "$dest.gpg"
+    if ! content_matches "$dest.gpg" "$src"; then
+        echo_fail "Verify failed: $dest.gpg does not decrypt to $src"
+        cat "$gpg_err" >&2
+        exit 1
+    fi
+    echo_ok "Verified: $dest.gpg"
 done
