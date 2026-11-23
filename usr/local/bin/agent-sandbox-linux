@@ -135,11 +135,30 @@ for socket in $SANDBOX_AGENT_SOCKET_WHITELIST; do
 done
 
 
+# RO binds. A read-only bind area is recursive: --ro-bind forces every bind
+# under it read-only. So an RO path that is an ancestor of an RW path must not
+# be a recursive ro area, or it swallows the rw child (EROFS, notably on ZFS
+# where /opt, /opt/llm and /opt/polystrata share one dataset superblock).
+# Bind such a parent rw, then re-bind each rw child on top of it, then
+# remount the parent read-only non-recursively. The child binds sit above the
+# parent mount, so the parent's --remount-ro (non-recursive) leaves them rw.
 for path in $SANDBOX_AGENT_DIR_RO_WHITELIST; do
-    if [[ -e "$path" ]]; then
-        bwrap_args+=( --ro-bind "$path" "$path" )
-    else
+    if [[ ! -e "$path" ]]; then
         echo_warn "RO bind skipped: $path does not exist"
+        continue
+    fi
+    rw_children=()
+    for rw in $SANDBOX_AGENT_DIR_RW_WHITELIST; do
+        case "$rw" in "$path"/*) rw_children+=( "$rw" ) ;; esac
+    done
+    if [[ "${#rw_children[@]}" -gt 0 ]]; then
+        bwrap_args+=( --bind "$path" "$path" )
+        for child in "${rw_children[@]}"; do
+            bwrap_args+=( --bind "$child" "$child" )
+        done
+        bwrap_args+=( --remount-ro "$path" )
+    else
+        bwrap_args+=( --ro-bind "$path" "$path" )
     fi
 done
 
