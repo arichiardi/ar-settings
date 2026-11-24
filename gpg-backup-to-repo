@@ -30,6 +30,9 @@ all_files=(
     "/etc/caddy/conf.d/alba/llamaswap_handler.caddy:etc/caddy/conf.d/alba/llamaswap_handler.caddy"
     "$HOME/.config/pi/agent/models.json:home/.config/pi/agent/models.json"
     "$HOME/.config/pi/agent/settings.json:home/.config/pi/agent/settings.json"
+    "$HOME/.config/pi/agent/ar-llm/handoff.json:home/.config/pi/agent/ar-llm/handoff.json"
+    "$HOME/.config/pi/agent/ar-llm/custom-compaction.json:home/.config/pi/agent/ar-llm/custom-compaction.json"
+    "$HOME/.config/pi/agent/ar-llm/dir-providers.json:home/.config/pi/agent/ar-llm/dir-providers.json"
 )
 
 if [[ $# -gt 0 ]]; then
