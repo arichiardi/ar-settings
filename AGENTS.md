@@ -156,16 +156,21 @@ Verify changes as follows.
    git config core.hooksPath .githooks
    ```
 
-## Git conventions
+### GPG in the agent sandbox
 
-- Write concise, imperative commit messages.
-- Keep every private value out of a commit message. See "Commit messages" under
-  "Private config and data".
-- Commit signing is enabled. Do not disable it.
-- Never use `git commit --amend` or `git push --force` without explicit user
-  confirmation.
-- Keep unrelated changes out of a commit. The user may have uncommitted work in
-  the tree. Check `git status` before you stage.
+The passphrase prompt is wired up. Run the gpg call. On any gpg failure,
+stop and report the exact error. Do not retry with a workaround.
+
+Rules for gpg calls made by the agent:
+
+- Never pass `--pinentry-mode=loopback`. The sandbox has no tty, so the
+  call fails. Drop loopback from `gpg_symmetric_args`.
+- Never write to `/dev/null`. The sandbox blocks it. Write decrypted output
+  to a temp file, then remove it.
+- Never print decrypted content. Redact tokens, keys, and private endpoints.
+
+The verify step in `gpg-backup-to-repo` uses loopback and `/dev/null`. It
+fails in-sandbox and passes only on a real tty.
 
 ## Editing rules
 
