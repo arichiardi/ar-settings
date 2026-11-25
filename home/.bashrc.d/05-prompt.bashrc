@@ -22,16 +22,18 @@ _color_support=$(detect_color_support)
 # Prompt highlight for a shell that runs as an account other than the one that
 # logged in. No configuration: the kernel and systemd carry the answer.
 
-# Echo the cgroup of this process. Overridable so tests can feed a path.
-_self_cgroup () {
-    sed -n 1p /proc/self/cgroup 2>/dev/null
-}
-
-# True when this shell is not the login account: a visible sudo crossing, or a
-# shell started by the current user's own systemd manager. The manager PID is
-# env state, so anchor it on the cgroup, which is kernel state and cannot be
-# inherited. Cache the verdict in the caller, so PROMPT_COMMAND pays the cost
-# once per shell.
+# True when the shell runs as an account other than the one that launched it.
+#
+# A: /proc/self/loginuid, the kernel audit login UID, differs from EUID.
+# pam_loginuid writes it at login, sshd starts a fresh value, and a normal
+# process cannot write it, so a sudo crossing stays visible.
+#
+# B: MANAGERPID is set, and the cgroup places the shell under
+# user@EUID.service, so a systemd unit of this user's own manager owns it.
+# That is a machine scope. A normal login, terminal, or tmux shell is under
+# user@N.slice as session-*.scope, not under user@N.service, so this does not
+# fire for one even when MANAGERPID is set. Cache the verdict in the caller,
+# so PROMPT_COMMAND pays the cost once per shell.
 _is_impersonated () {
     local lu
     case "${_impersonated_cache:-}" in
@@ -47,11 +49,51 @@ _is_impersonated () {
     if [ -n "$lu" ] && [ "$lu" != "$EUID" ]; then
         _impersonated_cache=yes
     elif [ -n "${MANAGERPID:-}" ]; then
-        case "$(_self_cgroup)" in
-            *"user@${EUID}.service/"*) _impersonated_cache=yes ;;
+        # The kernel cgroup path. A scope is under user@N.service, a login or
+        # terminal is under user@N.slice as session-*.scope.
+        case "$(sed -n 1p /proc/self/cgroup 2>/dev/null)" in
+        *"user@${EUID}.service/"*) _impersonated_cache=yes ;;
         esac
     fi
     [ "$_impersonated_cache" = yes ]
+}
+
+# Set <out-var> to the color sequence for <context>, cached in <cache-var>.
+# Call it in the caller: a command substitution runs in a subshell and loses
+# the cache assignment, which costs a tool call on every prompt.
+# Take the color id from context-color and emit the SGR sequence directly,
+# not via tput: tput is unreliable in some shells and this box's scope.
+_prompt_color () {
+    local _pc_out="$1" _pc_cache="$2" _pc_ctx="$3" _pc_sgr=38
+    [ "$4" = "background" ] && _pc_sgr=48
+    if [ -z "${!_pc_cache:-}" ]; then
+        local _pc_id
+        _pc_id="$(context-color --id $([ "$_pc_sgr" = 48 ] && printf -- --background) --context "$_pc_ctx" 2>/dev/null)"
+        if [[ "$_pc_id" =~ ^[0-9]+$ ]]; then
+            # Bare open, no reset: the template closes each slot with its own NC.
+            printf -v "$_pc_cache" '%s' "\\[\\e[${_pc_sgr};5;${_pc_id}m\\]"
+        else
+            printf -v "$_pc_cache" '%s' _none
+        fi
+    fi
+    [ "${!_pc_cache}" = _none ] || printf -v "$_pc_out" '%s' "${!_pc_cache}"
+}
+
+# The account name for the color hash, from bash, not from a command: a machine
+# scope has a PATH with no whoami and no hostname. The result is a hash input,
+# so strip anything that is not part of a name.
+_prompt_name () {
+    local _pn="${USERNAME:-${USER:-}}"
+    _pn="${_pn//[^A-Za-z0-9._-]/}"
+    [ -n "$_pn" ] || _pn="$(whoami 2>/dev/null)"
+    printf '%s' "$_pn"
+}
+
+# The machine name for the color hash, from bash, then from a command.
+_prompt_host () {
+    local _ph="${HOSTNAME:-$(hostname 2>/dev/null)}"
+    _ph="${_ph//[^A-Za-z0-9._-]/}"
+    printf '%s' "$_ph"
 }
 
 virtualenv_prompt() {
@@ -86,22 +128,31 @@ function __do_ps1 () {
     PS1_HOST_COLOR=""
     PS1_USER_BG=""
 
-    # Mirror the host highlight: a background color on an impersonated name.
-    # Cache the color in the caller, not in a command substitution.
-    if _is_impersonated && [ "$use_color" = "true" ]; then
-        if [ -z "${_user_bg_color_cache:-}" ]; then
-            _user_bg_color_cache="$(context-color --prompt --background --context whoami)"
-        fi
-        PS1_USER_BG="$_user_bg_color_cache"
+    # SSH state, read once: the markers sshd puts in the shell it starts.
+    local is_ssh=no
+    if [ -n "${SSH_CLIENT:-}" ] || [ -n "${SSH_TTY:-}" ]; then
+        is_ssh=yes
     fi
 
     if [ "$use_color" = "true" ]; then
-        if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
-            # Remote session: highlight the machine with a background color.
-            PS1_HOST_COLOR=$(context-color --prompt --background --context hostname)
-        elif [ -z "$PS1_USER_BG" ]; then
-            # My own account, local session: a foreground color on the name.
-            PS1_AT_COLOR="$(context-color --prompt --context whoami)"
+        # User slot: is this the account that logged in? A machine scope carries
+        # no ssh markers, so the scope check answers it, not the session.
+        if _is_impersonated; then
+            [ -n "${_user_name_cache:-}" ] || _user_name_cache="$(_prompt_name)"
+            _prompt_color PS1_USER_BG _user_bg_color_cache "printf %s $_user_name_cache" background
+        elif [ "$is_ssh" = no ]; then
+            [ -n "${_user_name_cache:-}" ] || _user_name_cache="$(_prompt_name)"
+            _prompt_color PS1_AT_COLOR _user_fg_color_cache "printf %s $_user_name_cache" foreground
+        fi
+
+        # Host slot: a remote session, or a shell launched from another
+        # account. A scope reaches its owner's manager, whose login session
+        # is the launcher's, so the manager's login uid identifies a remote
+        # launch, and a local scope colors the account and leaves the host
+        # plain.
+        if [ "$is_ssh" = yes ] || _is_impersonated; then
+            [ -n "${_host_name_cache:-}" ] || _host_name_cache="$(_prompt_host)"
+            _prompt_color PS1_HOST_COLOR _host_bg_color_cache "printf %s $_host_name_cache" background
         fi
     fi
 
