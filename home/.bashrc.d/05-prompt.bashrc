@@ -145,12 +145,9 @@ function __do_ps1 () {
             _prompt_color PS1_AT_COLOR _user_fg_color_cache "printf %s $_user_name_cache" foreground
         fi
 
-        # Host slot: a remote session, or a shell launched from another
-        # account. A scope reaches its owner's manager, whose login session
-        # is the launcher's, so the manager's login uid identifies a remote
-        # launch, and a local scope colors the account and leaves the host
-        # plain.
-        if [ "$is_ssh" = yes ] || _is_impersonated; then
+        # Host slot: a remote session only. A local shell, including a local
+        # agent scope, is not remote, so it never colors the host.
+        if [ "$is_ssh" = yes ]; then
             [ -n "${_host_name_cache:-}" ] || _host_name_cache="$(_prompt_host)"
             _prompt_color PS1_HOST_COLOR _host_bg_color_cache "printf %s $_host_name_cache" background
         fi
