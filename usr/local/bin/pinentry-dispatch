@@ -18,6 +18,15 @@
 # users must set PINENTRY_USER_DATA=mac for the native dialog; the
 # dispatcher does not guess.
 #
+# Do not export a global PINENTRY_USER_DATA=tty, for example in
+# .profile.d. gpg-agent is one daemon per user, and it reads the hint from
+# its own environment. A global tty forces a tty prompt in every session,
+# including a graphical one, and defeats the auto-detect above. Over
+# ssh -A the local agent draws the prompt, so a DISPLAY present gives a
+# GUI, and no display falls back to tty on its own. Leave the hint unset
+# for that behavior, and set it only in the narrow scope that needs a
+# fixed backend.
+#
 # An empty hint means "no hint". Any other unrecognized value is a fatal
 # error, so a typo cannot silently fall back to a GUI prompt.
 #
