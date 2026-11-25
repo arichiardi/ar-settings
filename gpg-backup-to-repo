@@ -33,6 +33,7 @@ all_files=(
     "$HOME/.config/pi/agent/ar-llm/handoff.json:home/.config/pi/agent/ar-llm/handoff.json"
     "$HOME/.config/pi/agent/ar-llm/custom-compaction.json:home/.config/pi/agent/ar-llm/custom-compaction.json"
     "$HOME/.config/pi/agent/ar-llm/dir-providers.json:home/.config/pi/agent/ar-llm/dir-providers.json"
+    "$HOME/.config/pi/agent/ar-llm/skill-request-params.json:home/.config/pi/agent/ar-llm/skill-request-params.json"
 )
 
 if [[ $# -gt 0 ]]; then
