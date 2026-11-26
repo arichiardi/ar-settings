@@ -169,8 +169,9 @@ Rules for gpg calls made by the agent:
   to a temp file, then remove it.
 - Never print decrypted content. Redact tokens, keys, and private endpoints.
 
-The verify step in `gpg-backup-to-repo` uses loopback and `/dev/null`. It
-fails in-sandbox and passes only on a real tty.
+To re-encrypt a file, use `./gpg-backup-to-repo <live_path>` from the
+repository root. It verifies the round-trip. The verify step uses loopback
+and `/dev/null`, so it requires a real tty and will fail in-sandbox.
 
 ## Editing rules
 
