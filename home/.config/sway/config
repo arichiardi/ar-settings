@@ -13,6 +13,9 @@ hide_edge_borders none
 
 # Pinentry passphrase dialogs to floating layout.
 for_window [class="(?i)pinentry"] floating enable border normal
+for_window [shell="xwayland" title="(?i)pinentry.*"] floating enable border normal
+# XWayland property-race fallback: force floating after a short delay.
+exec_always --no-startup-id sway-pinentry-float
 for_window [app_id="gcr-prompter"] floating enable border normal
 for_window [window_type="dialog"] floating enable
 

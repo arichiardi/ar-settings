@@ -1,0 +1,163 @@
+#!/usr/bin/env python3
+"""sway-pinentry-float - force pinentry windows to floating on map.
+
+Works around a sway XWayland property race: for_window criteria are
+evaluated once at view creation, but WM_CLASS/WM_NAME for XWayland
+windows arrive asynchronously. This hook subscribes to window events
+and applies floating after a short delay so properties have settled.
+
+Robustness:
+- Outer retry loop: re-subscribes when the pipe closes (sway restart).
+- Waits for the sway IPC socket before subscribing.
+- Single instance via flock.
+- Clean shutdown on SIGTERM/SIGINT.
+- Logs to stderr (lands in sway's log under exec_always).
+
+Run from sway config:
+  exec_always --no-startup-id sway-pinentry-float
+"""
+import fcntl
+import json
+import os
+import signal
+import subprocess
+import sys
+import time
+
+LOCK_PATH = os.path.join(os.environ.get("XDG_RUNTIME_DIR", "/tmp"), "sway-pinentry-float.lock")
+RECONNECT_DELAY = 1.0
+PROPERTY_SETTLE_DELAY = 0.3
+CRITERIA = ['[class="(?i)pinentry"]', '[title="(?i)pinentry.*"]']
+
+running = True
+
+def _sig_handler(signum, frame):
+    global running
+    running = False
+
+def log(msg):
+    print(f"sway-pinentry-float: {msg}", file=sys.stderr, flush=True)
+
+def run_swaymsg(cmd):
+    try:
+        r = subprocess.run(
+            ['swaymsg', cmd],
+            capture_output=True, text=True, timeout=5
+        )
+        return r.stdout.strip() or r.stderr.strip()
+    except subprocess.TimeoutExpired:
+        return "timeout"
+    except FileNotFoundError:
+        return "swaymsg not found"
+    except Exception as e:
+        return f"error: {e}"
+
+def wait_for_socket():
+    """Wait until the sway IPC socket is responsive."""
+    while running:
+        r = run_swaymsg('-t get_version')
+        if r and 'error' not in r and 'not found' not in r and 'timeout' not in r:
+            return
+        log(f"sway socket not ready ({r}), retrying in {RECONNECT_DELAY}s")
+        time.sleep(RECONNECT_DELAY)
+
+def subscribe_loop():
+    """Subscribe to window events and handle pinentry maps.
+
+    Returns when the pipe closes or running is set to False.
+    """
+    try:
+        proc = subprocess.Popen(
+            ['swaymsg', '-t', 'subscribe', '-m', '["window"]'],
+            stdout=subprocess.PIPE, text=True
+        )
+    except Exception as e:
+        log(f"failed to start swaymsg subscribe: {e}")
+        return
+
+    log("subscribed, waiting for window events")
+
+    try:
+        while running:
+            line = proc.stdout.readline()
+            if not line:
+                log("subscription pipe closed")
+                break
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                d = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+
+            if d.get('change') != 'new':
+                continue
+
+            c = d.get('container', {})
+            name = str(c.get('name') or '')
+            wp = c.get('window_properties', {}) or {}
+            cls = str(wp.get('class') or '')
+            title = str(wp.get('title') or '')
+            blob = (name + cls + title).lower()
+
+            if 'pinentry' not in blob:
+                continue
+
+            log(f"detected pinentry class={cls!r} title={title!r} name={name!r}")
+            time.sleep(PROPERTY_SETTLE_DELAY)
+
+            for crit in CRITERIA:
+                r1 = run_swaymsg(f'{crit} floating enable')
+                log(f"{crit} floating enable -> {r1}")
+                r2 = run_swaymsg(f'{crit} border normal')
+                log(f"{crit} border normal -> {r2}")
+    finally:
+        try:
+            proc.terminate()
+            proc.wait(timeout=2)
+        except Exception:
+            try:
+                proc.kill()
+            except Exception:
+                pass
+
+def main():
+    signal.signal(signal.SIGTERM, _sig_handler)
+    signal.signal(signal.SIGINT, _sig_handler)
+
+    # Single instance via flock.
+    lock_fd = os.open(LOCK_PATH, os.O_CREAT | os.O_RDWR, 0o644)
+    try:
+        fcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        log("another instance is running, exiting")
+        os.close(lock_fd)
+        sys.exit(0)
+
+    try:
+        os.ftruncate(lock_fd, 0)
+        os.write(lock_fd, str(os.getpid()).encode())
+    except OSError:
+        pass
+
+    try:
+        while running:
+            wait_for_socket()
+            if not running:
+                break
+            subscribe_loop()
+            if not running:
+                break
+            log(f"reconnecting in {RECONNECT_DELAY}s")
+            time.sleep(RECONNECT_DELAY)
+    finally:
+        try:
+            fcntl.flock(lock_fd, fcntl.LOCK_UN)
+            os.close(lock_fd)
+            os.unlink(LOCK_PATH)
+        except OSError:
+            pass
+
+if __name__ == '__main__':
+    main()
