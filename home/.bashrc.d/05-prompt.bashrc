@@ -57,14 +57,60 @@ _is_impersonated () {
     [ "$_impersonated_cache" = yes ]
 }
 
-# Set <out-var> to the color sequence for <context>, cached in <cache-var>.
-# Call it in the caller: a command substitution runs in a subshell and loses
-# the cache assignment, which costs a tool call on every prompt.
+# The tool bumps forced ids past its default excludes (0, 7, 15), so
+# pre-subtract and the map id is the shown id. Fills _prompt_force_out.
+_prompt_force_arg () {
+    case "$1" in
+        0|7|15) return 1 ;;
+        1) _prompt_force_out=0 ;;
+        2|3|4|5|6) _prompt_force_out=$(( $1 - 1 )) ;;
+        8) _prompt_force_out=6 ;;
+        9|10|11|12|13|14) _prompt_force_out=$(( $1 - 2 )) ;;
+        *) _prompt_force_out=$(( $1 - 3 )) ;;
+    esac
+}
+
+# AR_PROMPT_COLORS: whitespace-separated name:ID tokens, ID 0-255, that map
+# a name to a fixed color instead of the hash. "*" maps unmapped names.
+# 0, 7, 15 are unreachable (the tool's default excludes). Read at runtime:
+# exporting a new value recolors the next prompt. Fills _prompt_map_out
+# with the tool force argument, empty for an unmapped name.
+_prompt_map () {
+    _prompt_map_out=''
+    local _pm_name="$1" _pm_tok _pm_id _pm_dflt=''
+    for _pm_tok in ${AR_PROMPT_COLORS:-}; do
+        case "$_pm_tok" in *:*) ;; *) continue ;; esac
+        _pm_id="${_pm_tok#*:}"
+        [[ "$_pm_id" =~ ^[0-9]+$ ]] && [ "$_pm_id" -le 255 ] || continue
+        case "${_pm_tok%%:*}" in
+            "$_pm_name")
+                _prompt_force_arg "$_pm_id" && { _prompt_map_out="$_prompt_force_out"; return; }
+                ;;
+            '*')
+                if [ -z "$_pm_dflt" ]; then
+                    _prompt_force_arg "$_pm_id" && _pm_dflt="$_prompt_force_out"
+                fi
+                ;;
+        esac
+    done
+    _prompt_map_out="$_pm_dflt"
+}
+
+# Set <out-var> to the color sequence for the name <name>, cached in
+# <cache-var>. A mapped name (AR_PROMPT_COLORS) forces its id; an unmapped
+# name keeps the hash of its own name. Call it in the caller: a command
+# substitution runs in a subshell and loses the cache assignment, which
+# costs a tool call on every prompt.
 _prompt_color () {
-    local _pc_out="$1" _pc_cache="$2" _pc_ctx="$3" _pc_bg=""
+    local _pc_out="$1" _pc_cache="$2" _pc_name="$3" _pc_bg=""
     [ "$4" = "background" ] && _pc_bg="--background"
     if [ -z "${!_pc_cache:-}" ]; then
-        printf -v "$_pc_cache" '%s' "$(context-color --prompt $_pc_bg --context "$_pc_ctx" 2>/dev/null)"
+        _prompt_map "$_pc_name"
+        if [ -n "$_prompt_map_out" ]; then
+            printf -v "$_pc_cache" '%s' "$(context-color --prompt $_pc_bg --force "$_prompt_map_out" 2>/dev/null)"
+        else
+            printf -v "$_pc_cache" '%s' "$(context-color --prompt $_pc_bg --context "printf %s $_pc_name" 2>/dev/null)"
+        fi
         # Cache a tool call that yields nothing, so it is not retried on every
         # prompt. No color sequence starts with an underscore.
         [ -n "${!_pc_cache}" ] || printf -v "$_pc_cache" '%s' _none
@@ -132,17 +178,17 @@ function __do_ps1 () {
         # no ssh markers, so the scope check answers it, not the session.
         if _is_impersonated; then
             [ -n "${_user_name_cache+set}" ] || _user_name_cache="$(_prompt_name)"
-            _prompt_color PS1_USER_BG _user_bg_color_cache "printf %s $_user_name_cache" background
+            _prompt_color PS1_USER_BG _user_bg_color_cache "$_user_name_cache" background
         elif [ "$is_ssh" = no ]; then
             [ -n "${_user_name_cache+set}" ] || _user_name_cache="$(_prompt_name)"
-            _prompt_color PS1_AT_COLOR _user_fg_color_cache "printf %s $_user_name_cache" foreground
+            _prompt_color PS1_AT_COLOR _user_fg_color_cache "$_user_name_cache" foreground
         fi
 
         # Host slot: a remote session only. A local shell, including a local
         # agent scope, is not remote, so it never colors the host.
         if [ "$is_ssh" = yes ]; then
             [ -n "${_host_name_cache+set}" ] || _host_name_cache="$(_prompt_host)"
-            _prompt_color PS1_HOST_COLOR _host_bg_color_cache "printf %s $_host_name_cache" background
+            _prompt_color PS1_HOST_COLOR _host_bg_color_cache "$_host_name_cache" background
         fi
     fi
 
