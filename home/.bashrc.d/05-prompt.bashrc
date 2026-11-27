@@ -31,7 +31,7 @@ _color_support=$(detect_color_support)
 # B: MANAGERPID is set, and the cgroup places the shell under
 # user@EUID.service, so a systemd unit of this user's own manager owns it.
 # That is a machine scope. A normal login, terminal, or tmux shell is under
-# user@N.slice as session-*.scope, not under user@N.service, so this does not
+# user-N.slice as session-*.scope, not under user@N.service, so this does not
 # fire for one even when MANAGERPID is set. Cache the verdict in the caller,
 # so PROMPT_COMMAND pays the cost once per shell.
 _is_impersonated () {
@@ -41,16 +41,15 @@ _is_impersonated () {
         no)  return 1 ;;
     esac
 
-    lu=$(< "${_login_uid_path:-/proc/self/loginuid}") 2>/dev/null
+    lu=$(cat "${_login_uid_path:-/proc/self/loginuid}" 2>/dev/null)
     case "$lu" in ''|4294967295) lu='' ;; esac
-    _login_uid_cache="$lu"
 
     _impersonated_cache=no
     if [ -n "$lu" ] && [ "$lu" != "$EUID" ]; then
         _impersonated_cache=yes
     elif [ -n "${MANAGERPID:-}" ]; then
         # The kernel cgroup path. A scope is under user@N.service, a login or
-        # terminal is under user@N.slice as session-*.scope.
+        # terminal is under user-N.slice as session-*.scope.
         case "$(sed -n 1p /proc/self/cgroup 2>/dev/null)" in
         *"user@${EUID}.service/"*) _impersonated_cache=yes ;;
         esac
@@ -61,20 +60,14 @@ _is_impersonated () {
 # Set <out-var> to the color sequence for <context>, cached in <cache-var>.
 # Call it in the caller: a command substitution runs in a subshell and loses
 # the cache assignment, which costs a tool call on every prompt.
-# Take the color id from context-color and emit the SGR sequence directly,
-# not via tput: tput is unreliable in some shells and this box's scope.
 _prompt_color () {
-    local _pc_out="$1" _pc_cache="$2" _pc_ctx="$3" _pc_sgr=38
-    [ "$4" = "background" ] && _pc_sgr=48
+    local _pc_out="$1" _pc_cache="$2" _pc_ctx="$3" _pc_bg=""
+    [ "$4" = "background" ] && _pc_bg="--background"
     if [ -z "${!_pc_cache:-}" ]; then
-        local _pc_id
-        _pc_id="$(context-color --id $([ "$_pc_sgr" = 48 ] && printf -- --background) --context "$_pc_ctx" 2>/dev/null)"
-        if [[ "$_pc_id" =~ ^[0-9]+$ ]]; then
-            # Bare open, no reset: the template closes each slot with its own NC.
-            printf -v "$_pc_cache" '%s' "\\[\\e[${_pc_sgr};5;${_pc_id}m\\]"
-        else
-            printf -v "$_pc_cache" '%s' _none
-        fi
+        printf -v "$_pc_cache" '%s' "$(context-color --prompt $_pc_bg --context "$_pc_ctx" 2>/dev/null)"
+        # Cache a tool call that yields nothing, so it is not retried on every
+        # prompt. No color sequence starts with an underscore.
+        [ -n "${!_pc_cache}" ] || printf -v "$_pc_cache" '%s' _none
     fi
     [ "${!_pc_cache}" = _none ] || printf -v "$_pc_out" '%s' "${!_pc_cache}"
 }
@@ -122,8 +115,8 @@ function __do_ps1 () {
     fi
 
     # Reset every slot each pass. The branches below fill one slot only, so a
-    # stale value leaks into the template and into child shells. PROMPT_COMMAND
-    # re-runs this function for every prompt.
+    # stale value leaks into the template. PROMPT_COMMAND re-runs this
+    # function for every prompt.
     PS1_AT_COLOR=""
     PS1_HOST_COLOR=""
     PS1_USER_BG=""
@@ -138,17 +131,17 @@ function __do_ps1 () {
         # User slot: is this the account that logged in? A machine scope carries
         # no ssh markers, so the scope check answers it, not the session.
         if _is_impersonated; then
-            [ -n "${_user_name_cache:-}" ] || _user_name_cache="$(_prompt_name)"
+            [ -n "${_user_name_cache+set}" ] || _user_name_cache="$(_prompt_name)"
             _prompt_color PS1_USER_BG _user_bg_color_cache "printf %s $_user_name_cache" background
         elif [ "$is_ssh" = no ]; then
-            [ -n "${_user_name_cache:-}" ] || _user_name_cache="$(_prompt_name)"
+            [ -n "${_user_name_cache+set}" ] || _user_name_cache="$(_prompt_name)"
             _prompt_color PS1_AT_COLOR _user_fg_color_cache "printf %s $_user_name_cache" foreground
         fi
 
         # Host slot: a remote session only. A local shell, including a local
         # agent scope, is not remote, so it never colors the host.
         if [ "$is_ssh" = yes ]; then
-            [ -n "${_host_name_cache:-}" ] || _host_name_cache="$(_prompt_host)"
+            [ -n "${_host_name_cache+set}" ] || _host_name_cache="$(_prompt_host)"
             _prompt_color PS1_HOST_COLOR _host_bg_color_cache "printf %s $_host_name_cache" background
         fi
     fi
