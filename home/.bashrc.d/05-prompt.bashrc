@@ -71,41 +71,64 @@ _prompt_force_arg () {
 }
 
 # AR_PROMPT_COLORS: whitespace-separated name:ID tokens, ID 0-255, that map
-# a name to a fixed color instead of the hash. "*" maps unmapped names.
-# 0, 7, 15 are unreachable (the tool's default excludes). Read at runtime:
-# exporting a new value recolors the next prompt. Fills _prompt_map_out
-# with the tool force argument, empty for an unmapped name.
+# a name to a fixed color instead of the hash. The value may start with
+# fg or bg (name:fg:ID, like the SGR order): that overrides the slot's
+# fg/bg for the name; omitted means the slot default. "*" maps unmapped
+# names. 0, 7, 15 are unreachable (the tool's default excludes). Read at
+# runtime: exporting a new value recolors the next prompt. Fills
+# _prompt_map_out with the tool force argument, empty for an unmapped name,
+# and _prompt_map_mode, empty when the token sets no mode.
 _prompt_map () {
     _prompt_map_out=''
-    local _pm_name="$1" _pm_tok _pm_id _pm_dflt=''
+    _prompt_map_mode=''
+    local _pm_name="$1" _pm_tok _pm_id _pm_dflt='' _pm_dmode='' _pm_mode_of=''
     for _pm_tok in ${AR_PROMPT_COLORS:-}; do
         case "$_pm_tok" in *:*) ;; *) continue ;; esac
         _pm_id="${_pm_tok#*:}"
+        _pm_mode_of=''
+        case "$_pm_id" in
+            *:*)
+                _pm_mode_of="${_pm_id%%:*}"
+                _pm_id="${_pm_id#*:}"
+                case "$_pm_mode_of" in fg|bg) ;; *) continue ;; esac
+                ;;
+        esac
         [[ "$_pm_id" =~ ^[0-9]+$ ]] && [ "$_pm_id" -le 255 ] || continue
         case "${_pm_tok%%:*}" in
             "$_pm_name")
-                _prompt_force_arg "$_pm_id" && { _prompt_map_out="$_prompt_force_out"; return; }
+                _prompt_force_arg "$_pm_id" && {
+                    _prompt_map_out="$_prompt_force_out"
+                    _prompt_map_mode="$_pm_mode_of"
+                    return
+                }
                 ;;
             '*')
                 if [ -z "$_pm_dflt" ]; then
-                    _prompt_force_arg "$_pm_id" && _pm_dflt="$_prompt_force_out"
+                    _prompt_force_arg "$_pm_id" && {
+                        _pm_dflt="$_prompt_force_out"
+                        _pm_dmode="$_pm_mode_of"
+                    }
                 fi
                 ;;
         esac
     done
     _prompt_map_out="$_pm_dflt"
+    _prompt_map_mode="$_pm_dmode"
 }
 
 # Set <out-var> to the color sequence for the name <name>, cached in
 # <cache-var>. A mapped name (AR_PROMPT_COLORS) forces its id; an unmapped
-# name keeps the hash of its own name. Call it in the caller: a command
-# substitution runs in a subshell and loses the cache assignment, which
-# costs a tool call on every prompt.
+# name keeps the hash of its own name. A mapped name's mode overrides the
+# slot's fg/bg. Call it in the caller: a command substitution runs in a
+# subshell and loses the cache assignment, which costs a tool call on every
+# prompt.
 _prompt_color () {
     local _pc_out="$1" _pc_cache="$2" _pc_name="$3" _pc_bg=""
     [ "$4" = "background" ] && _pc_bg="--background"
     if [ -z "${!_pc_cache:-}" ]; then
         _prompt_map "$_pc_name"
+        # A name mode overrides the slot default; empty means keep it.
+        case "$_prompt_map_mode" in bg) _pc_bg="--background" ;; fg) _pc_bg='' ;; esac
         if [ -n "$_prompt_map_out" ]; then
             printf -v "$_pc_cache" '%s' "$(context-color --prompt $_pc_bg --force "$_prompt_map_out" 2>/dev/null)"
         else
@@ -178,6 +201,7 @@ function __do_ps1 () {
         # no ssh markers, so the scope check answers it, not the session.
         if _is_impersonated; then
             [ -n "${_user_name_cache+set}" ] || _user_name_cache="$(_prompt_name)"
+            # Slot default is background; a :fg map entry overrides it.
             _prompt_color PS1_USER_BG _user_bg_color_cache "$_user_name_cache" background
         elif [ "$is_ssh" = no ]; then
             [ -n "${_user_name_cache+set}" ] || _user_name_cache="$(_prompt_name)"
